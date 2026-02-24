@@ -1,6 +1,26 @@
+import { useState } from "react";
+
 export default function Home() {
+  const [showDemo, setShowDemo] = useState(false);
+  const [belief, setBelief] = useState("");
+  const [result, setResult] = useState(null);
+
+  // Simple demo logic (fake but intelligent)
+  const analyzeBelief = () => {
+    if (!belief.trim()) return;
+
+    const sample = {
+      value: "Personal Agency",
+      structure: "Foundational Belief",
+      contradictions: "None detected",
+      implications: "Consistency, long‑term thinking",
+    };
+
+    setResult(sample);
+  };
+
   return (
-    <div style={{ marginTop: '60px' }}>
+    <div style={{ marginTop: "60px" }}>
 
       {/* HERO */}
       <section>
@@ -23,9 +43,9 @@ export default function Home() {
           deterministic environment for thinking clearly.
         </p>
 
-        <div style={{ marginTop: '50px' }}>
-          <h2 style={{ fontSize: '1.6rem', marginBottom: '10px' }}>Coming Soon</h2>
-          <p style={{ fontSize: '1.15rem', color: '#666', maxWidth: '600px' }}>
+        <div style={{ marginTop: "50px" }}>
+          <h2 style={{ fontSize: "1.6rem", marginBottom: "10px" }}>Coming Soon</h2>
+          <p style={{ fontSize: "1.15rem", color: "#666", maxWidth: "600px" }}>
             Coherex is preparing for public release. A new way to understand your mind is almost here.
           </p>
         </div>
@@ -34,11 +54,10 @@ export default function Home() {
         <button className="demo-button" onClick={() => setShowDemo(true)}>
           Try Demo
         </button>
-
       </section>
 
       {/* WHY COHEREX EXISTS */}
-      <section style={{ marginTop: '80px' }}>
+      <section style={{ marginTop: "80px" }}>
         <h2>Why Coherex Exists</h2>
 
         <p>
@@ -55,9 +74,7 @@ export default function Home() {
           ever being named. We navigate our lives with a map we’ve never actually seen.
         </p>
 
-        <p>
-          Coherex exists to make that map visible.
-        </p>
+        <p>Coherex exists to make that map visible.</p>
 
         <p>
           It does not tell you what to think. It does not persuade, correct, or interpret.
@@ -72,13 +89,11 @@ export default function Home() {
           structure of your thinking, you can improve it.
         </p>
 
-        <p>
-          Coherex exists because clarity is a form of freedom.
-        </p>
+        <p>Coherex exists because clarity is a form of freedom.</p>
       </section>
 
       {/* HOW COHEREX WORKS */}
-      <section style={{ marginTop: '80px' }}>
+      <section style={{ marginTop: "80px" }}>
         <h2>How Coherex Works</h2>
 
         <p>
@@ -109,7 +124,7 @@ export default function Home() {
       </section>
 
       {/* CORE PILLARS */}
-      <section style={{ marginTop: '80px' }}>
+      <section style={{ marginTop: "80px" }}>
         <h2>Core Pillars</h2>
 
         <p>
@@ -132,3 +147,114 @@ export default function Home() {
 
         <h3>3. Agency Over Automation</h3>
         <p>
+          Coherex does not tell you what to believe. It does not correct you, persuade you,
+          or optimize you. It gives you the tools to understand your own mind with clarity,
+          so you can make deliberate, informed changes.
+        </p>
+      </section>
+
+      {/* ARCHITECTURE */}
+      <section style={{ marginTop: "80px" }}>
+        <h2>The Architecture</h2>
+
+        <p>
+          Coherex is designed as a cognitive operating system — a structured environment
+          for mapping, analyzing, and refining your worldview.
+        </p>
+
+        <h3>1. Input Layer</h3>
+        <p>
+          You enter statements: beliefs, assumptions, claims, questions. Each one becomes
+          a node in your cognitive graph.
+        </p>
+
+        <h3>2. Structural Analysis Engine</h3>
+        <p>
+          Coherex examines each statement for logical form, implications, dependencies,
+          and contradictions. It does not interpret meaning — it analyzes structure.
+        </p>
+
+        <h3>3. Graph Model</h3>
+        <p>
+          Your statements form a dynamic, interconnected map. Nodes link where ideas
+          support each other, branch where they diverge, and highlight where they conflict.
+        </p>
+
+        <h3>4. Insight Layer</h3>
+        <p>
+          Contradictions, clusters, foundations, and pressure points become visible. You
+          see the architecture of your worldview — not as intuition, but as a system.
+        </p>
+      </section>
+
+      {/* USE CASES */}
+      <section style={{ marginTop: "80px" }}>
+        <h2>Use Cases</h2>
+
+        <p>
+          Coherex adapts to the way you think. Here are a few ways people use it:
+        </p>
+
+        <h3>1. Clarifying Beliefs</h3>
+        <p>
+          When you write down your beliefs, Coherex shows how they connect — and where
+          they contradict — giving you a clearer understanding of your worldview.
+        </p>
+
+        <h3>2. Resolving Contradictions</h3>
+        <p>
+          Contradictions are highlighted automatically. You can explore them, resolve
+          them, or refine your thinking with precision.
+        </p>
+
+        <h3>3. Exploring Complex Topics</h3>
+        <p>
+          For philosophical questions, scientific ideas, or personal decisions, Coherex
+          helps you map the structure of your reasoning so you can think more clearly.
+        </p>
+
+        <h3>4. Tracking Cognitive Growth</h3>
+        <p>
+          As your worldview evolves, your graph evolves with it. You can see how your
+          thinking changes over time — not as a diary, but as a system.
+        </p>
+      </section>
+
+      {/* ⭐ DEMO MODAL ⭐ */}
+      {showDemo && (
+        <div className="demo-modal-overlay">
+          <div className="demo-modal">
+            <h2>Try Coherex Demo</h2>
+            <p>Enter a belief to see a structured preview.</p>
+
+            <input
+              type="text"
+              value={belief}
+              onChange={(e) => setBelief(e.target.value)}
+              placeholder="Type a belief..."
+              className="demo-input"
+            />
+
+            <button className="demo-run" onClick={analyzeBelief}>
+              Analyze
+            </button>
+
+            {result && (
+              <div className="demo-output">
+                <p><strong>Value Detected:</strong> {result.value}</p>
+                <p><strong>Structure:</strong> {result.structure}</p>
+                <p><strong>Contradictions:</strong> {result.contradictions}</p>
+                <p><strong>Implications:</strong> {result.implications}</p>
+              </div>
+            )}
+
+            <button className="demo-close" onClick={() => setShowDemo(false)}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
