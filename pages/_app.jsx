@@ -1,12 +1,5 @@
-import '../styles/globals.css';
-import Layout from '../components/Layout';
-
-export default function App({ Component, pageProps }) {
-  return (
-    <Layout>
-      <Component {...pageProps} />
-    </Layout>
-  );
-}
-
-
+<nav className="flex space-x-6 text-white">
+  <a href="/" className="hover:text-gray-300 transition">Home</a>
+  <a href="/about" className="hover:text-gray-300 transition">About</a>
+  <a href="/pricing" className="hover:text-gray-300 transition">Pricing</a>
+</nav>
