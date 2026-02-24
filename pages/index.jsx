@@ -1,65 +1,31 @@
-import Head from 'next/head';
-
 export default function Home() {
   return (
-    <>
-      <Head>
-        <title>Coherex — A Cognitive OS</title>
-        <meta
-          name="description"
-          content="A cognitive OS for mapping beliefs, contradictions, and meaning."
-        />
-      </Head>
+    <section style={{ marginTop: '60px' }}>
+      <h1>Understand Your Mind as a System</h1>
 
-      <main className="home-container">
+      <p>
+        Every belief forms a structure. Every contradiction reveals a fault line.
+        Coherex gives you a clear, navigable model of how your worldview fits
+        together — not as opinions, but as a coherent architecture.
+      </p>
 
-        {/* HERO */}
-        <section className="hero">
-          <h1>Coherex</h1>
-          <p className="hero-subtitle">
-            A cognitive OS for mapping beliefs, contradictions, and meaning.
-          </p>
-        </section>
+      <p>
+        It analyzes your statements, maps their relationships, detects contradictions,
+        and builds a dynamic model of your worldview. It is not a journal. It is not a
+        chatbot. It is a cognitive instrument.
+      </p>
 
-        {/* PHILOSOPHY */}
-        <section className="section philosophy">
-          <h2>Understand Your Mind as a System</h2>
-          <p>
-            Every belief forms a structure. Every contradiction reveals a fault line.
-            Coherex gives you a clear, navigable model of how your worldview fits together —
-            not as opinions, but as a coherent architecture.
-          </p>
-        </section>
+      <p>
+        No feeds. No distractions. No algorithms shaping your attention. Just a clean,
+        deterministic environment for thinking clearly.
+      </p>
 
-        {/* PRODUCT */}
-        <section className="section product">
-          <h2>The Engine Behind Coherence</h2>
-          <p>
-            Coherex analyzes your statements, maps their relationships, detects contradictions,
-            and builds a dynamic model of your worldview. It is not a journal. It is not a
-            chatbot. It is a cognitive instrument.
-          </p>
-        </section>
-
-        {/* CLARITY */}
-        <section className="section clarity">
-          <h2>Precision Over Noise</h2>
-          <p>
-            No feeds. No distractions. No algorithms shaping your attention.
-            Just a clean, deterministic environment for thinking clearly.
-          </p>
-        </section>
-
-        {/* CTA */}
-        <section className="section cta">
-          <h2>Coming Soon</h2>
-          <p>
-            Coherex is preparing for public release.  
-            A new way to understand your mind is almost here.
-          </p>
-        </section>
-
-      </main>
-    </>
+      <div style={{ marginTop: '50px' }}>
+        <h2 style={{ fontSize: '1.6rem', marginBottom: '10px' }}>Coming Soon</h2>
+        <p style={{ fontSize: '1.15rem', color: '#666', maxWidth: '600px' }}>
+          Coherex is preparing for public release. A new way to understand your mind is almost here.
+        </p>
+      </div>
+    </section>
   );
 }
