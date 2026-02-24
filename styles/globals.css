@@ -1,3 +1,14 @@
+:root {
+  --coherex-bg: #f7f9fc;
+  --coherex-text: #111;
+  --coherex-accent: #3B82F6;
+  --coherex-card: #ffffff;
+  --coherex-shadow: rgba(0, 0, 0, 0.08);
+}body {
+  background: linear-gradient(180deg, #eef2f7 0%, #ffffff 100%);
+  color: var(--coherex-text);
+}
+
 /* ------------------------------ */
 /*  Coherex Global Styles         */
 /*  Clean, minimal, deterministic */
@@ -87,6 +98,24 @@ footer {
   main {
     padding: 30px 16px;
   }
+}section {
+  background: var(--coherex-card);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px var(--coherex-shadow);
+  transform: translateZ(0);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  margin-bottom: 40px;
 }
+
+section:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+h1, h2 {
+  color: var(--coherex-accent);
+}
+
 
   
