@@ -1,17 +1,17 @@
-export default function Footer() {
-  return (
-    <footer
-      style={{
-        padding: '40px 20px',
-        borderTop: '1px solid #eee',
-        marginTop: '60px',
-        textAlign: 'center',
-        fontSize: '14px',
-        color: '#666'
-      }}
-    >
-      <p>Coherex © 2026</p>
-      <p style={{ marginTop: '8px' }}>A cognitive OS for mapping beliefs, contradictions, and meaning.</p>
-    </footer>
-  );
-}
+<footer className="footer">
+  <div className="footer-inner">
+
+    <div className="footer-left">
+      <div className="footer-logo">C</div>
+      <p className="footer-tagline">Coherex — A Cognitive Operating System</p>
+    </div>
+
+    <div className="footer-right">
+      <a href="#" className="footer-link">About</a>
+      <a href="#" className="footer-link">Architecture</a>
+      <a href="#" className="footer-link">Pillars</a>
+      <a href="#" className="footer-link badge">Coming Soon</a>
+    </div>
+
+  </div>
+</footer>
