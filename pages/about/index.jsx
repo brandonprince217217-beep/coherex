@@ -1,5 +1,4 @@
 import Head from 'next/head';
-import '../../styles/sections.css';
 
 export default function About() {
   return (
