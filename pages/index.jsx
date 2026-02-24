@@ -1,4 +1,8 @@
+import { useState } from "react";
+
 export default function Home() {
+  const [showDemo, setShowDemo] = useState(false);
+
   return (
     <>
       {/* Navigation */}
@@ -15,11 +19,33 @@ export default function Home() {
           <p className="text-lg mb-8">
             Your cognitive OS for structured thinking.
           </p>
-          <button className="btn-glow">
+
+          {/* Try Demo Button */}
+          <button 
+            className="btn-glow"
+            onClick={() => setShowDemo(true)}
+          >
             Try Demo
           </button>
         </div>
       </main>
+
+      {/* Demo Modal */}
+      {showDemo && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center">
+          <div className="bg-white text-black p-6 rounded-xl max-w-md">
+            <h2 className="text-2xl font-bold mb-4">Coherex Demo</h2>
+            <p className="mb-6">This is where your demo content will go.</p>
+
+            <button 
+              className="px-4 py-2 bg-black text-white rounded"
+              onClick={() => setShowDemo(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
