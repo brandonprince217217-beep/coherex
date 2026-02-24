@@ -7,6 +7,3 @@ export default function MyApp({ Component, pageProps }) {
     </Layout>
   );
 }
-<button className="demo-button" onClick={() => setShowDemo(true)}>
-  Try Demo
-</button>
