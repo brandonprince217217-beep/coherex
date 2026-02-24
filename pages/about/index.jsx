@@ -39,3 +39,25 @@ export default function About() {
             yourself with a level of precision that was previously impossible.
           </p>
         </section>
+
+        <section className="page-section">
+          <h2>The Solution</h2>
+          <p>
+            Coherex is a cognitive OS designed to map that system. It analyzes your statements,
+            identifies their connections, detects contradictions, and builds a coherent model
+            of your beliefs. The result is not self‑help. It is self‑understanding.
+          </p>
+        </section>
+
+        <section className="page-section">
+          <h2>The Goal</h2>
+          <p>
+            To give every person a clear, navigable representation of their own mind — not as
+            noise, but as structure. Not as fragments, but as coherence.
+          </p>
+        </section>
+
+      </main>
+    </>
+  );
+}
