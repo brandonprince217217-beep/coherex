@@ -29,6 +29,12 @@ export default function Home() {
             Coherex is preparing for public release. A new way to understand your mind is almost here.
           </p>
         </div>
+
+        {/* ⭐ TRY DEMO BUTTON ⭐ */}
+        <button className="demo-button" onClick={() => setShowDemo(true)}>
+          Try Demo
+        </button>
+
       </section>
 
       {/* WHY COHEREX EXISTS */}
@@ -102,97 +108,27 @@ export default function Home() {
         </p>
       </section>
 
-    </div><section style={{ marginTop: '80px' }}>
-  <h2>Core Pillars</h2>
+      {/* CORE PILLARS */}
+      <section style={{ marginTop: '80px' }}>
+        <h2>Core Pillars</h2>
 
-  <p>
-    Coherex is built on three foundational principles that shape every part of the system.
-  </p>
+        <p>
+          Coherex is built on three foundational principles that shape every part of the system.
+        </p>
 
-  <h3>1. Structure Over Sentiment</h3>
-  <p>
-    Coherex does not interpret your emotions or intentions. It analyzes the logical
-    structure of your statements — what they imply, what they depend on, and where
-    they conflict. This keeps the system neutral, precise, and free from bias.
-  </p>
+        <h3>1. Structure Over Sentiment</h3>
+        <p>
+          Coherex does not interpret your emotions or intentions. It analyzes the logical
+          structure of your statements — what they imply, what they depend on, and where
+          they conflict. This keeps the system neutral, precise, and free from bias.
+        </p>
 
-  <h3>2. Transparency Over Mystery</h3>
-  <p>
-    Your worldview should not be a black box. Coherex makes your beliefs visible,
-    mappable, and understandable. You see exactly how your ideas connect, where
-    contradictions form, and how your thinking evolves over time.
-  </p>
+        <h3>2. Transparency Over Mystery</h3>
+        <p>
+          Your worldview should not be a black box. Coherex makes your beliefs visible,
+          mappable, and understandable. You see exactly how your ideas connect, where
+          contradictions form, and how your thinking evolves over time.
+        </p>
 
-  <h3>3. Agency Over Automation</h3>
-  <p>
-    Coherex does not tell you what to believe. It does not correct you, persuade you,
-    or optimize you. It gives you the tools to understand your own mind with clarity,
-    so you can make deliberate, informed changes.
-  </p>
-</section>
-<section style={{ marginTop: '80px' }}>
-  <h2>The Architecture</h2>
-
-  <p>
-    Coherex is designed as a cognitive operating system — a structured environment
-    for mapping, analyzing, and refining your worldview.
-  </p>
-
-  <h3>1. Input Layer</h3>
-  <p>
-    You enter statements: beliefs, assumptions, claims, questions. Each one becomes
-    a node in your cognitive graph.
-  </p>
-
-  <h3>2. Structural Analysis Engine</h3>
-  <p>
-    Coherex examines each statement for logical form, implications, dependencies,
-    and contradictions. It does not interpret meaning — it analyzes structure.
-  </p>
-
-  <h3>3. Graph Model</h3>
-  <p>
-    Your statements form a dynamic, interconnected map. Nodes link where ideas
-    support each other, branch where they diverge, and highlight where they conflict.
-  </p>
-
-  <h3>4. Insight Layer</h3>
-  <p>
-    Contradictions, clusters, foundations, and pressure points become visible. You
-    see the architecture of your worldview — not as intuition, but as a system.
-  </p>
-</section>
-<section style={{ marginTop: '80px' }}>
-  <h2>Use Cases</h2>
-
-  <p>
-    Coherex adapts to the way you think. Here are a few ways people use it:
-  </p>
-
-  <h3>1. Clarifying Beliefs</h3>
-  <p>
-    When you write down your beliefs, Coherex shows how they connect — and where
-    they contradict — giving you a clearer understanding of your worldview.
-  </p>
-
-  <h3>2. Resolving Contradictions</h3>
-  <p>
-    Contradictions are highlighted automatically. You can explore them, resolve
-    them, or refine your thinking with precision.
-  </p>
-
-  <h3>3. Exploring Complex Topics</h3>
-  <p>
-    For philosophical questions, scientific ideas, or personal decisions, Coherex
-    helps you map the structure of your reasoning so you can think more clearly.
-  </p>
-
-  <h3>4. Tracking Cognitive Growth</h3>
-  <p>
-    As your worldview evolves, your graph evolves with it. You can see how your
-    thinking changes over time — not as a diary, but as a system.
-  </p>
-</section>
-
-  );
-}
+        <h3>3. Agency Over Automation</h3>
+        <p>
