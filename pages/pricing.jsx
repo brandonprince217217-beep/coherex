@@ -31,7 +31,6 @@ export default function Pricing() {
         Choose the level of clarity, structure, and cognitive precision you want.
       </p>
 
-      {/* Pricing Cards */}
       <div
         style={{
           display: "flex",
@@ -41,21 +40,21 @@ export default function Pricing() {
         }}
       >
 
-        {/* BASIC PLAN */}
+        {/* BASIC / PREMIUM */}
         <div className="card">
           <h2 className="title">Basic</h2>
           <p className="desc">Essential clarity tools for everyday structure.</p>
           <p className="price">$4.99 / month</p>
 
           <a
-            href="YOUR_STRIPE_BASIC_LINK"
+            href="https://buy.stripe.com/14A3cn4bXbgCh0t2pvasg04"
             className="button"
           >
             Get Basic
           </a>
         </div>
 
-        {/* PRO PLAN — MOST POPULAR */}
+        {/* PRO / ULTRA — MOST POPULAR */}
         <div className="card popular">
           <div className="badge">Most Popular</div>
 
@@ -64,21 +63,21 @@ export default function Pricing() {
           <p className="price">$9.99 / month</p>
 
           <a
-            href="YOUR_STRIPE_PRO_LINK"
+            href="https://buy.stripe.com/bJedR15g1doKeSl2pvasg01"
             className="button"
           >
             Get Pro
           </a>
         </div>
 
-        {/* LIFETIME PLAN */}
+        {/* LIFETIME */}
         <div className="card">
           <h2 className="title">Lifetime</h2>
           <p className="desc">One payment. Full access. Forever.</p>
-          <p className="price">$49.99 one‑time</p>
+          <p className="price">$149 one‑time</p>
 
           <a
-            href="YOUR_STRIPE_LIFETIME_LINK"
+            href="https://buy.stripe.com/7sYdR14bX98ueSlc05asg02"
             className="button"
           >
             Get Lifetime
@@ -86,7 +85,6 @@ export default function Pricing() {
         </div>
       </div>
 
-      {/* STYLES */}
       <style jsx>{`
         .card {
           width: 100%;
@@ -100,7 +98,6 @@ export default function Pricing() {
           transition: transform 200ms ease, box-shadow 200ms ease, border 200ms ease;
         }
 
-        /* Cosmic gradient border */
         .card::before {
           content: "";
           position: absolute;
@@ -115,7 +112,6 @@ export default function Pricing() {
                   mask-composite: exclude;
         }
 
-        /* Hover glow + lift */
         .card:hover {
           transform: translateY(-6px);
           box-shadow: 0 0 25px rgba(138, 43, 226, 0.4);
