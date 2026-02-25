@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global resets */
 html, body {
   padding: 0;
   margin: 0;
@@ -11,14 +10,12 @@ html, body {
   color: #fff;
 }
 
-/* Page container */
 .page-container {
   max-width: 900px;
   margin: 0 auto;
   padding: 4rem 1.5rem;
 }
 
-/* Hero section */
 .page-hero {
   text-align: center;
   margin-top: 4rem;
