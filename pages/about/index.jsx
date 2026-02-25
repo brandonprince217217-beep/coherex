@@ -32,23 +32,46 @@ export default function About() {
         About the Developer
       </h2>
 
-      <h3
+      <p
         style={{
-          fontSize: "22px",
-          fontWeight: "500",
-          marginBottom: "30px",
-          opacity: 0.8
+          fontSize: "20px",
+          opacity: 0.85,
+          marginBottom: "30px"
         }}
       >
-        Brandon Prince
-      </h3>
+        I build systems that feel clean, intentional, and powerful — systems that
+        turn complexity into clarity and give people a smarter way to interact
+        with their own minds. Coherex is the expression of that vision: a reality
+        tool designed to help you think better, move with precision, and navigate
+        information without friction.
+      </p>
 
-      <p style={{ fontSize: "20px", opacity: 0.85 }}>
-        I’m Brandon Prince — the creator, architect, and developer behind
-        Coherex. I build systems that feel clean, intentional, and powerful.
-        My focus is on creating digital experiences that are simple to use,
-        visually premium, and built with precision. Coherex is my vision for
-        a smarter, more intuitive way to interact with information and tools.
+      <p
+        style={{
+          fontSize: "20px",
+          opacity: 0.85,
+          marginBottom: "30px"
+        }}
+      >
+        At the core of Coherex is a simple belief: <strong>the mind is the first
+        reality you experience</strong>, and when you shape that reality with
+        structure and intention, everything else becomes easier to navigate.
+        Coherex exists to make that shift accessible — a place where ideas become
+        organized, decisions become clearer, and thinking becomes a tool instead
+        of a barrier.
+      </p>
+
+      <p
+        style={{
+          fontSize: "20px",
+          opacity: 0.85
+        }}
+      >
+        This platform reflects the way its creator, <strong>Brandon Prince</strong>,
+        approaches the world: minimal, deliberate, and built for people who want
+        more control over their mental landscape. Coherex isn’t just software —
+        it’s a cognitive framework, a design philosophy, and a new way to
+        experience your own mind.
       </p>
     </div>
   );
