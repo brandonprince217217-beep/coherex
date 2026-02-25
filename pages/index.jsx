@@ -1,4 +1,8 @@
 export default function Home() {
+  function handleDemoClick() {
+    alert("Demo coming soon!");
+  }
+
   return (
     <div style={{
       minHeight: "100vh",
@@ -28,15 +32,18 @@ export default function Home() {
       </p>
 
       <div style={{ marginTop: "50px" }}>
-        <button style={{
-          padding: "16px 32px",
-          background: "#4f46e5",
-          border: "none",
-          borderRadius: "10px",
-          color: "white",
-          fontSize: "20px",
-          cursor: "pointer"
-        }}>
+        <button
+          onClick={handleDemoClick}
+          style={{
+            padding: "16px 32px",
+            background: "#4f46e5",
+            border: "none",
+            borderRadius: "10px",
+            color: "white",
+            fontSize: "20px",
+            cursor: "pointer"
+          }}
+        >
           Try Demo
         </button>
       </div>
