@@ -1,55 +1,33 @@
-<p>TEST LINE -- Brandon was here</p>
- import Head from 'next/head';
-
 export default function Home() {
   return (
-    <>
-      <Head>
-        <title>Coherex -- Cognitive OS</title>
-        <meta
-          name="description"
-          content="Coherex helps you map beliefs, contradictions, and meaning with clarity."
-        />
-      </Head>
+    <div style={{
+      minHeight: "100vh",
+      background: "#0a0a0a",
+      color: "white",
+      padding: "60px 40px",
+      fontFamily: "Inter, sans-serif"
+    }}>
+      
+      <h1 style={{
+        fontSize: "52px",
+        fontWeight: "700",
+        marginBottom: "20px"
+      }}>
+        Coherex — A Cognitive OS
+      </h1>
 
-      <main className="page-container">
+      <p style={{
+        fontSize: "22px",
+        maxWidth: "650px",
+        lineHeight: "1.6",
+        opacity: 0.85
+      }}>
+        A system for understanding how your mind fits together.  
+        Map beliefs. Reveal contradictions.  
+        Build clarity from the inside out.
+      </p>
 
-        {/* HERO */}
-        <section className="hero">
-          <h1 className="hero-title">Coherex</h1>
-          <p className="hero-subtitle">
-            A cognitive OS for understanding how your mind fits together.
-          </p>
-        </section>
-
-        {/* SECTION 1 */}
-        <section className="section">
-          <h2 className="section-title">Map Your Beliefs</h2>
-          <p className="section-text">
-            Coherex helps you capture statements, assumptions, and ideas -- then
-            organizes them into a structured worldview model.
-          </p>
-        </section>
-
-        {/* SECTION 2 */}
-        <section className="section">
-          <h2 className="section-title">Detect Contradictions</h2>
-          <p className="section-text">
-            The system automatically identifies conflicts, tensions, and logical
-            inconsistencies across your beliefs.
-          </p>
-        </section>
-
-        {/* SECTION 3 */}
-        <section className="section">
-          <h2 className="section-title">See the Bigger Picture</h2>
-          <p className="section-text">
-            Visualize how your ideas connect, evolve, and influence each other
-            over time.
-          </p>
-        </section>
-
-      </main>
-    </>
-  );
-}
+      <div style={{ marginTop: "50px" }}>
+        <button style={{
+          padding: "16px 32px",
+         
