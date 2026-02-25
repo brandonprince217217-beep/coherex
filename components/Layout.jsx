@@ -1,24 +1,27 @@
 export default function Layout({ children }) {
   return (
-    <div style={{
-      background: "#0a0a0a",
-      minHeight: "100vh",
-      color: "white",
-      fontFamily: "Inter, sans-serif",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center"
-    }}>
-
-      {/* CENTERED NAV */}
-      <nav style={{
+    <div
+      style={{
+        background: "#0a0a0a",
+        minHeight: "100vh",
+        color: "white",
+        fontFamily: "Inter, sans-serif",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: "38px",
-        marginBottom: "60px"
-      }}>
+        justifyContent: "center"
+      }}
+    >
+      {/* CENTERED NAV */}
+      <nav
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "38px",
+          marginBottom: "60px"
+        }}
+      >
         {[
           { name: "Home", href: "/" },
           { name: "About", href: "/about" },
@@ -61,7 +64,7 @@ export default function Layout({ children }) {
           width: 0%;
           height: 3px;
           background: white;
-          box-shadow: 0 0 8px rgba(255,255,255,0.6);
+          box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
           transition: width 200ms ease;
         }
 
@@ -73,8 +76,6 @@ export default function Layout({ children }) {
           width: 100%;
         }
       `}</style>
-
     </div>
   );
 }
-
