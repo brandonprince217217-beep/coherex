@@ -1,33 +1,26 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-html, body {
-  padding: 0;
+/* Global Reset */
+* {
   margin: 0;
-  font-family: system-ui, sans-serif;
-  background: #000;
-  color: #fff;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.page-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 4rem 1.5rem;
+/* Cosmic Background */
+body {
+  background: radial-gradient(circle at 20% 20%, #1a1a2e, #0a0a0a 60%);
+  background-attachment: fixed;
+  color: white;
+  font-family: Inter, sans-serif;
 }
 
-.page-hero {
-  text-align: center;
-  margin-top: 4rem;
+/* Smooth Text */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.page-hero h1 {
-  font-size: 3rem;
-  font-weight: 700;
-}
-
-.page-subtitle {
-  margin-top: 1rem;
-  font-size: 1.25rem;
-  opacity: 0.8;
+/* Remove default link styles */
+a {
+  color: inherit;
+  text-decoration: none;
 }
