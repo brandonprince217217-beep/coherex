@@ -4,19 +4,37 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
+  const [displayed, setDisplayed] = useState("");
 
   async function runDemo() {
     if (!query.trim()) return;
 
     setLoading(true);
     setResult("");
+    setDisplayed("");
 
     try {
       const res = await fetch("/api/demo?q=" + encodeURIComponent(query));
       const data = await res.json();
-      setResult(data.answer);
+      const fullText = data.answer;
+
+      setResult(fullText);
+
+      // Typing animation
+      let i = 0;
+      const speed = 12; // ms per character
+
+      function type() {
+        setDisplayed(fullText.slice(0, i));
+        i++;
+        if (i <= fullText.length) {
+          setTimeout(type, speed);
+        }
+      }
+
+      type();
     } catch (err) {
-      setResult("Something went wrong. Try again.");
+      setDisplayed("Something went wrong. Try again.");
     }
 
     setLoading(false);
@@ -58,7 +76,7 @@ export default function Home() {
         Build clarity from the inside out.
       </p>
 
-      {/* Demo Input */}
+      {/* Input */}
       <div
         style={{
           maxWidth: "900px",
@@ -99,7 +117,7 @@ export default function Home() {
         </button>
       </div>
 
-      {/* Demo Output */}
+      {/* Output */}
       <div
         style={{
           marginTop: "40px",
@@ -113,10 +131,11 @@ export default function Home() {
           minHeight: "400px",
           whiteSpace: "pre-wrap",
           fontSize: "20px",
-          lineHeight: "1.7"
+          lineHeight: "1.7",
+          fontFamily: "Inter, sans-serif"
         }}
       >
-        {loading ? "Thinking…" : result || "Your results will appear here."}
+        {loading ? "Thinking…" : displayed || "Your results will appear here."}
       </div>
     </div>
   );
