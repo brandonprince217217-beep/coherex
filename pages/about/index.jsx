@@ -68,10 +68,12 @@ export default function About() {
         }}
       >
         This platform reflects the way its creator, <strong>Brandon Prince</strong>,
-        approaches the world: minimal, deliberate, and built for people who want
-        more control over their mental landscape. Coherex isn’t just software —
-        it’s a cognitive framework, a design philosophy, and a new way to
-        experience your own mind.
+        approaches the world — and it’s strengthened by the presence of{" "}
+        <strong>Denise Prince</strong>, whose brilliance and perspective shape the
+        deeper philosophy behind Coherex. Two sharp minds, aligned in intention,
+        building a system designed to elevate how people experience their inner
+        world. Coherex isn’t just software — it’s a cognitive framework, a design
+        philosophy, and a new way to experience your own mind.
       </p>
     </div>
   );
