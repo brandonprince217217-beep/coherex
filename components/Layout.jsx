@@ -5,42 +5,50 @@ export default function Layout({ children }) {
       minHeight: "100vh",
       color: "white",
       fontFamily: "Inter, sans-serif",
-      display: "flex"
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center"
     }}>
 
-      {/* LEFT SIDEBAR NAV */}
+      {/* CENTERED NAV */}
       <nav style={{
-        width: "200px",
-        padding: "40px 20px",
         display: "flex",
         flexDirection: "column",
-        gap: "26px",
-        borderRight: "1px solid #222"
+        alignItems: "center",
+        gap: "40px",
+        marginBottom: "60px"
       }}>
         <a href="/" style={{
           color: "white",
           textDecoration: "none",
-          fontSize: "26px",
-          fontWeight: "600"
+          fontSize: "40px",
+          fontWeight: "700",
+          borderBottom: "2px solid white",
+          paddingBottom: "8px"
         }}>Home</a>
 
         <a href="/about" style={{
           color: "white",
           textDecoration: "none",
-          fontSize: "26px",
-          fontWeight: "600"
+          fontSize: "40px",
+          fontWeight: "700",
+          borderBottom: "2px solid white",
+          paddingBottom: "8px"
         }}>About</a>
 
         <a href="/pricing" style={{
           color: "white",
           textDecoration: "none",
-          fontSize: "26px",
-          fontWeight: "600"
+          fontSize: "40px",
+          fontWeight: "700",
+          borderBottom: "2px solid white",
+          paddingBottom: "8px"
         }}>Pricing</a>
       </nav>
 
-      {/* MAIN CONTENT */}
-      <main style={{ flex: 1, padding: "40px" }}>
+      {/* PAGE CONTENT */}
+      <main style={{ width: "100%", maxWidth: "900px", padding: "20px" }}>
         {children}
       </main>
 
