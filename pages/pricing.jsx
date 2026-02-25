@@ -40,7 +40,7 @@ export default function Pricing() {
         }}
       >
 
-        {/* BASIC / PREMIUM */}
+        {/* BASIC */}
         <div className="card">
           <h2 className="title">Basic</h2>
           <p className="desc">Essential clarity tools for everyday structure.</p>
@@ -54,7 +54,7 @@ export default function Pricing() {
           </a>
         </div>
 
-        {/* PRO / ULTRA — MOST POPULAR */}
+        {/* PRO */}
         <div className="card popular">
           <div className="badge">Most Popular</div>
 
