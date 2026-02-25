@@ -22,7 +22,7 @@ export default function Home() {
 
       // Typing animation
       let i = 0;
-      const speed = 12; // ms per character
+      const speed = 12;
 
       function type() {
         setDisplayed(fullText.slice(0, i));
@@ -40,11 +40,16 @@ export default function Home() {
     setLoading(false);
   }
 
+  function copyResult() {
+    if (!result) return;
+    navigator.clipboard.writeText(result);
+    alert("Copied to clipboard!");
+  }
+
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "#0a0a0a",
         color: "white",
         padding: "60px 20px",
         fontFamily: "Inter, sans-serif"
@@ -132,10 +137,33 @@ export default function Home() {
           whiteSpace: "pre-wrap",
           fontSize: "20px",
           lineHeight: "1.7",
-          fontFamily: "Inter, sans-serif"
+          fontFamily: "Inter, sans-serif",
+          position: "relative"
         }}
       >
         {loading ? "Thinking…" : displayed || "Your results will appear here."}
+
+        {/* Copy Button */}
+        {result && (
+          <button
+            onClick={copyResult}
+            style={{
+              marginTop: "20px",
+              padding: "10px 18px",
+              background: "#4f46e5",
+              border: "none",
+              borderRadius: "8px",
+              color: "white",
+              fontSize: "16px",
+              cursor: "pointer",
+              position: "absolute",
+              bottom: "20px",
+              right: "20px"
+            }}
+          >
+            Copy
+          </button>
+        )}
       </div>
     </div>
   );
