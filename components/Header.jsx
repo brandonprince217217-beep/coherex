@@ -1,25 +1,8 @@
-import Link from 'next/link';
+<nav className="flex flex-col items-start space-y-4 text-xl font-medium">
+  <a href="/">Home</a>
+  <a href="/about">About</a>
+  <a href="/pricing" className="text-white bg-black px-4 py-2 rounded-lg">
+    Pricing
+  </a>
+</nav>
 
-export default function Header() {
-  return (
-    <header
-      style={{
-        padding: '20px 20px',
-        borderBottom: '1px solid #eee',
-        marginBottom: '40px'
-      }}
-    >
-      <nav
-        style={{
-          display: 'flex',
-          gap: '20px',
-          fontSize: '15px'
-        }}
-      >
-        <Link href="/">Home</Link>
-        <Link href="/about">About</Link>
-        <Link href="/architecture">Architecture</Link>
-      </nav>
-    </header>
-  );
-}
