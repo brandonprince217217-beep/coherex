@@ -30,4 +30,17 @@ export default function Home() {
       <div style={{ marginTop: "50px" }}>
         <button style={{
           padding: "16px 32px",
-         
+          background: "#4f46e5",
+          border: "none",
+          borderRadius: "10px",
+          color: "white",
+          fontSize: "20px",
+          cursor: "pointer"
+        }}>
+          Try Demo
+        </button>
+      </div>
+
+    </div>
+  );
+}
