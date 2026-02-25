@@ -16,35 +16,34 @@ export default function Layout({ children }) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: "40px",
+        gap: "38px",
         marginBottom: "60px"
       }}>
-        <a href="/" style={{
-          color: "white",
-          textDecoration: "none",
-          fontSize: "40px",
-          fontWeight: "700",
-          borderBottom: "2px solid white",
-          paddingBottom: "8px"
-        }}>Home</a>
+        {[
+          { name: "Home", href: "/" },
+          { name: "About", href: "/about" },
+          { name: "Pricing", href: "/pricing" }
+        ].map((item) => (
+          <a
+            key={item.href}
+            href={item.href}
+            className="nav-item"
+            style={{
+              position: "relative",
+              color: "white",
+              textDecoration: "none",
+              fontSize: "42px",
+              fontWeight: "700",
+              paddingBottom: "6px",
+              transition: "color 200ms ease"
+            }}
+          >
+            {item.name}
 
-        <a href="/about" style={{
-          color: "white",
-          textDecoration: "none",
-          fontSize: "40px",
-          fontWeight: "700",
-          borderBottom: "2px solid white",
-          paddingBottom: "8px"
-        }}>About</a>
-
-        <a href="/pricing" style={{
-          color: "white",
-          textDecoration: "none",
-          fontSize: "40px",
-          fontWeight: "700",
-          borderBottom: "2px solid white",
-          paddingBottom: "8px"
-        }}>Pricing</a>
+            {/* Underline */}
+            <span className="underline"></span>
+          </a>
+        ))}
       </nav>
 
       {/* PAGE CONTENT */}
@@ -52,6 +51,30 @@ export default function Layout({ children }) {
         {children}
       </main>
 
+      {/* ANIMATIONS + EFFECTS */}
+      <style jsx>{`
+        .nav-item .underline {
+          position: absolute;
+          left: 50%;
+          bottom: 0;
+          transform: translateX(-50%);
+          width: 0%;
+          height: 3px;
+          background: white;
+          box-shadow: 0 0 8px rgba(255,255,255,0.6);
+          transition: width 200ms ease;
+        }
+
+        .nav-item:hover {
+          color: #b3b3ff;
+        }
+
+        .nav-item:hover .underline {
+          width: 100%;
+        }
+      `}</style>
+
     </div>
   );
 }
+
