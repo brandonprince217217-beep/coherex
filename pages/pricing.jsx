@@ -19,16 +19,53 @@ export default function Pricing() {
           Choose Your Plan
         </h1>
 
-        {/* PLAN WRAPPER */}
-        <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
 
-          {/* BASIC PLAN */}
-          <div style={{ marginBottom: '60px' }}>
+          {/* BASIC PLAN — MOST POPULAR */}
+          <div
+            style={{
+              marginBottom: '60px',
+              padding: '30px',
+              borderRadius: '14px',
+              border: '2px solid rgba(0, 140, 255, 0.7)',
+              boxShadow: '0 0 25px rgba(0, 140, 255, 0.5)',
+              position: 'relative',
+              transition: '0.3s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 40px rgba(0, 140, 255, 0.9)';
+              e.currentTarget.style.border = '2px solid rgba(0, 140, 255, 1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 25px rgba(0, 140, 255, 0.5)';
+              e.currentTarget.style.border = '2px solid rgba(0, 140, 255, 0.7)';
+            }}
+          >
+            {/* MOST POPULAR BADGE */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '-14px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: 'linear-gradient(90deg, #00aaff, #66d0ff)',
+                padding: '6px 16px',
+                borderRadius: '20px',
+                fontSize: '0.85rem',
+                fontWeight: 'bold',
+                color: 'black',
+                letterSpacing: '0.5px',
+                boxShadow: '0 0 12px rgba(0, 140, 255, 0.8)'
+              }}
+            >
+              MOST POPULAR
+            </div>
+
             <h2 style={{ fontSize: '1.7rem', marginBottom: '10px' }}>Basic</h2>
             <p style={{ marginBottom: '25px', opacity: 0.8 }}>$4.99 / month</p>
 
             <a
-              href="https://buy.stripe.com/7sYdR14bX98ueSlc05asg02"
+              href="https://buy.stripe.com/14A3cn4bXbgCh0t2pvasg04"
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -58,7 +95,24 @@ export default function Pricing() {
           </div>
 
           {/* ULTRA PLAN */}
-          <div style={{ marginBottom: '60px' }}>
+          <div
+            style={{
+              marginBottom: '60px',
+              padding: '30px',
+              borderRadius: '14px',
+              border: '2px solid rgba(0, 255, 170, 0.7)',
+              boxShadow: '0 0 25px rgba(0, 255, 170, 0.5)',
+              transition: '0.3s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 40px rgba(0, 255, 170, 0.9)';
+              e.currentTarget.style.border = '2px solid rgba(0, 255, 170, 1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 25px rgba(0, 255, 170, 0.5)';
+              e.currentTarget.style.border = '2px solid rgba(0, 255, 170, 0.7)';
+            }}
+          >
             <h2 style={{ fontSize: '1.7rem', marginBottom: '10px' }}>Ultra</h2>
             <p style={{ marginBottom: '25px', opacity: 0.8 }}>$9.99 / month</p>
 
@@ -93,12 +147,28 @@ export default function Pricing() {
           </div>
 
           {/* LIFETIME PLAN */}
-          <div>
+          <div
+            style={{
+              padding: '30px',
+              borderRadius: '14px',
+              border: '2px solid rgba(180, 90, 255, 0.7)',
+              boxShadow: '0 0 25px rgba(180, 90, 255, 0.5)',
+              transition: '0.3s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 40px rgba(180, 90, 255, 0.9)';
+              e.currentTarget.style.border = '2px solid rgba(180, 90, 255, 1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 25px rgba(180, 90, 255, 0.5)';
+              e.currentTarget.style.border = '2px solid rgba(180, 90, 255, 0.7)';
+            }}
+          >
             <h2 style={{ fontSize: '1.7rem', marginBottom: '10px' }}>Lifetime Access</h2>
             <p style={{ marginBottom: '25px', opacity: 0.8 }}>$149 one‑time</p>
 
             <a
-              href="https://buy.stripe.com/14A3cn4bXbgCh0t2pvasg04"
+              href="https://buy.stripe.com/7sYdR14bX98ueSlc05asg02"
               target="_blank"
               rel="noopener noreferrer"
               style={{
