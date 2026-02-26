@@ -5,14 +5,12 @@ export default function About() {
     <Layout>
       <div
         style={{
-          position: 'fixed',
-          inset: 0,
-          backgroundColor: 'black',
-          color: 'white',
-          overflowY: 'auto',
+          width: '100%',
+          minHeight: '100vh',
           paddingTop: '180px',
+          color: 'white',
           textAlign: 'center',
-          zIndex: 50
+          zIndex: 1
         }}
       >
         <h1 style={{ fontSize: '2rem', marginBottom: '20px' }}>
