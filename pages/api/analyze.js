@@ -17,15 +17,16 @@ export default async function handler(req, res) {
       apiKey: process.env.OPENAI_API_KEY,
     });
 
+    // FIXED: use a guaranteed working model
     const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
           content: `
 You are Coherex, a cognitive OS.
 
-Always return JSON in this exact format:
+Return JSON ONLY in this exact format:
 
 {
   "layer1": "Core interpretation...",
@@ -33,8 +34,6 @@ Always return JSON in this exact format:
   "layer3": "Mapping...",
   "layer4": "Agency..."
 }
-
-Do not include anything else.
           `,
         },
         {
@@ -52,10 +51,10 @@ Do not include anything else.
       data: json,
     });
   } catch (err) {
-    console.error("API Error:", err);
+    console.error("API Error:", err.response?.data || err.message);
     return res.status(500).json({
       error: "Failed to analyze input",
-      details: err.message,
+      details: err.response?.data || err.message,
     });
   }
 }
