@@ -4,13 +4,13 @@ export default function Home() {
   const [input, setInput] = useState("");
   const [insight, setInsight] = useState("");
   const [hasAsked, setHasAsked] = useState(false);
+  const [showLayer2, setShowLayer2] = useState(false);
 
   function handleSubmit(e) {
     e.preventDefault();
     if (!input.trim()) return;
 
-    // First-layer: single, clean, synthesized insight.
-    // Placeholder until the real Coherex engine is wired in.
+    // First-layer: single distilled insight
     const generated =
       "You’re overwhelmed because you’re trying to move forward without first making your inner situation explicit.";
 
@@ -19,8 +19,7 @@ export default function Home() {
   }
 
   function handleExpand() {
-    // This will later trigger the deeper layers (breakdown, dashboard, mind map).
-    alert("Deeper Coherex layers are coming next: breakdown, dashboard, and mind map.");
+    setShowLayer2(true);
   }
 
   return (
@@ -103,7 +102,7 @@ export default function Home() {
         </button>
       </form>
 
-      {/* FIRST-LAYER INSIGHT */}
+      {/* LAYER 1 — PRIMARY INSIGHT */}
       {hasAsked && (
         <div
           style={{
@@ -137,42 +136,127 @@ export default function Home() {
             {insight}
           </div>
 
-          {/* EXPAND CONTROL */}
-          <button
-            type="button"
-            onClick={handleExpand}
-            style={{
-              marginTop: "16px",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              padding: "6px 12px",
-              borderRadius: "999px",
-              border: "1px solid rgba(255,255,255,0.25)",
-              background: "transparent",
-              color: "rgba(255,255,255,0.8)",
-              fontSize: "13px",
-              cursor: "pointer"
-            }}
-          >
-            <span>Expand</span>
-            <span
+          {/* EXPAND BUTTON */}
+          {!showLayer2 && (
+            <button
+              type="button"
+              onClick={handleExpand}
               style={{
-                width: "16px",
-                height: "16px",
-                borderRadius: "999px",
-                border: "1px solid rgba(255,255,255,0.6)",
-                display: "flex",
+                marginTop: "16px",
+                display: "inline-flex",
                 alignItems: "center",
-                justifyContent: "center",
-                fontSize: "11px"
+                gap: "6px",
+                padding: "6px 12px",
+                borderRadius: "999px",
+                border: "1px solid rgba(255,255,255,0.25)",
+                background: "transparent",
+                color: "rgba(255,255,255,0.8)",
+                fontSize: "13px",
+                cursor: "pointer"
               }}
             >
-              +
-            </span>
-          </button>
+              <span>Expand</span>
+              <span
+                style={{
+                  width: "16px",
+                  height: "16px",
+                  borderRadius: "999px",
+                  border: "1px solid rgba(255,255,255,0.6)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "11px"
+                }}
+              >
+                +
+              </span>
+            </button>
+          )}
         </div>
       )}
+
+      {/* LAYER 2 — STRUCTURED BREAKDOWN */}
+      {showLayer2 && (
+        <div
+          style={{
+            marginTop: "20px",
+            maxWidth: "680px",
+            padding: "24px",
+            borderRadius: "18px",
+            border: "1px solid rgba(255,255,255,0.18)",
+            background: "rgba(0,0,0,0.35)",
+            boxShadow: "0 12px 35px rgba(0,0,0,0.45)",
+            textAlign: "left"
+          }}
+        >
+          <h2 style={{ fontSize: "22px", marginBottom: "14px" }}>
+            Cognitive Breakdown
+          </h2>
+
+          <Section title="Beliefs Extracted" items={[
+            "I’m overwhelmed.",
+            "I don’t have clarity.",
+            "I need to move forward but can’t."
+          ]} />
+
+          <Section title="Patterns Detected" items={[
+            "Avoidance of defining desires.",
+            "High internal pressure.",
+            "Fear of choosing incorrectly."
+          ]} />
+
+          <Section title="Contradictions" items={[
+            "Wants clarity but avoids defining specifics.",
+            "Wants progress but fears wrong direction."
+          ]} />
+
+          <Section title="Values Implied" items={[
+            "Growth",
+            "Direction",
+            "Self‑alignment"
+          ]} />
+
+          <Section title="Root Cause" items={[
+            "Lack of internal clarity, not lack of options."
+          ]} />
+
+          <Section title="Recommended Reframes" items={[
+            "I don’t need the perfect direction — I need the next honest step."
+          ]} />
+
+          <Section title="Next Steps" items={[
+            "Define what you actually want.",
+            "Clarify constraints.",
+            "Choose one micro‑action."
+          ]} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* SMALL REUSABLE COMPONENT FOR LAYER 2 */
+function Section({ title, items }) {
+  return (
+    <div style={{ marginBottom: "18px" }}>
+      <div
+        style={{
+          fontSize: "14px",
+          opacity: 0.7,
+          marginBottom: "6px",
+          textTransform: "uppercase",
+          letterSpacing: "0.08em"
+        }}
+      >
+        {title}
+      </div>
+      <ul style={{ marginLeft: "18px", opacity: 0.9 }}>
+        {items.map((item, i) => (
+          <li key={i} style={{ marginBottom: "4px" }}>
+            {item}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
