@@ -1,15 +1,19 @@
-import { CognitiveState } from './states';
-import { ENV_PRESETS, EnvironmentParams } from './environment';
+import { soundStateSwell, updateSoundscape } from "./sound";
 
-let currentState: CognitiveState = 'NEUTRAL';
+export function setCognitiveState(state: string) {
+  // Update CSS variable for visual layers
+  document.documentElement.style.setProperty("--cognitive-state", state);
 
-export function setCognitiveState(next: CognitiveState) {
-  currentState = next;
-  const env = ENV_PRESETS[next];
-  applyEnvironment(env);
-}
+  // Trigger audio swell for this state
+  soundStateSwell(state);
 
-function applyEnvironment(env: EnvironmentParams) {
-  // Example: connect to CSS variables
-  document.documentElement.style.setProperty('--nebula-brightness', env.nebula.brightness.toString());
+  // Sync soundscape with CSS variables
+  const styles = getComputedStyle(document.documentElement);
+
+  updateSoundscape({
+    low: parseFloat(styles.getPropertyValue("--sound-low")),
+    high: parseFloat(styles.getPropertyValue("--sound-high")),
+    width: parseFloat(styles.getPropertyValue("--sound-width")),
+    tension: parseFloat(styles.getPropertyValue("--sound-tension")),
+  });
 }
