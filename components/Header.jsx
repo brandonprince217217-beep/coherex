@@ -5,7 +5,7 @@ export default function Header() {
     <nav
       style={{
         position: 'absolute',
-        top: '50%',
+        top: '25%',        // moved higher
         left: '50%',
         transform: 'translate(-50%, -50%)',
         display: 'flex',
