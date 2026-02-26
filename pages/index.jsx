@@ -6,6 +6,7 @@ export default function Home() {
   const [hasAsked, setHasAsked] = useState(false);
   const [showLayer2, setShowLayer2] = useState(false);
   const [showLayer3, setShowLayer3] = useState(false);
+  const [showLayer4, setShowLayer4] = useState(false);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -16,6 +17,9 @@ export default function Home() {
 
     setInsight(generated);
     setHasAsked(true);
+    setShowLayer2(false);
+    setShowLayer3(false);
+    setShowLayer4(false);
   }
 
   function handleExpand() {
@@ -24,6 +28,10 @@ export default function Home() {
 
   function openDashboard() {
     setShowLayer3(true);
+  }
+
+  function openMindMap() {
+    setShowLayer4(true);
   }
 
   return (
@@ -41,7 +49,7 @@ export default function Home() {
       <h1 style={{ fontSize: "40px", fontWeight: "700" }}>Coherex</h1>
 
       <p style={{ fontSize: "18px", opacity: 0.8, maxWidth: "520px" }}>
-        Type what’s on your mind. Coherex returns one clear, distilled insight — the first layer of your cognitive OS.
+        Type what’s on your mind. Coherex reveals your inner structure layer by layer — from one insight to a full cognitive map.
       </p>
 
       {/* INPUT */}
@@ -231,7 +239,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* LAYER 3 — COGNITIVE DASHBOARD */}
+      {/* LAYER 3 — DASHBOARD */}
       {showLayer3 && (
         <div
           style={{
@@ -276,6 +284,46 @@ export default function Home() {
             • Clarify constraints  
             • Choose one micro‑action  
           </DashboardPanel>
+
+          {!showLayer4 && (
+            <button
+              type="button"
+              onClick={openMindMap}
+              style={{
+                marginTop: "10px",
+                padding: "10px 18px",
+                borderRadius: "999px",
+                border: "1px solid rgba(255,255,255,0.25)",
+                background: "transparent",
+                color: "rgba(255,255,255,0.9)",
+                cursor: "pointer",
+                fontSize: "14px"
+              }}
+            >
+              Show Mind Map
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* LAYER 4 — MIND MAP */}
+      {showLayer4 && (
+        <div
+          style={{
+            marginTop: "20px",
+            maxWidth: "900px",
+            padding: "24px",
+            borderRadius: "18px",
+            border: "1px solid rgba(255,255,255,0.2)",
+            background: "rgba(0,0,0,0.35)",
+            boxShadow: "0 16px 40px rgba(0,0,0,0.6)",
+            textAlign: "left"
+          }}
+        >
+          <h2 style={{ fontSize: "24px", marginBottom: "16px" }}>
+            Cognitive Mind Map
+          </h2>
+          <MindMap />
         </div>
       )}
     </div>
@@ -330,6 +378,58 @@ function DashboardPanel({ title, children }) {
         {title}
       </div>
       <div style={{ fontSize: "16px", lineHeight: 1.5 }}>{children}</div>
+    </div>
+  );
+}
+
+function MindMap() {
+  return (
+    <div
+      style={{
+        borderRadius: "16px",
+        padding: "18px",
+        background:
+          "radial-gradient(circle at top, rgba(255,255,255,0.12), transparent 55%), rgba(0,0,0,0.6)",
+        border: "1px solid rgba(255,255,255,0.18)",
+        fontSize: "14px",
+        lineHeight: 1.6
+      }}
+    >
+      <div style={{ marginBottom: "10px", opacity: 0.8 }}>
+        This is a conceptual map of how your current state is structured:
+      </div>
+
+      <pre
+        style={{
+          whiteSpace: "pre-wrap",
+          fontFamily: "Menlo, Monaco, Consolas, monospace",
+          fontSize: "13px",
+          background: "rgba(0,0,0,0.55)",
+          padding: "14px",
+          borderRadius: "12px",
+          border: "1px solid rgba(255,255,255,0.12)"
+        }}
+      >
+{`                [ Overwhelm ]
+                      |
+          -----------------------------
+          |                           |
+   [ Lack of Clarity ]         [ Fear of Wrong Choice ]
+          |                           |
+      [ Undefined Wants ]       [ High Standards ]
+          \\                       /
+           \\                     /
+            \\                   /
+             [ Desire for Direction ]
+                      |
+               [ Need for Next Honest Step ]`}
+      </pre>
+
+      <div style={{ marginTop: "10px", opacity: 0.85 }}>
+        Each node represents a belief or emotional state. Edges show how one
+        state feeds into another. Later, this becomes a fully interactive,
+        visual graph.
+      </div>
     </div>
   );
 }
