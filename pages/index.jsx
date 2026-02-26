@@ -1,54 +1,65 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { initSoundEngine, soundTypingPulse } from "@/lib/cognitive/sound";
 import { setCognitiveState } from "@/lib/cognitive/engine";
 
 export default function Home() {
   const [input, setInput] = useState("");
-  const [output, setOutput] = useState("");
+  const [response, setResponse] = useState("");
 
-  async function runDemo() {
-    // Universe reacts when user triggers the button
+  useEffect(() => {
+    initSoundEngine();
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     setCognitiveState("CREATIVE_FLOW");
 
-    setOutput("Thinking...");
-
-    const res = await fetch("/api/demo", {
+    const res = await fetch("/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ input }),
     });
 
     const data = await res.json();
-    setOutput(data.output);
-  }
+    setResponse(data.output || "");
+  };
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
-      <h1 className="text-3xl font-bold mb-6">Coherex Cognitive Engine Demo</h1>
+    <div className="min-h-screen coherex-bg text-white p-8 flex flex-col items-center justify-center">
+      <h1 className="text-4xl font-bold mb-6 text-center">Coherex Cognitive Engine</h1>
 
-      <textarea
-        className="w-full p-3 border rounded mb-4 text-black"
-        rows={4}
-        placeholder="Type a thought, belief, or idea..."
-        value={input}
-        onChange={(e) => {
-          setInput(e.target.value);
+      <form onSubmit={handleSubmit} className="w-full max-w-xl">
+        <textarea
+          className="w-full p-4 rounded-lg bg-black/30 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          rows={5}
+          placeholder="Type your thoughts..."
+          value={input}
+          onChange={(e) => {
+            setInput(e.target.value);
 
-          // Universe reacts while typing
-          setCognitiveState("EXPLORATION");
-        }}
-      />
+            // Cognitive state shift on typing
+            setCognitiveState("EXPLORATION");
 
-      <button
-        onClick={runDemo}
-        className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Run Demo
-      </button>
+            // Reactive typing pulse
+            soundTypingPulse(e.target.value.length % 5);
+          }}
+        />
 
-      <div className="mt-6 p-4 bg-gray-900 rounded">
-        <h2 className="text-xl font-semibold mb-2">Output</h2>
-        <p>{output}</p>
-      </div>
+        <button
+          type="submit"
+          className="mt-4 w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition"
+        >
+          Generate
+        </button>
+      </form>
+
+      {response && (
+        <div className="mt-8 w-full max-w-xl p-4 bg-white/10 rounded-lg border border-white/20">
+          <h2 className="text-xl font-semibold mb-2">Response</h2>
+          <p className="whitespace-pre-wrap">{response}</p>
+        </div>
+      )}
     </div>
   );
 }
