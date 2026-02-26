@@ -5,37 +5,37 @@ export default function About() {
     <Layout>
       <div
         style={{
-          position: 'relative',
-          width: '100%',
-          height: '100vh',
+          position: 'fixed',
+          inset: 0,
           backgroundColor: 'black',
-          overflow: 'hidden',
-          zIndex: 5,
           color: 'white',
-          paddingTop: '150px',
-          textAlign: 'center'
+          overflowY: 'auto',
+          paddingTop: '180px',
+          textAlign: 'center',
+          zIndex: 50
         }}
       >
         <h1 style={{ fontSize: '2rem', marginBottom: '20px' }}>
-          About the Developer
+          About the Developers
         </h1>
 
-        <p style={{ fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto' }}>
-          My name is <strong>Brandon Prince</strong>. I am the creator and
-          developer of <strong>Coherex</strong>, a cognitive operating system
-          designed to merge clarity, intelligence, and immersive digital
-          experience into one unified environment.
+        <p style={{ fontSize: '1.2rem', maxWidth: '650px', margin: '0 auto' }}>
+          Coherex is created and shaped by <strong>Brandon Prince</strong> and
+          <strong> Denise Prince</strong>, a partnership built on clarity,
+          intelligence, and a shared vision for a cognitive operating system
+          that feels alive, adaptive, and deeply personal.
         </p>
 
-        <p style={{ fontSize: '1.2rem', maxWidth: '600px', margin: '20px auto' }}>
-          Coherex is built to evolve into a living, adaptive system — a place
-          where users can think, create, and navigate their world with precision
-          and presence.
+        <p style={{ fontSize: '1.2rem', maxWidth: '650px', margin: '20px auto' }}>
+          Together, they bring intention and precision to every layer of the
+          system — from the cosmic environment to the HoloCore engine — crafting
+          a digital space designed to enhance focus, creativity, and presence.
         </p>
 
-        <p style={{ fontSize: '1.2rem', maxWidth: '600px', margin: '20px auto' }}>
-          Every layer of Coherex — from the cosmic environment to the HoloCore —
-          is crafted to feel alive, intelligent, and deeply personal.
+        <p style={{ fontSize: '1.2rem', maxWidth: '650px', margin: '20px auto' }}>
+          Coherex represents a unified pursuit: building a living cognitive
+          universe where users can think, create, and navigate with power and
+          clarity.
         </p>
       </div>
     </Layout>
