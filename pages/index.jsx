@@ -5,12 +5,12 @@ export default function Home() {
   const [insight, setInsight] = useState("");
   const [hasAsked, setHasAsked] = useState(false);
   const [showLayer2, setShowLayer2] = useState(false);
+  const [showLayer3, setShowLayer3] = useState(false);
 
   function handleSubmit(e) {
     e.preventDefault();
     if (!input.trim()) return;
 
-    // First-layer: single distilled insight
     const generated =
       "You’re overwhelmed because you’re trying to move forward without first making your inner situation explicit.";
 
@@ -20,6 +20,10 @@ export default function Home() {
 
   function handleExpand() {
     setShowLayer2(true);
+  }
+
+  function openDashboard() {
+    setShowLayer3(true);
   }
 
   return (
@@ -34,23 +38,9 @@ export default function Home() {
         gap: "28px"
       }}
     >
-      {/* TITLE */}
-      <h1
-        style={{
-          fontSize: "40px",
-          fontWeight: "700",
-          marginBottom: "4px"
-        }}
-      >
-        Coherex
-      </h1>
-      <p
-        style={{
-          fontSize: "18px",
-          opacity: 0.8,
-          maxWidth: "520px"
-        }}
-      >
+      <h1 style={{ fontSize: "40px", fontWeight: "700" }}>Coherex</h1>
+
+      <p style={{ fontSize: "18px", opacity: 0.8, maxWidth: "520px" }}>
         Type what’s on your mind. Coherex returns one clear, distilled insight — the first layer of your cognitive OS.
       </p>
 
@@ -61,7 +51,6 @@ export default function Home() {
           display: "flex",
           flexDirection: "row",
           gap: "10px",
-          marginTop: "10px",
           width: "100%",
           maxWidth: "560px",
           justifyContent: "center"
@@ -94,15 +83,14 @@ export default function Home() {
             color: "#000",
             fontWeight: "600",
             fontSize: "15px",
-            cursor: "pointer",
-            whiteSpace: "nowrap"
+            cursor: "pointer"
           }}
         >
           Generate
         </button>
       </form>
 
-      {/* LAYER 1 — PRIMARY INSIGHT */}
+      {/* LAYER 1 */}
       {hasAsked && (
         <div
           style={{
@@ -112,8 +100,7 @@ export default function Home() {
             borderRadius: "18px",
             border: "1px solid rgba(255,255,255,0.18)",
             background: "rgba(0,0,0,0.45)",
-            boxShadow: "0 18px 45px rgba(0,0,0,0.55)",
-            position: "relative"
+            boxShadow: "0 18px 45px rgba(0,0,0,0.55)"
           }}
         >
           <div
@@ -127,16 +114,9 @@ export default function Home() {
           >
             Primary Insight
           </div>
-          <div
-            style={{
-              fontSize: "20px",
-              lineHeight: 1.5
-            }}
-          >
-            {insight}
-          </div>
 
-          {/* EXPAND BUTTON */}
+          <div style={{ fontSize: "20px", lineHeight: 1.5 }}>{insight}</div>
+
           {!showLayer2 && (
             <button
               type="button"
@@ -175,7 +155,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* LAYER 2 — STRUCTURED BREAKDOWN */}
+      {/* LAYER 2 */}
       {showLayer2 && (
         <div
           style={{
@@ -229,13 +209,79 @@ export default function Home() {
             "Clarify constraints.",
             "Choose one micro‑action."
           ]} />
+
+          {!showLayer3 && (
+            <button
+              type="button"
+              onClick={openDashboard}
+              style={{
+                marginTop: "20px",
+                padding: "10px 18px",
+                borderRadius: "999px",
+                border: "1px solid rgba(255,255,255,0.25)",
+                background: "transparent",
+                color: "rgba(255,255,255,0.85)",
+                cursor: "pointer",
+                fontSize: "14px"
+              }}
+            >
+              Open Cognitive Dashboard
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* LAYER 3 — COGNITIVE DASHBOARD */}
+      {showLayer3 && (
+        <div
+          style={{
+            marginTop: "20px",
+            maxWidth: "900px",
+            padding: "24px",
+            borderRadius: "18px",
+            border: "1px solid rgba(255,255,255,0.18)",
+            background: "rgba(0,0,0,0.25)",
+            boxShadow: "0 12px 35px rgba(0,0,0,0.45)",
+            textAlign: "left"
+          }}
+        >
+          <h2 style={{ fontSize: "24px", marginBottom: "18px" }}>
+            Cognitive Dashboard
+          </h2>
+
+          <DashboardPanel title="Insight Summary">
+            {insight}
+          </DashboardPanel>
+
+          <DashboardPanel title="Belief Graph (Text Placeholder)">
+            • Overwhelmed  
+            • Lack of clarity  
+            • Fear of wrong choice  
+            • Desire for direction  
+          </DashboardPanel>
+
+          <DashboardPanel title="Emotional Map">
+            • Emotion: Overwhelm  
+            • Intensity: Medium‑High  
+            • Tone: Uncertainty  
+          </DashboardPanel>
+
+          <DashboardPanel title="Contradictions">
+            • Wants clarity ↔ avoids defining desires  
+            • Wants progress ↔ fears wrong direction  
+          </DashboardPanel>
+
+          <DashboardPanel title="Action Panel">
+            • Define what you want  
+            • Clarify constraints  
+            • Choose one micro‑action  
+          </DashboardPanel>
         </div>
       )}
     </div>
   );
 }
 
-/* SMALL REUSABLE COMPONENT FOR LAYER 2 */
 function Section({ title, items }) {
   return (
     <div style={{ marginBottom: "18px" }}>
@@ -257,6 +303,33 @@ function Section({ title, items }) {
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+function DashboardPanel({ title, children }) {
+  return (
+    <div
+      style={{
+        marginBottom: "20px",
+        padding: "18px",
+        borderRadius: "14px",
+        background: "rgba(255,255,255,0.05)",
+        border: "1px solid rgba(255,255,255,0.12)"
+      }}
+    >
+      <div
+        style={{
+          fontSize: "15px",
+          opacity: 0.75,
+          marginBottom: "8px",
+          textTransform: "uppercase",
+          letterSpacing: "0.08em"
+        }}
+      >
+        {title}
+      </div>
+      <div style={{ fontSize: "16px", lineHeight: 1.5 }}>{children}</div>
     </div>
   );
 }
