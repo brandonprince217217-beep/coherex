@@ -2,51 +2,40 @@ import Link from 'next/link';
 
 export default function Header() {
   return (
-    <nav
+    <header
       style={{
-        position: 'absolute',
-        top: '25%',        // moved higher
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '80px',
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
-        gap: '40px',
-        zIndex: 10
+        justifyContent: 'center',
+        backgroundColor: 'black',
+        zIndex: 9999,
+        borderBottom: '1px solid rgba(255,255,255,0.1)'
       }}
     >
-      <Link
-        href="/"
+      <nav
         style={{
-          fontSize: '48px',
-          color: 'white',
-          textDecoration: 'none'
+          display: 'flex',
+          gap: '40px',
+          fontSize: '1.2rem'
         }}
       >
-        Home
-      </Link>
+        <Link href="/" style={{ color: 'white', textDecoration: 'none' }}>
+          Home
+        </Link>
 
-      <Link
-        href="/about"
-        style={{
-          fontSize: '48px',
-          color: 'white',
-          textDecoration: 'none'
-        }}
-      >
-        About
-      </Link>
+        <Link href="/about" style={{ color: 'white', textDecoration: 'none' }}>
+          About
+        </Link>
 
-      <Link
-        href="/pricing"
-        style={{
-          fontSize: '48px',
-          color: 'white',
-          textDecoration: 'none'
-        }}
-      >
-        Pricing
-      </Link>
-    </nav>
+        <Link href="/pricing" style={{ color: 'white', textDecoration: 'none' }}>
+          Pricing
+        </Link>
+      </nav>
+    </header>
   );
 }
