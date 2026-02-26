@@ -424,6 +424,7 @@ function MindMap({ mindMap }) {
       </div>
 
       <pre
+      
         style={{
           whiteSpace: "pre-wrap",
           fontFamily: "Menlo, Monaco, Consolas, monospace",
