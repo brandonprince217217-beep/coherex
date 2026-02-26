@@ -1,170 +1,178 @@
 import { useState } from "react";
 
 export default function Home() {
-  const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState("");
-  const [displayed, setDisplayed] = useState("");
+  const [input, setInput] = useState("");
+  const [insight, setInsight] = useState("");
+  const [hasAsked, setHasAsked] = useState(false);
 
-  async function runDemo() {
-    if (!query.trim()) return;
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!input.trim()) return;
 
-    setLoading(true);
-    setResult("");
-    setDisplayed("");
+    // First-layer: single, clean, synthesized insight.
+    // Placeholder until the real Coherex engine is wired in.
+    const generated =
+      "You’re overwhelmed because you’re trying to move forward without first making your inner situation explicit.";
 
-    try {
-      const res = await fetch("/api/demo?q=" + encodeURIComponent(query));
-      const data = await res.json();
-      const fullText = data.answer;
-
-      setResult(fullText);
-
-      // Typing animation
-      let i = 0;
-      const speed = 12;
-
-      function type() {
-        setDisplayed(fullText.slice(0, i));
-        i++;
-        if (i <= fullText.length) {
-          setTimeout(type, speed);
-        }
-      }
-
-      type();
-    } catch (err) {
-      setDisplayed("Something went wrong. Try again.");
-    }
-
-    setLoading(false);
+    setInsight(generated);
+    setHasAsked(true);
   }
 
-  function copyResult() {
-    if (!result) return;
-    navigator.clipboard.writeText(result);
-    alert("Copied to clipboard!");
+  function handleExpand() {
+    // This will later trigger the deeper layers (breakdown, dashboard, mind map).
+    alert("Deeper Coherex layers are coming next: breakdown, dashboard, and mind map.");
   }
 
   return (
     <div
       style={{
-        minHeight: "100vh",
-        color: "white",
-        padding: "60px 20px",
-        fontFamily: "Inter, sans-serif"
+        minHeight: "70vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+        gap: "28px"
       }}
     >
+      {/* TITLE */}
       <h1
         style={{
-          fontSize: "52px",
+          fontSize: "40px",
           fontWeight: "700",
-          marginBottom: "20px",
-          textAlign: "center"
+          marginBottom: "4px"
         }}
       >
-        Coherex — A Cognitive OS
+        Coherex
       </h1>
-
       <p
         style={{
-          fontSize: "22px",
-          maxWidth: "650px",
-          lineHeight: "1.6",
-          opacity: 0.85,
-          margin: "0 auto",
-          textAlign: "center"
+          fontSize: "18px",
+          opacity: 0.8,
+          maxWidth: "520px"
         }}
       >
-        A system for understanding how your mind fits together.  
-        Map beliefs. Reveal contradictions.  
-        Build clarity from the inside out.
+        Type what’s on your mind. Coherex returns one clear, distilled insight — the first layer of your cognitive OS.
       </p>
 
-      {/* Input */}
-      <div
+      {/* INPUT */}
+      <form
+        onSubmit={handleSubmit}
         style={{
-          maxWidth: "900px",
-          margin: "50px auto 0",
           display: "flex",
-          gap: "10px"
+          flexDirection: "row",
+          gap: "10px",
+          marginTop: "10px",
+          width: "100%",
+          maxWidth: "560px",
+          justifyContent: "center"
         }}
       >
         <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Ask anything…"
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="I feel stuck because..."
           style={{
             flex: 1,
-            padding: "18px",
-            borderRadius: "12px",
-            border: "1px solid #444",
-            background: "#111",
+            padding: "12px 14px",
+            borderRadius: "999px",
+            border: "1px solid rgba(255,255,255,0.25)",
+            background: "rgba(0,0,0,0.35)",
             color: "white",
-            fontSize: "20px"
+            outline: "none",
+            fontSize: "16px"
           }}
         />
-
         <button
-          onClick={runDemo}
+          type="submit"
           style={{
-            padding: "18px 26px",
-            background: "#4f46e5",
-            color: "white",
-            borderRadius: "12px",
-            fontWeight: "700",
-            fontSize: "18px",
+            padding: "12px 20px",
+            borderRadius: "999px",
             border: "none",
-            cursor: "pointer"
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(200,200,255,0.95))",
+            color: "#000",
+            fontWeight: "600",
+            fontSize: "15px",
+            cursor: "pointer",
+            whiteSpace: "nowrap"
           }}
         >
-          Go
+          Generate
         </button>
-      </div>
+      </form>
 
-      {/* Output */}
-      <div
-        style={{
-          marginTop: "40px",
-          maxWidth: "900px",
-          marginLeft: "auto",
-          marginRight: "auto",
-          padding: "30px",
-          background: "rgba(255,255,255,0.05)",
-          borderRadius: "14px",
-          border: "1px solid rgba(255,255,255,0.1)",
-          minHeight: "400px",
-          whiteSpace: "pre-wrap",
-          fontSize: "20px",
-          lineHeight: "1.7",
-          fontFamily: "Inter, sans-serif",
-          position: "relative"
-        }}
-      >
-        {loading ? "Thinking…" : displayed || "Your results will appear here."}
-
-        {/* Copy Button */}
-        {result && (
-          <button
-            onClick={copyResult}
+      {/* FIRST-LAYER INSIGHT */}
+      {hasAsked && (
+        <div
+          style={{
+            marginTop: "26px",
+            maxWidth: "640px",
+            padding: "20px 22px",
+            borderRadius: "18px",
+            border: "1px solid rgba(255,255,255,0.18)",
+            background: "rgba(0,0,0,0.45)",
+            boxShadow: "0 18px 45px rgba(0,0,0,0.55)",
+            position: "relative"
+          }}
+        >
+          <div
             style={{
-              marginTop: "20px",
-              padding: "10px 18px",
-              background: "#4f46e5",
-              border: "none",
-              borderRadius: "8px",
-              color: "white",
-              fontSize: "16px",
-              cursor: "pointer",
-              position: "absolute",
-              bottom: "20px",
-              right: "20px"
+              fontSize: "14px",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              opacity: 0.6,
+              marginBottom: "10px"
             }}
           >
-            Copy
+            Primary Insight
+          </div>
+          <div
+            style={{
+              fontSize: "20px",
+              lineHeight: 1.5
+            }}
+          >
+            {insight}
+          </div>
+
+          {/* EXPAND CONTROL */}
+          <button
+            type="button"
+            onClick={handleExpand}
+            style={{
+              marginTop: "16px",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "6px 12px",
+              borderRadius: "999px",
+              border: "1px solid rgba(255,255,255,0.25)",
+              background: "transparent",
+              color: "rgba(255,255,255,0.8)",
+              fontSize: "13px",
+              cursor: "pointer"
+            }}
+          >
+            <span>Expand</span>
+            <span
+              style={{
+                width: "16px",
+                height: "16px",
+                borderRadius: "999px",
+                border: "1px solid rgba(255,255,255,0.6)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "11px"
+              }}
+            >
+              +
+            </span>
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
