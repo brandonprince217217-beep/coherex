@@ -22,8 +22,20 @@ export default async function handler(req, res) {
       messages: [
         {
           role: "system",
-          content:
-            "You are Coherex, a cognitive OS. Return structured JSON only.",
+          content: `
+You are Coherex, a cognitive OS.
+
+Always return JSON in this exact format:
+
+{
+  "layer1": "Core interpretation...",
+  "layer2": "Pattern detection...",
+  "layer3": "Mapping...",
+  "layer4": "Agency..."
+}
+
+Do not include anything else.
+          `,
         },
         {
           role: "user",
