@@ -11,80 +11,122 @@ export default function Pricing() {
           color: 'white',
           paddingTop: '160px',
           paddingBottom: '60px',
-          textAlign: 'center'
+          textAlign: 'center',
+          fontFamily: 'Inter, sans-serif'
         }}
       >
-        <h1 style={{ fontSize: '2rem', marginBottom: '40px' }}>
-          Pricing
+        <h1 style={{ fontSize: '2.4rem', marginBottom: '50px', letterSpacing: '1px' }}>
+          Choose Your Plan
         </h1>
 
-        {/* PLAN 1 */}
-        <div style={{ marginBottom: '40px' }}>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>Basic Plan</h2>
-          <p style={{ marginBottom: '20px' }}>$10 / month</p>
+        {/* PLAN WRAPPER */}
+        <div style={{ maxWidth: '700px', margin: '0 auto' }}>
 
-          <a
-            href="https://buy.stripe.com/7sYdR14bX98ueSlc05asg02"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-block',
-              padding: '12px 24px',
-              backgroundColor: '#0d6efd',
-              color: 'white',
-              borderRadius: '6px',
-              textDecoration: 'none',
-              fontSize: '1.1rem'
-            }}
-          >
-            Subscribe
-          </a>
-        </div>
+          {/* BASIC PLAN */}
+          <div style={{ marginBottom: '60px' }}>
+            <h2 style={{ fontSize: '1.7rem', marginBottom: '10px' }}>Basic</h2>
+            <p style={{ marginBottom: '25px', opacity: 0.8 }}>$4.99 / month</p>
 
-        {/* PLAN 2 */}
-        <div style={{ marginBottom: '40px' }}>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>Pro Plan</h2>
-          <p style={{ marginBottom: '20px' }}>$20 / month</p>
+            <a
+              href="https://buy.stripe.com/7sYdR14bX98ueSlc05asg02"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-block',
+                padding: '14px 32px',
+                background: 'rgba(0, 140, 255, 0.15)',
+                border: '1px solid rgba(0, 140, 255, 0.6)',
+                borderRadius: '8px',
+                color: '#00aaff',
+                textDecoration: 'none',
+                fontSize: '1.15rem',
+                letterSpacing: '0.5px',
+                boxShadow: '0 0 12px rgba(0, 140, 255, 0.5)',
+                transition: '0.25s'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.boxShadow = '0 0 22px rgba(0, 140, 255, 0.9)';
+                e.target.style.background = 'rgba(0, 140, 255, 0.25)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.boxShadow = '0 0 12px rgba(0, 140, 255, 0.5)';
+                e.target.style.background = 'rgba(0, 140, 255, 0.15)';
+              }}
+            >
+              Choose Basic
+            </a>
+          </div>
 
-          <a
-            href="https://buy.stripe.com/8x214f23P3Oa25z3tzasg00"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-block',
-              padding: '12px 24px',
-              backgroundColor: '#198754',
-              color: 'white',
-              borderRadius: '6px',
-              textDecoration: 'none',
-              fontSize: '1.1rem'
-            }}
-          >
-            Subscribe
-          </a>
-        </div>
+          {/* ULTRA PLAN */}
+          <div style={{ marginBottom: '60px' }}>
+            <h2 style={{ fontSize: '1.7rem', marginBottom: '10px' }}>Ultra</h2>
+            <p style={{ marginBottom: '25px', opacity: 0.8 }}>$9.99 / month</p>
 
-        {/* PLAN 3 */}
-        <div>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>Ultimate Plan</h2>
-          <p style={{ marginBottom: '20px' }}>$50 / month</p>
+            <a
+              href="https://buy.stripe.com/bJedR15g1doKeSl2pvasg01"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-block',
+                padding: '14px 32px',
+                background: 'rgba(0, 255, 170, 0.15)',
+                border: '1px solid rgba(0, 255, 170, 0.6)',
+                borderRadius: '8px',
+                color: '#00ffcc',
+                textDecoration: 'none',
+                fontSize: '1.15rem',
+                letterSpacing: '0.5px',
+                boxShadow: '0 0 12px rgba(0, 255, 170, 0.5)',
+                transition: '0.25s'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.boxShadow = '0 0 22px rgba(0, 255, 170, 0.9)';
+                e.target.style.background = 'rgba(0, 255, 170, 0.25)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.boxShadow = '0 0 12px rgba(0, 255, 170, 0.5)';
+                e.target.style.background = 'rgba(0, 255, 170, 0.15)';
+              }}
+            >
+              Choose Ultra
+            </a>
+          </div>
 
-          <a
-            href="https://buy.stripe.com/bJedR15g1doKeSl2pvasg01"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-block',
-              padding: '12px 24px',
-              backgroundColor: '#dc3545',
-              color: 'white',
-              borderRadius: '6px',
-              textDecoration: 'none',
-              fontSize: '1.1rem'
-            }}
-          >
-            Subscribe
-          </a>
+          {/* LIFETIME PLAN */}
+          <div>
+            <h2 style={{ fontSize: '1.7rem', marginBottom: '10px' }}>Lifetime Access</h2>
+            <p style={{ marginBottom: '25px', opacity: 0.8 }}>$149 one‑time</p>
+
+            <a
+              href="https://buy.stripe.com/14A3cn4bXbgCh0t2pvasg04"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-block',
+                padding: '14px 32px',
+                background: 'rgba(180, 90, 255, 0.15)',
+                border: '1px solid rgba(180, 90, 255, 0.6)',
+                borderRadius: '8px',
+                color: '#b45aff',
+                textDecoration: 'none',
+                fontSize: '1.15rem',
+                letterSpacing: '0.5px',
+                boxShadow: '0 0 12px rgba(180, 90, 255, 0.5)',
+                transition: '0.25s'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.boxShadow = '0 0 22px rgba(180, 90, 255, 0.9)';
+                e.target.style.background = 'rgba(180, 90, 255, 0.25)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.boxShadow = '0 0 12px rgba(180, 90, 255, 0.5)';
+                e.target.style.background = 'rgba(180, 90, 255, 0.15)';
+              }}
+            >
+              Buy Lifetime
+            </a>
+          </div>
+
         </div>
       </div>
     </Layout>
