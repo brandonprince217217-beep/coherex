@@ -60,17 +60,18 @@ export default function Home() {
         {/* Main Content */}
         <div
           style={{
-            position: 'relative',
+            position: 'absolute',
+            top: '70%',               // moved lower
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
             zIndex: 4,
             color: 'white',
-            textAlign: 'center',
-            marginTop: '40vh'
+            textAlign: 'center'
           }}
         >
           <h1>Coherex Cognitive OS</h1>
           <p>Welcome to your cognitive engine.</p>
 
-          {/* SEARCH BAR ADDED HERE */}
           <SearchBar />
         </div>
       </div>
