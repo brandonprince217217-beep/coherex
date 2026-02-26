@@ -1,16 +1,52 @@
+import Link from 'next/link';
+
 export default function Header() {
   return (
-    <header className="w-full py-4 px-6 bg-purple-600 text-white">
-      <nav className="flex flex-col items-start space-y-4 text-xl font-medium">
-        <a href="/">Home</a>
-        <a href="/about">About</a>
-        <a
-          href="/pricing"
-          className="text-white bg-black px-4 py-2 rounded-lg"
-        >
-          Pricing
-        </a>
-      </nav>
-    </header>
+    <nav
+      style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '40px',
+        zIndex: 10
+      }}
+    >
+      <Link
+        href="/"
+        style={{
+          fontSize: '48px',
+          color: 'white',
+          textDecoration: 'none'
+        }}
+      >
+        Home
+      </Link>
+
+      <Link
+        href="/about"
+        style={{
+          fontSize: '48px',
+          color: 'white',
+          textDecoration: 'none'
+        }}
+      >
+        About
+      </Link>
+
+      <Link
+        href="/pricing"
+        style={{
+          fontSize: '48px',
+          color: 'white',
+          textDecoration: 'none'
+        }}
+      >
+        Pricing
+      </Link>
+    </nav>
   );
 }
