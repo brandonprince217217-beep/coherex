@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { initSoundEngine, soundTypingPulse } from "@/lib/cognitive/sound";
 import { setCognitiveState } from "@/lib/cognitive/engine";
 import Constellation from "@/components/Constellation";
+import Vortex from "@/components/Vortex";
 
 export default function Home() {
   const [input, setInput] = useState("");
@@ -29,6 +30,7 @@ export default function Home() {
   return (
     <div className="min-h-screen coherex-bg text-white p-8 flex flex-col items-center justify-center relative overflow-hidden">
       <Constellation />
+      <Vortex />
 
       <h1 className="text-4xl font-bold mb-6 text-center relative z-10">
         Coherex Cognitive Engine
