@@ -130,3 +130,31 @@
     coherex-constellation-rotate calc(20s - var(--constellation-rotation) * 8s) linear infinite,
     coherex-vortex-ripple calc(6s + var(--vortex-energy) * 4s) ease-in-out infinite;
 }
+
+/* ============================
+   COHEREX COLOR WARMTH LAYER
+   ============================ */
+
+@keyframes coherex-warmth-shift {
+  0% {
+    filter: hue-rotate(calc(var(--nebula-warmth) * -10deg))
+      saturate(calc(0.8 + var(--nebula-warmth) * 0.2));
+  }
+  50% {
+    filter: hue-rotate(calc(var(--nebula-warmth) * 60deg))
+      saturate(calc(1 + var(--nebula-warmth) * 0.4));
+  }
+  100% {
+    filter: hue-rotate(calc(var(--nebula-warmth) * -10deg))
+      saturate(calc(0.8 + var(--nebula-warmth) * 0.2));
+  }
+}
+
+.coherex-bg {
+  animation:
+    coherex-breath calc(4s - var(--glow-breathing) * 2s) ease-in-out infinite,
+    coherex-nebula-drift calc(12s + var(--nebula-brightness) * 6s) ease-in-out infinite,
+    coherex-constellation-rotate calc(20s - var(--constellation-rotation) * 8s) linear infinite,
+    coherex-vortex-ripple calc(6s + var(--vortex-energy) * 4s) ease-in-out infinite,
+    coherex-warmth-shift calc(10s + var(--nebula-warmth) * 6s) ease-in-out infinite;
+}
