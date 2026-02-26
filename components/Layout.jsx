@@ -1,24 +1,12 @@
 export default function Layout({ children }) {
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        color: "white",
-        fontFamily: "Inter, sans-serif",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center"
-      }}
-    >
-      {/* CENTERED NAV */}
+    <div style={{ minHeight: "100vh", color: "white", fontFamily: "Inter, sans-serif" }}>
       <nav
         style={{
           display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
+          justifyContent: "center",
           gap: "38px",
-          marginBottom: "60px"
+          padding: "40px 0"
         }}
       >
         {[
@@ -34,26 +22,22 @@ export default function Layout({ children }) {
               position: "relative",
               color: "white",
               textDecoration: "none",
-              fontSize: "42px",
+              fontSize: "28px",
               fontWeight: "700",
               paddingBottom: "6px",
               transition: "color 200ms ease"
             }}
           >
             {item.name}
-
-            {/* Underline */}
             <span className="underline"></span>
           </a>
         ))}
       </nav>
 
-      {/* PAGE CONTENT */}
-      <main style={{ width: "100%", maxWidth: "900px", padding: "20px" }}>
+      <main style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", padding: "20px" }}>
         {children}
       </main>
 
-      {/* ANIMATIONS + EFFECTS */}
       <style jsx>{`
         .nav-item .underline {
           position: absolute;
