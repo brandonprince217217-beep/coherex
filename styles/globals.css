@@ -1,6 +1,33 @@
-body {
-  background: radial-gradient(circle at 20% 20%, #1a1a2e, #0a0a0a 60%);
-  background-attachment: fixed;
-  color: white;
-  font-family: Inter, sans-serif;
+:root {
+  /* Core Coherex environment variables */
+  --nebula-brightness: 0.5;
+  --nebula-contrast: 0.5;
+  --nebula-warmth: 0.5;
+
+  --constellation-rotation: 0.4;
+  --constellation-pulse: 0.1;
+  --constellation-spread: 0.5;
+
+  --vortex-energy: 0.3;
+  --vortex-branching: 0.1;
+  --vortex-stability: 0.8;
+
+  --glow-thickness: 0.4;
+  --glow-softness: 0.6;
+  --glow-breathing: 0.5;
+
+  --sound-low: 0.4;
+  --sound-high: 0.2;
+  --sound-width: 0.4;
+  --sound-tension: 0.2;
+}
+
+/* Background that reacts to cognitive states */
+.coherex-bg {
+  background: rgb(
+    calc(var(--nebula-brightness) * 20),
+    calc(var(--nebula-brightness) * 20),
+    calc(var(--nebula-brightness) * 30)
+  );
+  transition: background 0.4s ease;
 }
