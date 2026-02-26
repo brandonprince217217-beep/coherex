@@ -7,9 +7,12 @@ export default function About() {
         style={{
           width: '100%',
           minHeight: '100vh',
-          paddingTop: '180px',
+          backgroundColor: 'black',
           color: 'white',
+          paddingTop: '140px',
+          paddingBottom: '60px',
           textAlign: 'center',
+          position: 'relative',
           zIndex: 1
         }}
       >
