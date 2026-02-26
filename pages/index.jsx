@@ -2,24 +2,66 @@ import { useState } from "react";
 
 export default function Home() {
   const [input, setInput] = useState("");
-  const [insight, setInsight] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const [hasAsked, setHasAsked] = useState(false);
   const [showLayer2, setShowLayer2] = useState(false);
   const [showLayer3, setShowLayer3] = useState(false);
   const [showLayer4, setShowLayer4] = useState(false);
 
-  function handleSubmit(e) {
+  const [primaryInsight, setPrimaryInsight] = useState("");
+  const [beliefs, setBeliefs] = useState([]);
+  const [patterns, setPatterns] = useState([]);
+  const [contradictions, setContradictions] = useState([]);
+  const [values, setValues] = useState([]);
+  const [rootCause, setRootCause] = useState("");
+  const [reframes, setReframes] = useState([]);
+  const [nextSteps, setNextSteps] = useState([]);
+  const [dashboard, setDashboard] = useState(null);
+  const [mindMap, setMindMap] = useState(null);
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || loading) return;
 
-    const generated =
-      "You’re overwhelmed because you’re trying to move forward without first making your inner situation explicit.";
-
-    setInsight(generated);
-    setHasAsked(true);
+    setLoading(true);
+    setHasAsked(false);
     setShowLayer2(false);
     setShowLayer3(false);
     setShowLayer4(false);
+
+    try {
+      const res = await fetch("/api/engine", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: input })
+      });
+
+      if (!res.ok) {
+        throw new Error("Engine error");
+      }
+
+      const data = await res.json();
+
+      setPrimaryInsight(data.primaryInsight);
+      setBeliefs(data.beliefs || []);
+      setPatterns(data.patterns || []);
+      setContradictions(data.contradictions || []);
+      setValues(data.values || []);
+      setRootCause(data.rootCause || "");
+      setReframes(data.reframes || []);
+      setNextSteps(data.nextSteps || []);
+      setDashboard(data.dashboard || null);
+      setMindMap(data.mindMap || null);
+
+      setHasAsked(true);
+    } catch (err) {
+      console.error(err);
+      setPrimaryInsight("Something went wrong generating your cognitive map. Try again in a moment.");
+      setHasAsked(true);
+    } finally {
+      setLoading(false);
+    }
   }
 
   function handleExpand() {
@@ -49,7 +91,7 @@ export default function Home() {
       <h1 style={{ fontSize: "40px", fontWeight: "700" }}>Coherex</h1>
 
       <p style={{ fontSize: "18px", opacity: 0.8, maxWidth: "520px" }}>
-        Type what’s on your mind. Coherex reveals your inner structure layer by layer — from one insight to a full cognitive map.
+        Type what’s on your mind. Coherex turns it into a layered cognitive map — from one insight to a full OS view.
       </p>
 
       {/* INPUT */}
@@ -82,6 +124,7 @@ export default function Home() {
         />
         <button
           type="submit"
+          disabled={loading}
           style={{
             padding: "12px 20px",
             borderRadius: "999px",
@@ -91,10 +134,11 @@ export default function Home() {
             color: "#000",
             fontWeight: "600",
             fontSize: "15px",
-            cursor: "pointer"
+            cursor: loading ? "default" : "pointer",
+            opacity: loading ? 0.7 : 1
           }}
         >
-          Generate
+          {loading ? "Thinking..." : "Generate"}
         </button>
       </form>
 
@@ -123,7 +167,7 @@ export default function Home() {
             Primary Insight
           </div>
 
-          <div style={{ fontSize: "20px", lineHeight: 1.5 }}>{insight}</div>
+          <div style={{ fontSize: "20px", lineHeight: 1.5 }}>{primaryInsight}</div>
 
           {!showLayer2 && (
             <button
@@ -181,42 +225,13 @@ export default function Home() {
             Cognitive Breakdown
           </h2>
 
-          <Section title="Beliefs Extracted" items={[
-            "I’m overwhelmed.",
-            "I don’t have clarity.",
-            "I need to move forward but can’t."
-          ]} />
-
-          <Section title="Patterns Detected" items={[
-            "Avoidance of defining desires.",
-            "High internal pressure.",
-            "Fear of choosing incorrectly."
-          ]} />
-
-          <Section title="Contradictions" items={[
-            "Wants clarity but avoids defining specifics.",
-            "Wants progress but fears wrong direction."
-          ]} />
-
-          <Section title="Values Implied" items={[
-            "Growth",
-            "Direction",
-            "Self‑alignment"
-          ]} />
-
-          <Section title="Root Cause" items={[
-            "Lack of internal clarity, not lack of options."
-          ]} />
-
-          <Section title="Recommended Reframes" items={[
-            "I don’t need the perfect direction — I need the next honest step."
-          ]} />
-
-          <Section title="Next Steps" items={[
-            "Define what you actually want.",
-            "Clarify constraints.",
-            "Choose one micro‑action."
-          ]} />
+          <Section title="Beliefs Extracted" items={beliefs} />
+          <Section title="Patterns Detected" items={patterns} />
+          <Section title="Contradictions" items={contradictions} />
+          <Section title="Values Implied" items={values} />
+          <Section title="Root Cause" items={[rootCause]} />
+          <Section title="Recommended Reframes" items={reframes} />
+          <Section title="Next Steps" items={nextSteps} />
 
           {!showLayer3 && (
             <button
@@ -239,8 +254,8 @@ export default function Home() {
         </div>
       )}
 
-      {/* LAYER 3 — DASHBOARD */}
-      {showLayer3 && (
+      {/* LAYER 3 */}
+      {showLayer3 && dashboard && (
         <div
           style={{
             marginTop: "20px",
@@ -258,31 +273,35 @@ export default function Home() {
           </h2>
 
           <DashboardPanel title="Insight Summary">
-            {insight}
+            {primaryInsight}
           </DashboardPanel>
 
-          <DashboardPanel title="Belief Graph (Text Placeholder)">
-            • Overwhelmed  
-            • Lack of clarity  
-            • Fear of wrong choice  
-            • Desire for direction  
+          <DashboardPanel title="Belief Graph (Text)">
+            {(dashboard.beliefGraph || []).map((item, i) => (
+              <div key={i}>• {item}</div>
+            ))}
           </DashboardPanel>
 
           <DashboardPanel title="Emotional Map">
-            • Emotion: Overwhelm  
-            • Intensity: Medium‑High  
-            • Tone: Uncertainty  
+            {dashboard.emotionalMap && (
+              <>
+                <div>• Emotion: {dashboard.emotionalMap.emotion}</div>
+                <div>• Intensity: {dashboard.emotionalMap.intensity}</div>
+                <div>• Tone: {dashboard.emotionalMap.tone}</div>
+              </>
+            )}
           </DashboardPanel>
 
           <DashboardPanel title="Contradictions">
-            • Wants clarity ↔ avoids defining desires  
-            • Wants progress ↔ fears wrong direction  
+            {(dashboard.contradictionsPanel || []).map((item, i) => (
+              <div key={i}>• {item}</div>
+            ))}
           </DashboardPanel>
 
           <DashboardPanel title="Action Panel">
-            • Define what you want  
-            • Clarify constraints  
-            • Choose one micro‑action  
+            {(dashboard.actionsPanel || []).map((item, i) => (
+              <div key={i}>• {item}</div>
+            ))}
           </DashboardPanel>
 
           {!showLayer4 && (
@@ -306,8 +325,8 @@ export default function Home() {
         </div>
       )}
 
-      {/* LAYER 4 — MIND MAP */}
-      {showLayer4 && (
+      {/* LAYER 4 */}
+      {showLayer4 && mindMap && (
         <div
           style={{
             marginTop: "20px",
@@ -323,7 +342,7 @@ export default function Home() {
           <h2 style={{ fontSize: "24px", marginBottom: "16px" }}>
             Cognitive Mind Map
           </h2>
-          <MindMap />
+          <MindMap mindMap={mindMap} />
         </div>
       )}
     </div>
@@ -331,6 +350,8 @@ export default function Home() {
 }
 
 function Section({ title, items }) {
+  if (!items || items.length === 0 || !items[0]) return null;
+
   return (
     <div style={{ marginBottom: "18px" }}>
       <div
@@ -382,7 +403,10 @@ function DashboardPanel({ title, children }) {
   );
 }
 
-function MindMap() {
+function MindMap({ mindMap }) {
+  const nodes = mindMap.nodes || [];
+  const edges = mindMap.edges || [];
+
   return (
     <div
       style={{
@@ -396,7 +420,7 @@ function MindMap() {
       }}
     >
       <div style={{ marginBottom: "10px", opacity: 0.8 }}>
-        This is a conceptual map of how your current state is structured:
+        Conceptual map of how this state is structured:
       </div>
 
       <pre
@@ -410,25 +434,14 @@ function MindMap() {
           border: "1px solid rgba(255,255,255,0.12)"
         }}
       >
-{`                [ Overwhelm ]
-                      |
-          -----------------------------
-          |                           |
-   [ Lack of Clarity ]         [ Fear of Wrong Choice ]
-          |                           |
-      [ Undefined Wants ]       [ High Standards ]
-          \\                       /
-           \\                     /
-            \\                   /
-             [ Desire for Direction ]
-                      |
-               [ Need for Next Honest Step ]`}
+{nodes.map((n, i) => `• ${n}`).join("\n")}
+
+{edges.map(([a, b], i) => `${i === 0 ? "" : ""}${a}  →  ${b}`).join("\n")}
       </pre>
 
       <div style={{ marginTop: "10px", opacity: 0.85 }}>
-        Each node represents a belief or emotional state. Edges show how one
-        state feeds into another. Later, this becomes a fully interactive,
-        visual graph.
+        Each node is a belief or emotional state. Edges show how one state feeds into another.
+        This is the textual version of the graph — later, this becomes a fully interactive visual map.
       </div>
     </div>
   );
