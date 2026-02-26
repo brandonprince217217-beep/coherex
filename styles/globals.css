@@ -1,3 +1,7 @@
+/* ============================
+   COHEREX GLOBAL VARIABLES
+   ============================ */
+
 :root {
   /* Core Coherex environment variables */
   --nebula-brightness: 0.5;
@@ -22,12 +26,42 @@
   --sound-tension: 0.2;
 }
 
-/* Background that reacts to cognitive states */
+/* ============================
+   COHEREX BACKGROUND + GLOW
+   ============================ */
+
+/* Animated glow around the main container */
 .coherex-bg {
   background: rgb(
     calc(var(--nebula-brightness) * 20),
     calc(var(--nebula-brightness) * 20),
     calc(var(--nebula-brightness) * 30)
   );
-  transition: background 0.4s ease;
+  transition:
+    background 0.4s ease,
+    filter 0.6s ease,
+    box-shadow 0.6s ease;
+  filter: brightness(calc(0.8 + var(--nebula-contrast) * 0.4));
+  box-shadow: 0 0 calc(var(--glow-thickness) * 40px)
+    rgba(0, 150, 255, calc(var(--glow-softness) * 0.4));
+}
+
+/* Breathing animation tied to glow-breathing */
+@keyframes coherex-breath {
+  0% {
+    box-shadow: 0 0 calc(var(--glow-thickness) * 30px)
+      rgba(0, 150, 255, calc(var(--glow-softness) * 0.3));
+  }
+  50% {
+    box-shadow: 0 0 calc(var(--glow-thickness) * 50px)
+      rgba(0, 150, 255, calc(var(--glow-softness) * 0.5));
+  }
+  100% {
+    box-shadow: 0 0 calc(var(--glow-thickness) * 30px)
+      rgba(0, 150, 255, calc(var(--glow-softness) * 0.3));
+  }
+}
+
+.coherex-bg {
+  animation: coherex-breath calc(4s - var(--glow-breathing) * 2s) ease-in-out infinite;
 }
