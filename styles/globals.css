@@ -65,3 +65,68 @@
 .coherex-bg {
   animation: coherex-breath calc(4s - var(--glow-breathing) * 2s) ease-in-out infinite;
 }
+
+/* ============================
+   COHEREX MOTION LAYER
+   ============================ */
+
+/* Nebula drift based on brightness + warmth */
+@keyframes coherex-nebula-drift {
+  0% {
+    transform: translate3d(0px, 0px, 0);
+    filter: hue-rotate(calc(var(--nebula-warmth) * 10deg));
+  }
+  50% {
+    transform: translate3d(
+      calc(var(--nebula-brightness) * 8px),
+      calc(var(--nebula-brightness) * -8px),
+      0
+    );
+    filter: hue-rotate(calc(var(--nebula-warmth) * 40deg));
+  }
+  100% {
+    transform: translate3d(0px, 0px, 0);
+    filter: hue-rotate(calc(var(--nebula-warmth) * 10deg));
+  }
+}
+
+/* Constellation rotation + pulse */
+@keyframes coherex-constellation-rotate {
+  0% {
+    transform: rotate(0deg) scale(1);
+    opacity: calc(0.4 + var(--constellation-pulse) * 0.2);
+  }
+  50% {
+    transform: rotate(calc(var(--constellation-rotation) * 180deg)) scale(1.02);
+    opacity: calc(0.6 + var(--constellation-pulse) * 0.4);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    opacity: calc(0.4 + var(--constellation-pulse) * 0.2);
+  }
+}
+
+/* Vortex energy ripple */
+@keyframes coherex-vortex-ripple {
+  0% {
+    transform: scale(1);
+    filter: blur(calc(var(--vortex-energy) * 1px));
+  }
+  50% {
+    transform: scale(calc(1 + var(--vortex-energy) * 0.05));
+    filter: blur(calc(var(--vortex-energy) * 3px));
+  }
+  100% {
+    transform: scale(1);
+    filter: blur(calc(var(--vortex-energy) * 1px));
+  }
+}
+
+/* Apply motion to the main container */
+.coherex-bg {
+  animation:
+    coherex-breath calc(4s - var(--glow-breathing) * 2s) ease-in-out infinite,
+    coherex-nebula-drift calc(12s + var(--nebula-brightness) * 6s) ease-in-out infinite,
+    coherex-constellation-rotate calc(20s - var(--constellation-rotation) * 8s) linear infinite,
+    coherex-vortex-ripple calc(6s + var(--vortex-energy) * 4s) ease-in-out infinite;
+}
