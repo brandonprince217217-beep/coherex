@@ -9,11 +9,9 @@ export default function About() {
           minHeight: '100vh',
           backgroundColor: 'black',
           color: 'white',
-          paddingTop: '140px',
+          paddingTop: '160px', // pushes content below the header
           paddingBottom: '60px',
-          textAlign: 'center',
-          position: 'relative',
-          zIndex: 1
+          textAlign: 'center'
         }}
       >
         <h1 style={{ fontSize: '2rem', marginBottom: '20px' }}>
