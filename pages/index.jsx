@@ -11,6 +11,9 @@ export default function Home() {
   const [showLayer3, setShowLayer3] = useState(false);
   const [showLayer4, setShowLayer4] = useState(false);
 
+  // NEW: store AI result
+  const [result, setResult] = useState(null);
+
   async function analyze() {
     if (!input.trim()) return;
 
@@ -26,8 +29,8 @@ export default function Home() {
 
       const data = await res.json();
 
-      // You can expand this later with real output
-      console.log("AI Response:", data);
+      // NEW: save AI output
+      setResult(data.data);
     } catch (err) {
       console.error("Error:", err);
     }
@@ -97,8 +100,9 @@ export default function Home() {
           <h2 style={{ fontSize: "26px", marginBottom: "10px" }}>
             Layer 1 — Core Interpretation
           </h2>
+
           <p style={{ maxWidth: "600px", lineHeight: "1.6" }}>
-            This is where the system gives you the first structured insight.
+            {result?.layer1 || "Processing your input..."}
           </p>
 
           {!showLayer2 && (
@@ -126,8 +130,9 @@ export default function Home() {
           <h2 style={{ fontSize: "26px", marginBottom: "10px" }}>
             Layer 2 — Pattern Detection
           </h2>
+
           <p style={{ maxWidth: "600px", lineHeight: "1.6" }}>
-            Here the system identifies deeper patterns behind your belief.
+            {result?.layer2 || "Analyzing deeper patterns..."}
           </p>
 
           {!showLayer3 && (
@@ -155,8 +160,9 @@ export default function Home() {
           <h2 style={{ fontSize: "26px", marginBottom: "10px" }}>
             Layer 3 — Mapping
           </h2>
+
           <p style={{ maxWidth: "600px", lineHeight: "1.6" }}>
-            This layer shows how your belief connects to other internal structures.
+            {result?.layer3 || "Mapping internal structures..."}
           </p>
 
           {!showLayer4 && (
@@ -184,8 +190,9 @@ export default function Home() {
           <h2 style={{ fontSize: "26px", marginBottom: "10px" }}>
             Layer 4 — Agency
           </h2>
+
           <p style={{ maxWidth: "600px", lineHeight: "1.6" }}>
-            This is where the system gives you actionable clarity.
+            {result?.layer4 || "Generating actionable clarity..."}
           </p>
         </div>
       )}
