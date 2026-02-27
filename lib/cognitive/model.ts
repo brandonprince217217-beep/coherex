@@ -32,8 +32,8 @@ export type SoundParams = {
   clarity: number;
 };
 
-// This is the type your environment.ts file imports.
-// It MUST be exported exactly like this.
+// This MUST be exported exactly like this.
+// environment.ts imports this type.
 export type EnvironmentParams = {
   nebula: NebulaParams;
   constellation: ConstellationParams;
