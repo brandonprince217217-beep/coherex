@@ -51,12 +51,10 @@ export default function CognitiveField3D({ intensity, breakthrough }: Props) {
         uniform float uBreakthrough;
         uniform vec2 uResolution;
 
-        // Simple hash
         float hash(vec2 p) {
           return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
         }
 
-        // Noise
         float noise(vec2 p) {
           vec2 i = floor(p);
           vec2 f = fract(p);
