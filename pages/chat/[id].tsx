@@ -1,15 +1,33 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../../../lib/supabase";
-import ChatWindow from "../../../components/ChatWindow";
-import InputBar from "../../../components/InputBar";
-import Sidebar from "../../../components/Sidebar";
-import CognitivePanel from "../../../components/CognitivePanel";
-import CognitiveField3D from "../../../components/CognitiveField3D";
-import type { CognitiveAnalysis } from "../../../lib/cognitive/model";
+import { supabase } from "../../lib/supabase";
+import ChatWindow from "../../components/ChatWindow";
+import InputBar from "../../components/InputBar";
+import Sidebar from "../../components/Sidebar";
+import CognitivePanel from "../../components/CognitivePanel";
+import CognitiveField3D from "../../components/CognitiveField3D";
+import type { CognitiveAnalysis } from "../../lib/cognitive/model";
 
-export default function ChatPage({ conversationId }) {
-  const [messages, setMessages] = useState([]);
-  const [streaming, setStreaming] = useState(null);
+type Message = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  conversation_id: string;
+};
+
+type StreamingState = {
+  role: "assistant";
+  segments: string[];
+  visible: string;
+  isStreaming: boolean;
+} | null;
+
+type Props = {
+  conversationId: string;
+};
+
+export default function ChatPage({ conversationId }: Props) {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [streaming, setStreaming] = useState<StreamingState>(null);
   const [analysis, setAnalysis] = useState<CognitiveAnalysis | null>(null);
 
   useEffect(() => {
@@ -23,7 +41,7 @@ export default function ChatPage({ conversationId }) {
       .eq("conversation_id", conversationId)
       .order("created_at", { ascending: true });
 
-    setMessages(data || []);
+    setMessages((data as Message[]) || []);
   };
 
   const summarizeHistory = () => {
@@ -35,7 +53,7 @@ export default function ChatPage({ conversationId }) {
   };
 
   const sendMessage = async (text: string) => {
-    const userMsg = {
+    const userMsg: Message = {
       id: crypto.randomUUID(),
       role: "user",
       content: text,
@@ -121,7 +139,7 @@ export default function ChatPage({ conversationId }) {
 
     const finalText = segments.join("\n\n");
 
-    const assistantMsg = {
+    const assistantMsg: Message = {
       id: crypto.randomUUID(),
       role: "assistant",
       content: finalText,
@@ -159,5 +177,5 @@ export default function ChatPage({ conversationId }) {
 }
 
 ChatPage.getInitialProps = ({ query }) => ({
-  conversationId: query.id,
+  conversationId: query.id as string,
 });
