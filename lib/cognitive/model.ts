@@ -37,3 +37,10 @@ export type EnvironmentParams = {
   glow: GlowParams;
   sound: SoundParams;
 };
+
+export type CognitiveAnalysis = {
+  summary: string;
+  insights: string[];
+  emotionalTone: string;
+  confidence: number;
+};
