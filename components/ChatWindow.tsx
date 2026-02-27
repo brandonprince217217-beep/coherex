@@ -1,40 +1,78 @@
-// components/ChatWindow.tsx
-import { useEffect, useRef, useState } from "react";
-import MessageBlock from "./MessageBlock";
+import { useState } from "react";
+import InputBar from "./InputBar";
 import StreamingBlock from "./StreamingBlock";
-import SoftCursor from "./SoftCursor";
 
-export default function ChatWindow({ messages, streaming }) {
-  const ref = useRef(null);
-  const [autoScroll, setAutoScroll] = useState(true);
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+}
 
-  useEffect(() => {
-    if (!autoScroll) return;
-    if (!ref.current) return;
-    ref.current.scrollTo({
-      top: ref.current.scrollHeight,
-      behavior: "smooth",
+export default function ChatWindow() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [streamingText, setStreamingText] = useState("");
+
+  const sendMessage = async (text: string) => {
+    // Add user message
+    setMessages((prev) => [...prev, { role: "user", content: text }]);
+
+    // Start streaming
+    setStreamingText("");
+
+    const response = await fetch("/api/stream", {
+      method: "POST",
+      body: JSON.stringify({ message: text }),
     });
-  }, [messages, streaming, autoScroll]);
 
-  const handleScroll = () => {
-    const el = ref.current;
-    const nearBottom =
-      el.scrollHeight - el.scrollTop - el.clientHeight < 40;
-    setAutoScroll(nearBottom);
+    const reader = response.body?.getReader();
+    if (!reader) return;
+
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+      setStreamingText((prev) => prev + chunk);
+    }
+
+    // Finalize assistant message
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: streamingText + "" },
+    ]);
+
+    setStreamingText("");
+
+    // Trigger cognitive engine
+    fetch("/api/cognitive", {
+      method: "POST",
+      body: JSON.stringify({
+        message: text,
+        historySummary: "",
+      }),
+    });
+
+    // Trigger title generator
+    fetch("/api/title", {
+      method: "POST",
+      body: JSON.stringify({ message: text }),
+    });
   };
 
   return (
-    <div className="chat-window" ref={ref} onScroll={handleScroll}>
-      <div className="chat-inner">
-        {messages.map((m) => (
-          <MessageBlock key={m.id} role={m.role} text={m.content} />
+    <div className="chat-window">
+      <div className="messages">
+        {messages.map((m, i) => (
+          <div key={i} className={`msg ${m.role}`}>
+            {m.content}
+          </div>
         ))}
 
-        {streaming && <StreamingBlock state={streaming} />}
-
-        {!streaming && <SoftCursor />}
+        {streamingText && <StreamingBlock text={streamingText} />}
       </div>
+
+      <InputBar onSend={sendMessage} />
     </div>
   );
 }
