@@ -1,79 +1,35 @@
-import OpenAI from "openai";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { openai } from "../../lib/openai";
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { text } = req.body || {};
-  if (!text || typeof text !== "string") {
-    return res.status(400).json({ error: "Missing text" });
-  }
-
   try {
-    const client = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY
-    });
+    const { input } = JSON.parse(req.body || "{}");
 
-    const prompt = `
-You are Coherex, a cognitive OS. Analyze the user's text and return a structured JSON object with these fields:
+    if (!input) {
+      return res.status(400).json({ error: "Missing input" });
+    }
 
-{
-  "primaryInsight": "...",
-  "beliefs": [],
-  "patterns": [],
-  "contradictions": [],
-  "values": [],
-  "rootCause": "",
-  "reframes": [],
-  "nextSteps": [],
-  "dashboard": {
-    "beliefGraph": [],
-    "emotionalMap": {
-      "emotion": "",
-      "intensity": "",
-      "tone": ""
-    },
-    "contradictionsPanel": [],
-    "actionsPanel": []
-  },
-  "mindMap": {
-    "nodes": [],
-    "edges": []
-  }
-}
-
-Rules:
-- Keep insights sharp and concise.
-- Extract beliefs even if implicit.
-- Detect contradictions.
-- Infer values.
-- Build a small mind-map with nodes + edges.
-- ALWAYS return valid JSON.
-- Do not include commentary outside the JSON.
-
-User text:
-"${text}"
-`;
-
-    const completion = await client.chat.completions.create({
+    const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      response_format: { type: "json_object" },
+      temperature: 0.5,
       messages: [
-        { role: "system", content: "You are Coherex, a cognitive OS." },
-        { role: "user", content: prompt }
-      ]
+        {
+          role: "system",
+          content: "You are the Coherex engine. Transform the input into a structured response.",
+        },
+        { role: "user", content: input },
+      ],
     });
 
-    const data = JSON.parse(completion.choices[0].message.content);
+    const output = completion.choices?.[0]?.message?.content || "";
 
-    return res.status(200).json(data);
-
+    res.status(200).json({ output });
   } catch (err) {
-    console.error("Engine error:", err);
-    return res.status(500).json({
-      error: "Engine failed",
-      details: err.message
-    });
+    console.error("Engine API error:", err);
+    res.status(500).json({ output: "" });
   }
 }
