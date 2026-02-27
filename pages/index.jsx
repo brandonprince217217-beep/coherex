@@ -7,7 +7,7 @@ export default function Home() {
   // THIS MAKES YOUR SEARCH WORK
   const handleSearch = (query) => {
     if (!query.trim()) return;
-    setResult("Processing: " + query);
+    setResult("You searched: " + query);
   };
 
   return (
