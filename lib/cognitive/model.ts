@@ -1,5 +1,3 @@
-// Core parameter types for each visual/sensory subsystem of the Coherex field
-
 export type NebulaParams = {
   brightness: number;
   motionSpeed: number;
@@ -32,8 +30,6 @@ export type SoundParams = {
   clarity: number;
 };
 
-// This MUST be exported exactly like this.
-// environment.ts imports this type.
 export type EnvironmentParams = {
   nebula: NebulaParams;
   constellation: ConstellationParams;
