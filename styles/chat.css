@@ -1,9 +1,11 @@
+/* CHAT LAYOUT */
 .layout {
   display: flex;
   height: 100vh;
   overflow: hidden;
 }
 
+/* SIDEBAR */
 .sidebar {
   width: 240px;
   background: rgba(255, 255, 255, 0.04);
@@ -45,8 +47,221 @@
   color: white;
 }
 
+/* CHAT AREA */
 .chat-area {
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+/* CHAT WINDOW */
+.chat-window {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  color: white;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* INPUT BAR */
+.input-bar {
+  padding: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  gap: 12px;
+}
+
+.input-bar input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+.input-bar button {
+  padding: 12px 18px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255, 255, 255, 0.18);
+  color: white;
+  cursor: pointer;
+}
+
+/* STREAMING CURSOR */
+.soft-cursor {
+  display: inline-block;
+  width: 6px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.7);
+  margin-left: 4px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* MESSAGE BLOCKS */
+.message-block {
+  margin-bottom: 20px;
+  white-space: pre-wrap;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.message-block.user {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* STREAMING BLOCK */
+.streaming-block {
+  white-space: pre-wrap;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* ------------------------------ */
+/* ADVANCED COGNITIVE PANEL STYLES */
+/* ------------------------------ */
+
+.cognitive-panel {
+  width: 320px;
+  background: radial-gradient(
+    circle at top left,
+    rgba(120, 200, 255, 0.12),
+    rgba(10, 10, 20, 0.96)
+  );
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cognitive-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.cognitive-empty {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.cognitive-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cognitive-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.cognitive-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.cognitive-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cognitive-block {
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.cognitive-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.cognitive-list.contradictions li {
+  color: rgba(255, 140, 140, 0.9);
+}
+
+.breakthrough-pill {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.breakthrough-pill.warm {
+  background: rgba(255, 200, 120, 0.16);
+  color: rgba(255, 220, 160, 0.95);
+}
+
+.breakthrough-pill.hot {
+  background: rgba(255, 120, 160, 0.22);
+  color: rgba(255, 230, 240, 0.98);
+  box-shadow: 0 0 18px rgba(255, 120, 160, 0.5);
+}
+
+.belief-graph {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.belief-node {
+  padding: 6px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 10, 20, 0.9);
+  min-width: 0;
+}
+
+.belief-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.belief-meta {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.belief-belief {
+  border-color: rgba(140, 200, 255, 0.4);
+}
+
+.belief-value {
+  border-color: rgba(160, 255, 200, 0.4);
+}
+
+.belief-fear {
+  border-color: rgba(255, 140, 140, 0.5);
+}
+
+.belief-desire {
+  border-color: rgba(255, 210, 140, 0.5);
+}
+
+.belief-assumption {
+  border-color: rgba(200, 160, 255, 0.5);
 }
