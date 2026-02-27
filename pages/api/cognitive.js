@@ -41,11 +41,6 @@ Return a JSON object with this exact shape:
     }
   ]
 }
-
-Rules:
-- emotionalIntensity and breakthroughLikelihood must be between 0 and 1.
-- beliefGraph should have 3–8 nodes.
-- Be concise but specific.
 `;
 
     const userPrompt = `
@@ -70,14 +65,8 @@ ${message}
     let parsed = emptyAnalysis();
 
     try {
-      const obj = JSON.parse(raw);
-      parsed = {
-        ...parsed,
-        ...obj,
-      };
-    } catch (e) {
-      // fall back to empty
-    }
+      parsed = { ...parsed, ...JSON.parse(raw) };
+    } catch (e) {}
 
     res.status(200).json(parsed);
   } catch (err) {
