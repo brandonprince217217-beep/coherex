@@ -16,13 +16,15 @@ export default function SearchBar({ onSearch, disabled }) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const next = (index + 1) % suggestions.length;
-      setIndex(next);
-      setPlaceholder(suggestions[next]);
+      setIndex(prev => {
+        const next = (prev + 1) % suggestions.length;
+        setPlaceholder(suggestions[next]);
+        return next;
+      });
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [index]);
+  }, []);
 
   const handleSearch = () => {
     if (!disabled && input.trim() !== "") {
