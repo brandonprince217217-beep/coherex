@@ -1,23 +1,12 @@
-// components/StreamingBlock.tsx
-import { useEffect, useState } from "react";
+interface StreamingBlockProps {
+  text: string;
+}
 
-export default function StreamingBlock({ state }) {
-  const [text, setText] = useState(state.visible);
-  const [cursor, setCursor] = useState(true);
-
-  useEffect(() => {
-    const t = setInterval(() => setCursor((v) => !v), 550);
-    return () => clearInterval(t);
-  }, []);
-
-  useEffect(() => {
-    setText(state.visible);
-  }, [state.visible]);
-
+export default function StreamingBlock({ text }: StreamingBlockProps) {
   return (
-    <pre className="msg-assistant stream-text">
-      {text}
-      {state.isStreaming && cursor && <span className="soft-cursor">▌</span>}
-    </pre>
+    <div className="streaming-block">
+      <span>{text}</span>
+      <span className="cursor">▌</span>
+    </div>
   );
 }
