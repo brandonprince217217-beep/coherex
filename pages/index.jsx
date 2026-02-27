@@ -1,9 +1,12 @@
 import Layout from '../components/Layout';
 import SearchBar from '../components/SearchBar';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
   const [analysis, setAnalysis] = useState(null);
+  const [trialActive, setTrialActive] = useState(true);
+  const [timeLeft, setTimeLeft] = useState(180); // 3 minutes
+  const [showPopup, setShowPopup] = useState(false);
 
   // DOMAIN DETECTION
   const detectDomain = (text) => {
@@ -60,6 +63,12 @@ export default function Home() {
 
   // MAIN ENGINE
   const handleSearch = (query) => {
+    // If trial ended → redirect ONLY when they try to search
+    if (!trialActive) {
+      window.location.href = "https://buy.stripe.com/14A3cn4bXbgCh0t2pvasg04";
+      return;
+    }
+
     const trimmed = query.trim();
     if (!trimmed) return;
 
@@ -79,6 +88,31 @@ export default function Home() {
     setAnalysis(result);
   };
 
+  // TRIAL TIMER
+  useEffect(() => {
+    if (!trialActive) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setTrialActive(false);
+          setShowPopup(true); // SHOW POPUP WHEN TIME ENDS
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [trialActive]);
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
   return (
     <Layout>
       <div
@@ -90,18 +124,29 @@ export default function Home() {
           paddingTop: '160px',
           paddingBottom: '60px',
           textAlign: 'center',
-          fontFamily: 'Inter, sans-serif'
+          fontFamily: 'Inter, sans-serif',
+          position: 'relative'
         }}
       >
         <h1 style={{ fontSize: '2.4rem', marginBottom: '20px' }}>
           Coherex
         </h1>
 
-        <p style={{ opacity: 0.7, marginBottom: '40px' }}>
+        <p style={{ opacity: 0.7, marginBottom: '10px' }}>
           Your Cognitive Operating System
         </p>
 
-        <SearchBar onSearch={handleSearch} />
+        {trialActive ? (
+          <p style={{ opacity: 0.8, fontSize: '0.9rem', marginBottom: '20px' }}>
+            Free trial active — time left: {formatTime(timeLeft)}
+          </p>
+        ) : (
+          <p style={{ opacity: 0.8, fontSize: '0.9rem', marginBottom: '20px', color: 'red' }}>
+            Your free trial has ended. Search is locked.
+          </p>
+        )}
+
+        <SearchBar onSearch={handleSearch} disabled={!trialActive} />
 
         {analysis && (
           <div
@@ -162,6 +207,74 @@ export default function Home() {
             </div>
             <div>
               {analysis.reframe}
+            </div>
+          </div>
+        )}
+
+        {/* POPUP MESSAGE */}
+        {showPopup && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              background: 'rgba(0,0,0,0.7)',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 9999
+            }}
+          >
+            <div
+              style={{
+                width: '85%',
+                maxWidth: '360px',
+                background: 'black',
+                border: '1px solid rgba(0,140,255,0.7)',
+                borderRadius: '14px',
+                padding: '20px',
+                boxShadow: '0 0 20px rgba(0,140,255,0.6)',
+                position: 'relative',
+                textAlign: 'center'
+              }}
+            >
+              {/* CLOSE BUTTON */}
+              <div
+                onClick={() => setShowPopup(false)}
+                style={{
+                  position: 'absolute',
+                  top: '10px',
+                  right: '14px',
+                  fontSize: '1.4rem',
+                  cursor: 'pointer',
+                  color: 'white'
+                }}
+              >
+                ×
+              </div>
+
+              <h3 style={{ marginBottom: '14px' }}>Trial Ended</h3>
+
+              <p style={{ opacity: 0.8, marginBottom: '20px' }}>
+                Go to Pricing for lifetime access to unlimited access.
+              </p>
+
+              <a
+                href="/pricing"
+                style={{
+                  display: 'inline-block',
+                  padding: '10px 18px',
+                  background: 'rgba(0,140,255,0.9)',
+                  borderRadius: '10px',
+                  color: 'white',
+                  textDecoration: 'none',
+                  boxShadow: '0 0 12px rgba(0,140,255,0.6)'
+                }}
+              >
+                Go to Pricing
+              </a>
             </div>
           </div>
         )}
