@@ -1,9 +1,5 @@
-import OpenAI from "openai";
+import { openai } from "../../lib/openai";
 import { emptyAnalysis } from "../../lib/cognitive/model";
-
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -51,7 +47,7 @@ Latest user message:
 ${message}
 `;
 
-    const completion = await client.chat.completions.create({
+    const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       temperature: 0.4,
       response_format: { type: "json_object" },
