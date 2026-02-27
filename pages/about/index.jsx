@@ -8,6 +8,7 @@ export default function AboutPage() {
       </Head>
 
       <main className="about-root">
+        {/* HERO */}
         <section className="about-hero">
           <h1>Understand your mind. Build your clarity.</h1>
           <p>
@@ -17,13 +18,17 @@ export default function AboutPage() {
             uncertainty.
           </p>
 
+          {/* VIDEO SECTION */}
           <div className="about-video-wrapper">
-            <div className="about-video-placeholder">
-              <span>90-second Coherex overview video</span>
-            </div>
+            <video
+              src="/coherex-about.mp4"
+              controls
+              className="about-video-placeholder"
+            />
           </div>
         </section>
 
+        {/* PERSPECTIVE */}
         <section className="about-section">
           <h2>The Coherex perspective</h2>
           <p>
@@ -41,6 +46,7 @@ export default function AboutPage() {
           </p>
         </section>
 
+        {/* MISSION */}
         <section className="about-section">
           <h2>Our mission</h2>
           <p>
@@ -52,6 +58,7 @@ export default function AboutPage() {
           </p>
         </section>
 
+        {/* VISION */}
         <section className="about-section">
           <h2>Our vision</h2>
           <p>
@@ -62,6 +69,7 @@ export default function AboutPage() {
           </p>
         </section>
 
+        {/* VALUES */}
         <section className="about-section">
           <h2>Our values</h2>
           <ul className="about-values">
@@ -86,6 +94,7 @@ export default function AboutPage() {
           </ul>
         </section>
 
+        {/* STORY */}
         <section className="about-section">
           <h2>Why Coherex exists</h2>
           <p>
@@ -98,6 +107,7 @@ export default function AboutPage() {
           </p>
         </section>
 
+        {/* FOUNDERS */}
         <section className="about-section about-founders">
           <p>
             Coherex is crafted as a living cognitive universe, architected by{" "}
