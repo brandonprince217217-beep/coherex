@@ -1,14 +1,10 @@
-import OpenAI from "openai";
-
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { openai } from "../../lib/openai";
 
 export default async function handler(req, res) {
   try {
     const { message } = JSON.parse(req.body || "{}");
 
-    const completion = await client.chat.completions.create({
+    const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       temperature: 0.3,
       messages: [
