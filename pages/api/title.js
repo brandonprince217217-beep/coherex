@@ -1,34 +1,30 @@
 import OpenAI from "openai";
 
-export const config = {
-  runtime: "edge",
-};
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
-export default async function handler(req) {
-  const { message } = await req.json();
+export default async function handler(req, res) {
+  try {
+    const { message } = JSON.parse(req.body || "{}");
 
-  const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
+    const completion = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      temperature: 0.3,
+      messages: [
+        {
+          role: "system",
+          content: "Generate a short, clean conversation title.",
+        },
+        { role: "user", content: message },
+      ],
+    });
 
-  const completion = await client.chat.completions.create({
-    model: "gpt-4.1",
-    messages: [
-      {
-        role: "system",
-        content:
-          "Generate a short 3–6 word title summarizing the user's message. No quotes. No punctuation.",
-      },
-      {
-        role: "user",
-        content: message,
-      },
-    ],
-  });
+    const title = completion.choices?.[0]?.message?.content || "Conversation";
 
-  const title = completion.choices[0].message.content.trim();
-
-  return new Response(JSON.stringify({ title }), {
-    headers: { "Content-Type": "application/json" },
-  });
+    res.status(200).json({ title });
+  } catch (err) {
+    console.error("Title API error:", err);
+    res.status(200).json({ title: "Conversation" });
+  }
 }
