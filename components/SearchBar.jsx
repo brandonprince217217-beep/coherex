@@ -13,7 +13,7 @@ export default function SearchBar({ onSearch }) {
         placeholder="Ask Coherex anything..."
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
-            onSearch(e.target.value);
+            onSearch(e.target.value);  // <-- THIS sends the search text
           }
         }}
         style={{
