@@ -1,141 +1,129 @@
-/* === COHEREX PREMIUM NEON COSMIC THEME === */
+/* ============================
+   GLOBAL RESET
+   ============================ */
 
-/* Global cosmic background */
-body {
-  background: radial-gradient(circle at 20% 20%, #0a0f1f, #000);
-  color: #e2e8f0;
-  font-family: "Inter", sans-serif;
-  overflow: hidden;
-}
-
-/* Chat window container */
-.chat-window {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
+* {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
-/* Messages area */
-.messages {
-  flex: 1;
-  overflow-y: auto;
-  padding-right: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-/* User + assistant messages */
-.msg {
-  max-width: 80%;
-  padding: 14px 18px;
-  border-radius: 14px;
-  line-height: 1.5;
-  font-size: 16px;
-  backdrop-filter: blur(12px);
-  animation: fadeIn 0.3s ease;
-}
-
-/* User bubble */
-.msg.user {
-  align-self: flex-end;
-  background: rgba(0, 180, 255, 0.15);
-  border: 1px solid rgba(0, 180, 255, 0.4);
-  box-shadow: 0 0 12px rgba(0, 180, 255, 0.3);
-}
-
-/* Assistant bubble */
-.msg.assistant {
-  align-self: flex-start;
-  background: rgba(120, 0, 255, 0.15);
-  border: 1px solid rgba(120, 0, 255, 0.4);
-  box-shadow: 0 0 12px rgba(120, 0, 255, 0.3);
-}
-
-/* Streaming block (typing effect) */
-.streaming-block {
-  align-self: flex-start;
-  background: rgba(120, 0, 255, 0.15);
-  border: 1px solid rgba(120, 0, 255, 0.4);
-  padding: 14px 18px;
-  border-radius: 14px;
-  font-size: 16px;
-  display: flex;
-  gap: 4px;
-  box-shadow: 0 0 12px rgba(120, 0, 255, 0.3);
-}
-
-/* Blinking cursor */
-.cursor {
-  animation: blink 1s infinite;
-  color: #bb86fc;
-}
-
-@keyframes blink {
-  0% { opacity: 1; }
-  50% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
-/* Input bar container */
-.input-bar {
-  display: flex;
-  gap: 10px;
-  padding: 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(10px);
-}
-
-/* Input field */
-.input-field {
-  flex: 1;
-  padding: 12px 16px;
-  border-radius: 10px;
-  border: 1px solid rgba(0, 180, 255, 0.4);
-  background: rgba(0, 0, 0, 0.4);
+html, body {
+  height: 100%;
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+  background: radial-gradient(circle at 20% 20%, #0a0f1f, #050816 70%);
   color: #e2e8f0;
-  outline: none;
-  font-size: 16px;
-  box-shadow: 0 0 8px rgba(0, 180, 255, 0.2);
+  overflow-x: hidden;
 }
 
-.input-field::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+/* Smooth text */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Send button */
-.send-btn {
-  padding: 12px 20px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #00b4ff, #7a00ff);
-  border: none;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 0 12px rgba(0, 180, 255, 0.4);
-  transition: 0.2s ease;
+/* Links */
+a {
+  color: #00b4ff;
+  text-decoration: none;
 }
 
-.send-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 18px rgba(0, 180, 255, 0.6);
+a:hover {
+  text-decoration: underline;
 }
 
-/* Smooth fade-in animation */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+/* ============================
+   GLOBAL LAYOUT HELPERS
+   ============================ */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
-/* Scrollbar styling */
-.messages::-webkit-scrollbar {
-  width: 6px;
+/* ============================
+   ABOUT PAGE STYLES
+   ============================ */
+
+.about-root {
+  min-height: 100vh;
+  padding: 80px 24px;
+  max-width: 960px;
+  margin: 0 auto;
+  color: #e2e8f0;
 }
 
-.messages::-webkit-scrollbar-thumb {
-  background: rgba(120, 0, 255, 0.4);
-  border-radius: 10px;
+.about-hero {
+  text-align: center;
+  margin-bottom: 56px;
 }
+
+.about-hero h1 {
+  font-size: 2.6rem;
+  margin-bottom: 16px;
+}
+
+.about-hero p {
+  max-width: 640px;
+  margin: 0 auto 32px;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.about-video-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.about-video-placeholder {
+  width: 100%;
+  max-width: 720px;
+  aspect-ratio: 16 / 9;
+  border-radius: 18px;
+  border: 1px solid rgba(0, 180, 255, 0.4);
+  background: radial-gradient(circle at 10% 0%, #1a2238, #050816);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a0aec0;
+  font-size: 0.95rem;
+  box-shadow: 0 0 24px rgba(0, 180, 255, 0.35);
+}
+
+.about-section {
+  margin-bottom: 40px;
+}
+
+.about-section h2 {
+  font-size: 1.6rem;
+  margin-bottom: 12px;
+}
+
+.about-section p {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.about-values {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.about-values li {
+  margin-bottom: 10px;
+}
+
+.about-founders {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 24px;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #cbd5f5;
+}
+
+/* ============================
+   END OF FILE
+   ============================ */
