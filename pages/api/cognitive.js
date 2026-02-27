@@ -1,31 +1,87 @@
-import { NextResponse } from "next/server";
-import { analyzeMessageDeep } from "../../lib/cognitive/model";
+import OpenAI from "openai";
+import { emptyAnalysis } from "../../lib/cognitive/model";
 
-export const config = {
-  runtime: "edge",
-};
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
-export default async function handler(req) {
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
   try {
-    const { message, historySummary } = await req.json();
+    const { message, historySummary } = JSON.parse(req.body || "{}");
 
-    if (!message || typeof message !== "string") {
-      return new NextResponse(
-        JSON.stringify({ error: "Missing message" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+    if (!message) {
+      return res.status(400).json({ error: "Missing message" });
     }
 
-    const analysis = await analyzeMessageDeep(message, historySummary || null);
+    const systemPrompt = `
+You are a cognitive architect analyzing a user's message.
 
-    return new NextResponse(JSON.stringify(analysis), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
+Return a JSON object with this exact shape:
+
+{
+  "coreBelief": string,
+  "impliedMeaning": string,
+  "emotionalTone": string,
+  "emotionalIntensity": number,
+  "coreNeed": string,
+  "hiddenAssumptions": string[],
+  "contradictions": string[],
+  "breakthroughLikelihood": number,
+  "identityShift": string,
+  "nextQuestion": string,
+  "beliefGraph": [
+    {
+      "label": string,
+      "kind": "belief" | "value" | "fear" | "desire" | "assumption",
+      "strength": number
+    }
+  ]
+}
+
+Rules:
+- emotionalIntensity and breakthroughLikelihood must be between 0 and 1.
+- beliefGraph should have 3–8 nodes.
+- Be concise but specific.
+`;
+
+    const userPrompt = `
+Recent conversation summary:
+${historySummary || "(none)"}
+
+Latest user message:
+${message}
+`;
+
+    const completion = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      temperature: 0.4,
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
     });
+
+    const raw = completion.choices?.[0]?.message?.content || "{}";
+    let parsed = emptyAnalysis();
+
+    try {
+      const obj = JSON.parse(raw);
+      parsed = {
+        ...parsed,
+        ...obj,
+      };
+    } catch (e) {
+      // fall back to empty
+    }
+
+    res.status(200).json(parsed);
   } catch (err) {
-    return new NextResponse(
-      JSON.stringify({ error: "Cognitive analysis failed" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    console.error("Cognitive API error:", err);
+    res.status(200).json(emptyAnalysis());
   }
 }
