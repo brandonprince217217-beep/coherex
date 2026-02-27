@@ -1,84 +1,122 @@
-import Layout from '../../components/Layout';
+import Head from "next/head";
 
-export default function About() {
+export default function AboutPage() {
   return (
-    <Layout>
-      <div
-        style={{
-          width: '100%',
-          minHeight: '100vh',
-          backgroundColor: 'black',
-          color: 'white',
-          paddingTop: '160px',
-          paddingBottom: '60px',
-          textAlign: 'center',
-          fontFamily: 'Inter, sans-serif',
-          animation: 'fadeIn 1.2s ease'
-        }}
-      >
+    <>
+      <Head>
+        <title>About Coherex</title>
+      </Head>
 
-        {/* Fade‑in animation */}
-        <style>{`
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-        `}</style>
-
-        <h1 style={{ fontSize: '2.4rem', marginBottom: '40px', letterSpacing: '1px' }}>
-          About the Developers
-        </h1>
-
-        <div
-          style={{
-            maxWidth: '850px',
-            margin: '0 auto',
-            fontSize: '1.1rem',
-            lineHeight: 1.75,
-            textAlign: 'left',
-            opacity: 0.92,
-            padding: '35px 40px',
-            borderRadius: '14px',
-            border: '2px solid rgba(0, 140, 255, 0.7)',
-            boxShadow: '0 0 25px rgba(0, 140, 255, 0.5)',
-            transition: '0.3s'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 40px rgba(0, 140, 255, 0.9)';
-            e.currentTarget.style.border = '2px solid rgba(0, 140, 255, 1)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 25px rgba(0, 140, 255, 0.5)';
-            e.currentTarget.style.border = '2px solid rgba(0, 140, 255, 0.7)';
-          }}
-        >
-          <p style={{ marginBottom: '22px' }}>
-            Coherex is created by <strong>Brandon Prince</strong> and <strong>Denise Prince</strong>, 
-            a builder–designer partnership focused on clarity, intelligence, and the future of human cognition. 
-            Their work blends system architecture, psychology, and immersive digital design to create a platform 
-            that feels alive, adaptive, and deeply intuitive.
-          </p>
-
-          <p style={{ marginBottom: '22px' }}>
-            Brandon brings a precision‑driven approach to cognitive systems — designing structures that reduce 
-            friction, sharpen thinking, and help people operate with more intention. Denise brings the emotional 
-            intelligence, aesthetic clarity, and human‑centered design that makes Coherex feel warm, grounded, 
-            and personal. Together, they build technology that respects how the mind actually works.
-          </p>
-
-          <p style={{ marginBottom: '22px' }}>
-            Coherex is their shared mission: a cognitive environment engineered for people who think deeply, 
-            create boldly, and want a space that elevates their mental clarity. Every layer — from the interface 
-            to the underlying logic — is crafted with intention, intelligence, and a commitment to helping people 
-            navigate life with more focus and power.
-          </p>
-
+      <main className="about-root">
+        {/* Hero */}
+        <section className="about-hero">
+          <h1>Understand your mind. Build your clarity.</h1>
           <p>
-            Coherex isn’t just another app. It’s a new way of using your mind — a digital environment built for 
-            clarity, creativity, and personal evolution.
+            Coherex is a next-generation cognitive operating system that reveals
+            the deeper structure behind your thoughts, beliefs, and emotional
+            signals—so you can make decisions with intention instead of
+            uncertainty.
           </p>
-        </div>
-      </div>
-    </Layout>
+
+          <div className="about-video-wrapper">
+            {/* Replace this with your real video embed */}
+            <div className="about-video-placeholder">
+              <span>90-second Coherex overview video</span>
+            </div>
+          </div>
+        </section>
+
+        {/* The Coherex Perspective */}
+        <section className="about-section">
+          <h2>The Coherex perspective</h2>
+          <p>
+            Your thoughts, emotions, and decisions follow patterns. They&apos;re
+            shaped by beliefs, experiences, and signals you may not always
+            notice. Coherex is designed to help you see those patterns clearly,
+            so you can make choices with confidence instead of uncertainty.
+          </p>
+          <p>
+            When you express a thought, Coherex breaks it down into meaningful
+            components—belief type, emotional charge, hidden assumptions,
+            contradictions, core needs, and more. It doesn&apos;t just respond.
+            It interprets. It helps you understand not just what you think, but
+            why you think it.
+          </p>
+        </section>
+
+        {/* Mission */}
+        <section className="about-section">
+          <h2>Our mission</h2>
+          <p>
+            Coherex exists to help you understand your mind with clarity and
+            precision. We believe that self-awareness is not a mystery—it&apos;s
+            a skill. By revealing the structure behind your thoughts and
+            emotions, Coherex gives you tools to navigate life with confidence,
+            intention, and insight.
+          </p>
+        </section>
+
+        {/* Vision */}
+        <section className="about-section">
+          <h2>Our vision</h2>
+          <p>
+            We envision a world where every person has access to a cognitive
+            operating system—a companion that helps them understand their
+            patterns, challenge their assumptions, and build a more aligned
+            version of themselves. Coherex is the first step toward that future.
+          </p>
+        </section>
+
+        {/* Values */}
+        <section className="about-section about-grid">
+          <div>
+            <h2>Our values</h2>
+            <ul className="about-values">
+              <li>
+                <strong>Clarity:</strong> Understanding begins with seeing
+                things as they are.
+              </li>
+              <li>
+                <strong>Agency:</strong> You deserve tools that help you take
+                control of your thinking.
+              </li>
+              <li>
+                <strong>Insight:</strong> The mind has structure, and structure
+                can be understood.
+              </li>
+              <li>
+                <strong>Integrity:</strong> Your data, your privacy, your
+                growth.
+              </li>
+              <li>
+                <strong>Exploration:</strong> Curiosity drives transformation.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* Story */}
+        <section className="about-section">
+          <h2>Why Coherex exists</h2>
+          <p>
+            Coherex was created to close the gap between what you feel and what
+            you understand. Traditional tools help you organize your tasks.
+            Coherex helps you organize your mind. By analyzing the deeper layers
+            behind your thoughts—belief type, emotional charge, hidden
+            assumptions, contradictions, core needs—the system reveals what&apos;s
+            really driving your decisions.
+          </p>
+        </section>
+
+        {/* Founders note (non-intrusive, additive) */}
+        <section className="about-section about-founders">
+          <p>
+            Coherex is crafted as a living cognitive universe, architected by{" "}
+            <strong>Brandon and Denise Prince</strong> with a single intention:
+            to give you a clearer relationship with your own mind.
+          </p>
+        </section>
+      </main>
+    </>
   );
 }
