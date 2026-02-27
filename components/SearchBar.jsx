@@ -1,66 +1,56 @@
+import { useState, useEffect } from 'react';
+
 export default function SearchBar({ onSearch, disabled }) {
-  const handleButtonClick = () => {
-    if (disabled) return;
-    const input = document.getElementById("coherex-search");
-    if (input && input.value.trim()) {
-      onSearch(input.value);
+  const suggestions = [
+    "Why do I feel stuck right now?",
+    "Why do I keep overthinking things?",
+    "Why am I scared to make a decision?",
+    "Why do I feel like I'm not enough?",
+    "Why do I repeat the same patterns?",
+    "Why does this situation bother me so much?"
+  ];
+
+  const [placeholder, setPlaceholder] = useState(suggestions[0]);
+  const [index, setIndex] = useState(0);
+  const [input, setInput] = useState("");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % suggestions.length);
+      setPlaceholder(suggestions[(index + 1) % suggestions.length]);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [index]);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !disabled) {
+      onSearch(input);
+      setInput("");
     }
   };
 
   return (
-    <div
-      style={{
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        marginTop: '30px',
-        gap: '10px',
-        opacity: disabled ? 0.4 : 1,
-        pointerEvents: disabled ? 'none' : 'auto'
-      }}
-    >
+    <div style={{ marginInline: "auto", maxWidth: "520px" }}>
       <input
-        id="coherex-search"
         type="text"
-        placeholder={disabled ? "Trial ended — upgrade for access" : "Ask Coherex anything..."}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            onSearch(e.target.value);
-          }
-        }}
+        value={input}
         disabled={disabled}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder={placeholder}
         style={{
-          width: '70%',
-          maxWidth: '350px',
-          padding: '14px 18px',
-          borderRadius: '10px',
-          border: '1px solid rgba(0, 140, 255, 0.6)',
-          background: 'rgba(0, 140, 255, 0.12)',
-          color: 'white',
-          fontSize: '1rem',
-          outline: 'none',
-          boxShadow: '0 0 12px rgba(0, 140, 255, 0.4)',
-          transition: '0.25s'
+          width: "100%",
+          padding: "14px 18px",
+          borderRadius: "14px",
+          border: "1px solid rgba(0,140,255,0.7)",
+          background: "rgba(0,0,0,0.6)",
+          color: "white",
+          fontSize: "1rem",
+          outline: "none",
+          boxShadow: "0 0 14px rgba(0,140,255,0.4)",
         }}
       />
-
-      <button
-        onClick={handleButtonClick}
-        disabled={disabled}
-        style={{
-          padding: '14px 20px',
-          borderRadius: '10px',
-          border: 'none',
-          background: disabled ? 'rgba(120,120,120,0.8)' : 'rgba(0, 140, 255, 0.8)',
-          color: 'white',
-          fontSize: '1rem',
-          cursor: disabled ? 'default' : 'pointer',
-          boxShadow: '0 0 12px rgba(0, 140, 255, 0.6)',
-          transition: '0.25s'
-        }}
-      >
-        Search
-      </button>
     </div>
   );
 }
