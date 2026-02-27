@@ -12,7 +12,9 @@ export default function SearchBar({ onSearch }) {
         type="text"
         placeholder="Ask Coherex anything..."
         onKeyDown={(e) => {
-          if (e.key === 'Enter') onSearch(e.target.value);
+          if (e.key === 'Enter') {
+            onSearch(e.target.value);   // <-- THIS is the fix
+          }
         }}
         style={{
           width: '90%',
@@ -26,14 +28,6 @@ export default function SearchBar({ onSearch }) {
           outline: 'none',
           boxShadow: '0 0 12px rgba(0, 140, 255, 0.4)',
           transition: '0.25s'
-        }}
-        onFocus={(e) => {
-          e.target.style.boxShadow = '0 0 22px rgba(0, 140, 255, 0.9)';
-          e.target.style.background = 'rgba(0, 140, 255, 0.2)';
-        }}
-        onBlur={(e) => {
-          e.target.style.boxShadow = '0 0 12px rgba(0, 140, 255, 0.4)';
-          e.target.style.background = 'rgba(0, 140, 255, 0.12)';
         }}
       />
     </div>
