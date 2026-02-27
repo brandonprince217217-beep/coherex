@@ -8,7 +8,6 @@ export default function AboutPage() {
       </Head>
 
       <main className="about-root">
-        {/* Hero */}
         <section className="about-hero">
           <h1>Understand your mind. Build your clarity.</h1>
           <p>
@@ -19,14 +18,12 @@ export default function AboutPage() {
           </p>
 
           <div className="about-video-wrapper">
-            {/* Replace this with your real video embed */}
             <div className="about-video-placeholder">
               <span>90-second Coherex overview video</span>
             </div>
           </div>
         </section>
 
-        {/* The Coherex Perspective */}
         <section className="about-section">
           <h2>The Coherex perspective</h2>
           <p>
@@ -44,7 +41,6 @@ export default function AboutPage() {
           </p>
         </section>
 
-        {/* Mission */}
         <section className="about-section">
           <h2>Our mission</h2>
           <p>
@@ -56,7 +52,6 @@ export default function AboutPage() {
           </p>
         </section>
 
-        {/* Vision */}
         <section className="about-section">
           <h2>Our vision</h2>
           <p>
@@ -67,35 +62,30 @@ export default function AboutPage() {
           </p>
         </section>
 
-        {/* Values */}
-        <section className="about-section about-grid">
-          <div>
-            <h2>Our values</h2>
-            <ul className="about-values">
-              <li>
-                <strong>Clarity:</strong> Understanding begins with seeing
-                things as they are.
-              </li>
-              <li>
-                <strong>Agency:</strong> You deserve tools that help you take
-                control of your thinking.
-              </li>
-              <li>
-                <strong>Insight:</strong> The mind has structure, and structure
-                can be understood.
-              </li>
-              <li>
-                <strong>Integrity:</strong> Your data, your privacy, your
-                growth.
-              </li>
-              <li>
-                <strong>Exploration:</strong> Curiosity drives transformation.
-              </li>
-            </ul>
-          </div>
+        <section className="about-section">
+          <h2>Our values</h2>
+          <ul className="about-values">
+            <li>
+              <strong>Clarity:</strong> Understanding begins with seeing things
+              as they are.
+            </li>
+            <li>
+              <strong>Agency:</strong> You deserve tools that help you take
+              control of your thinking.
+            </li>
+            <li>
+              <strong>Insight:</strong> The mind has structure, and structure
+              can be understood.
+            </li>
+            <li>
+              <strong>Integrity:</strong> Your data, your privacy, your growth.
+            </li>
+            <li>
+              <strong>Exploration:</strong> Curiosity drives transformation.
+            </li>
+          </ul>
         </section>
 
-        {/* Story */}
         <section className="about-section">
           <h2>Why Coherex exists</h2>
           <p>
@@ -108,7 +98,6 @@ export default function AboutPage() {
           </p>
         </section>
 
-        {/* Founders note (non-intrusive, additive) */}
         <section className="about-section about-founders">
           <p>
             Coherex is crafted as a living cognitive universe, architected by{" "}
