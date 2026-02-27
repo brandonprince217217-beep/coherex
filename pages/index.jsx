@@ -32,8 +32,10 @@ export default function Home() {
           Your Cognitive Operating System
         </p>
 
+        {/* SEARCH BAR */}
         <SearchBar onSearch={handleSearch} />
 
+        {/* SEARCH RESULT */}
         {result && (
           <div
             style={{
