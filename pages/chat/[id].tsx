@@ -33,7 +33,6 @@ export default function ChatPage({ conversationId }) {
     setMessages((prev) => [...prev, userMsg]);
     await supabase.from("messages").insert(userMsg);
 
-    // Auto‑title if conversation has no title yet
     const { data: convo } = await supabase
       .from("conversations")
       .select("title")
