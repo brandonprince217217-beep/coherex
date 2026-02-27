@@ -1,79 +1,88 @@
-import Head from 'next/head';
-import Constellation from '../components/Constellation';
-import Vortex from '../components/Vortex';
-import HoloCore from '../components/HoloCore';
 import Layout from '../components/Layout';
-import SearchBar from '../components/SearchBar';
+import { useState } from 'react';
 
 export default function Home() {
+  const [result, setResult] = useState("");
+
+  // THIS MAKES YOUR SEARCH WORK
+  const handleSearch = (query) => {
+    if (!query.trim()) return;
+    setResult("Processing: " + query);
+  };
+
   return (
     <Layout>
-      <Head>
-        <title>Coherex</title>
-        <meta name="description" content="Cognitive OS" />
-      </Head>
-
       <div
         style={{
-          position: 'relative',
           width: '100%',
-          height: '100vh',
-          overflow: 'hidden',
-          backgroundColor: 'black'
+          minHeight: '100vh',
+          backgroundColor: 'black',
+          color: 'white',
+          paddingTop: '160px',
+          paddingBottom: '60px',
+          textAlign: 'center',
+          fontFamily: 'Inter, sans-serif'
         }}
       >
-        {/* Background Constellation */}
+        <h1 style={{ fontSize: '2.4rem', marginBottom: '20px' }}>
+          Coherex
+        </h1>
+
+        <p style={{ opacity: 0.7, marginBottom: '40px' }}>
+          Your Cognitive Operating System
+        </p>
+
+        {/* SEARCH BAR */}
         <div
           style={{
-            position: 'absolute',
-            inset: 0,
-            zIndex: 1
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            marginBottom: '30px'
           }}
         >
-          <Constellation />
+          <input
+            type="text"
+            placeholder="Ask Coherex anything..."
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleSearch(e.target.value);
+            }}
+            style={{
+              width: '90%',
+              maxWidth: '420px',
+              padding: '14px 18px',
+              borderRadius: '10px',
+              border: '1px solid rgba(0, 140, 255, 0.6)',
+              background: 'rgba(0, 140, 255, 0.12)',
+              color: 'white',
+              fontSize: '1rem',
+              outline: 'none',
+              boxShadow: '0 0 12px rgba(0, 140, 255, 0.4)',
+              transition: '0.25s'
+            }}
+            onFocus={(e) => {
+              e.target.style.boxShadow = '0 0 22px rgba(0, 140, 255, 0.9)';
+              e.target.style.background = 'rgba(0, 140, 255, 0.2)';
+            }}
+            onBlur={(e) => {
+              e.target.style.boxShadow = '0 0 12px rgba(0, 140, 255, 0.4)';
+              e.target.style.background = 'rgba(0, 140, 255, 0.12)';
+            }}
+          />
         </div>
 
-        {/* Vortex Layer */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            zIndex: 2
-          }}
-        >
-          <Vortex />
-        </div>
-
-        {/* HoloCore (center engine) */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex: 3
-          }}
-        >
-          <HoloCore />
-        </div>
-
-        {/* Main Content */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '70%',               // moved lower
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex: 4,
-            color: 'white',
-            textAlign: 'center'
-          }}
-        >
-          <h1>Coherex Cognitive OS</h1>
-          <p>Welcome to your cognitive engine.</p>
-
-          <SearchBar />
-        </div>
+        {/* SEARCH RESULT */}
+        {result && (
+          <div
+            style={{
+              marginTop: '20px',
+              fontSize: '1.2rem',
+              opacity: 0.9
+            }}
+          >
+            {result}
+          </div>
+        )}
       </div>
     </Layout>
   );
