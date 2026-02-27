@@ -4,52 +4,41 @@ import { supabase } from "../lib/supabase";
 import { useRouter } from "next/router";
 
 export default function Sidebar() {
-  const [convos, setConvos] = useState([]);
   const router = useRouter();
-  const active = router.query.id;
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    load();
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUser(data?.user || null);
+    };
+    getUser();
   }, []);
 
-  const load = async () => {
-    const { data } = await supabase
-      .from("conversations")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    setConvos(data || []);
-  };
-
-  const newConversation = async () => {
-    const { data } = await supabase
-      .from("conversations")
-      .insert({ title: "New Conversation" })
-      .select()
-      .single();
-
-    router.push(`/chat/${data.id}`);
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
   };
 
   return (
-    <div className="sidebar">
-      <button className="new-btn" onClick={newConversation}>
-        + New
-      </button>
+    <aside className="sidebar">
+      <nav>
+        <Link href="/">Home</Link>
+        <Link href="/chat">Chat</Link>
+        <Link href="/pricing">Pricing</Link>
+        <Link href="/about">About</Link>
+      </nav>
 
-      <div className="sidebar-list">
-        {convos.map((c) => (
-          <Link key={c.id} href={`/chat/${c.id}`}>
-            <div
-              className={
-                c.id === active ? "sidebar-item active" : "sidebar-item"
-              }
-            >
-              {c.title || "Untitled"}
-            </div>
-          </Link>
-        ))}
+      <div className="auth-section">
+        {user ? (
+          <>
+            <p>Signed in as {user.email}</p>
+            <button onClick={handleSignOut}>Sign Out</button>
+          </>
+        ) : (
+          <Link href="/auth">Sign In</Link>
+        )}
       </div>
-    </div>
+    </aside>
   );
 }
