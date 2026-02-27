@@ -1,43 +1,35 @@
-import OpenAI from "openai";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { openai } from "../../lib/openai";
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
-
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { section, userInput } = req.body;
-
-  if (!section || !userInput) {
-    return res.status(400).json({ error: "Missing section or userInput" });
-  }
-
   try {
-    const response = await client.chat.completions.create({
+    const { text } = JSON.parse(req.body || "{}");
+
+    if (!text) {
+      return res.status(400).json({ error: "Missing text" });
+    }
+
+    const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
+      temperature: 0.3,
       messages: [
         {
           role: "system",
-          content: `You are Coherex, a cognitive OS.
-You generate deep psychological analysis inside a structured engine.
-Your tone is calm, precise, and insightful.`
+          content: "Analyze the user's text and return a short summary.",
         },
-        {
-          role: "user",
-          content: `Generate the "${section}" section for this user input: "${userInput}".
-Return ONLY the text. No bullets unless the section requires them.`
-        }
-      ]
+        { role: "user", content: text },
+      ],
     });
 
-    const output = response.choices[0].message.content?.trim() || "";
-    res.status(200).json({ output });
+    const summary = completion.choices?.[0]?.message?.content || "";
 
-  } catch (error) {
-    console.error("AI ERROR:", error);
-    res.status(500).json({ error: "AI request failed" });
+    res.status(200).json({ summary });
+  } catch (err) {
+    console.error("Analyze API error:", err);
+    res.status(500).json({ summary: "" });
   }
 }
