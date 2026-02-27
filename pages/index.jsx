@@ -1,6 +1,6 @@
 import Layout from '../components/Layout';
 import SearchBar from '../components/SearchBar';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export default function Home() {
   const [analysis, setAnalysis] = useState(null);
@@ -273,61 +273,6 @@ export default function Home() {
               <div style={labelStyle}>Next Question</div>
               <div>{analysis.nextQuestion}</div>
             </div>
-          </div>
-        )}
-
-        {showPopup && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '20%',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '85%',
-              maxWidth: '360px',
-              background: 'black',
-              border: '1px solid rgba(0,140,255,0.7)',
-              borderRadius: '14px',
-              padding: '20px',
-              boxShadow: '0 0 20px rgba(0,140,255,0.6)',
-              zIndex: 9999,
-              textAlign: 'center',
-            }}
-          >
-            <div
-              onClick={() => setShowPopup(false)}
-              style={{
-                position: 'absolute',
-                top: '10px',
-                right: '14px',
-                fontSize: '1.4rem',
-                cursor: 'pointer',
-                color: 'white',
-              }}
-            >
-              ×
-            </div>
-
-            <h3 style={{ marginBottom: '14px' }}>Your free trial has ended.</h3>
-
-            <p style={{ opacity: 0.8, marginBottom: '20px' }}>
-              Go to Pricing for unlimited access.
-            </p>
-
-            <a
-              href="/pricing"
-              style={{
-                display: 'inline-block',
-                padding: '10px 18px',
-                background: 'rgba(0,140,255,0.9)',
-                borderRadius: '10px',
-                color: 'white',
-                textDecoration: 'none',
-                boxShadow: '0 0 12px rgba(0,140,255,0.6)',
-              }}
-            >
-              Go to Pricing
-            </a>
           </div>
         )}
       </div>
