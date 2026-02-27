@@ -1,5 +1,6 @@
-export default function SearchBar({ onSearch }) {
+export default function SearchBar({ onSearch, disabled }) {
   const handleButtonClick = () => {
+    if (disabled) return;
     const input = document.getElementById("coherex-search");
     if (input && input.value.trim()) {
       onSearch(input.value);
@@ -13,18 +14,21 @@ export default function SearchBar({ onSearch }) {
         display: 'flex',
         justifyContent: 'center',
         marginTop: '30px',
-        gap: '10px'
+        gap: '10px',
+        opacity: disabled ? 0.4 : 1,
+        pointerEvents: disabled ? 'none' : 'auto'
       }}
     >
       <input
         id="coherex-search"
         type="text"
-        placeholder="Ask Coherex anything..."
+        placeholder={disabled ? "Trial ended — upgrade for access" : "Ask Coherex anything..."}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
             onSearch(e.target.value);
           }
         }}
+        disabled={disabled}
         style={{
           width: '70%',
           maxWidth: '350px',
@@ -42,14 +46,15 @@ export default function SearchBar({ onSearch }) {
 
       <button
         onClick={handleButtonClick}
+        disabled={disabled}
         style={{
           padding: '14px 20px',
           borderRadius: '10px',
           border: 'none',
-          background: 'rgba(0, 140, 255, 0.8)',
+          background: disabled ? 'rgba(120,120,120,0.8)' : 'rgba(0, 140, 255, 0.8)',
           color: 'white',
           fontSize: '1rem',
-          cursor: 'pointer',
+          cursor: disabled ? 'default' : 'pointer',
           boxShadow: '0 0 12px rgba(0, 140, 255, 0.6)',
           transition: '0.25s'
         }}
