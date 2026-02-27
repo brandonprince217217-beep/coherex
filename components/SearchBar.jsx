@@ -16,22 +16,27 @@ export default function SearchBar({ onSearch, disabled }) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % suggestions.length);
-      setPlaceholder(suggestions[(index + 1) % suggestions.length]);
+      const next = (index + 1) % suggestions.length;
+      setIndex(next);
+      setPlaceholder(suggestions[next]);
     }, 3000);
 
     return () => clearInterval(interval);
   }, [index]);
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !disabled) {
+  const handleSearch = () => {
+    if (!disabled && input.trim() !== "") {
       onSearch(input);
       setInput("");
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleSearch();
+  };
+
   return (
-    <div style={{ marginInline: "auto", maxWidth: "520px" }}>
+    <div style={{ marginInline: "auto", maxWidth: "520px", width: "90%" }}>
       <input
         type="text"
         value={input}
@@ -41,6 +46,8 @@ export default function SearchBar({ onSearch, disabled }) {
         placeholder={placeholder}
         style={{
           width: "100%",
+          maxWidth: "100%",
+          boxSizing: "border-box",
           padding: "14px 18px",
           borderRadius: "14px",
           border: "1px solid rgba(0,140,255,0.7)",
@@ -51,6 +58,25 @@ export default function SearchBar({ onSearch, disabled }) {
           boxShadow: "0 0 14px rgba(0,140,255,0.4)",
         }}
       />
+
+      <button
+        onClick={handleSearch}
+        disabled={disabled}
+        style={{
+          marginTop: "12px",
+          width: "100%",
+          padding: "12px",
+          borderRadius: "12px",
+          background: disabled ? "gray" : "rgba(0,140,255,0.9)",
+          color: "white",
+          border: "none",
+          fontSize: "1rem",
+          cursor: disabled ? "not-allowed" : "pointer",
+          boxShadow: "0 0 14px rgba(0,140,255,0.6)",
+        }}
+      >
+        Search
+      </button>
     </div>
   );
 }
