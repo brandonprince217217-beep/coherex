@@ -1,10 +1,13 @@
-// components/InputBar.tsx
 import { useState } from "react";
 
-export default function InputBar({ onSend }) {
+interface InputBarProps {
+  onSend: (text: string) => void;
+}
+
+export default function InputBar({ onSend }: InputBarProps) {
   const [text, setText] = useState("");
 
-  const submit = () => {
+  const send = () => {
     if (!text.trim()) return;
     onSend(text);
     setText("");
@@ -13,12 +16,15 @@ export default function InputBar({ onSend }) {
   return (
     <div className="input-bar">
       <input
+        className="input-field"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && submit()}
-        placeholder="Type..."
+        placeholder="Type your message..."
+        onKeyDown={(e) => e.key === "Enter" && send()}
       />
-      <button onClick={submit}>Send</button>
+      <button className="send-btn" onClick={send}>
+        Send
+      </button>
     </div>
   );
 }
