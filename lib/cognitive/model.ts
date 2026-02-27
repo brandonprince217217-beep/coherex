@@ -1,42 +1,43 @@
-export type BeliefNodeKind =
-  | "belief"
-  | "value"
-  | "fear"
-  | "desire"
-  | "assumption";
+// Core parameter types for each visual/sensory subsystem of the Coherex field
 
-export type BeliefNode = {
-  label: string;
-  kind: BeliefNodeKind;
-  strength: number; // 0–1
+export type NebulaParams = {
+  brightness: number;
+  motionSpeed: number;
+  contrast: number;
+  warmth: number;
 };
 
-export type CognitiveAnalysis = {
-  coreBelief: string;
-  impliedMeaning: string;
-  emotionalTone: string;
-  emotionalIntensity: number; // 0–1
-  coreNeed: string;
-  hiddenAssumptions: string[];
-  contradictions: string[];
-  breakthroughLikelihood: number; // 0–1
-  identityShift: string;
-  nextQuestion: string;
-  beliefGraph: BeliefNode[];
+export type ConstellationParams = {
+  rotationSpeed: number;
+  pulseIntensity: number;
+  spread: number;
+  symmetry: number;
 };
 
-export function emptyAnalysis(): CognitiveAnalysis {
-  return {
-    coreBelief: "",
-    impliedMeaning: "",
-    emotionalTone: "",
-    emotionalIntensity: 0,
-    coreNeed: "",
-    hiddenAssumptions: [],
-    contradictions: [],
-    breakthroughLikelihood: 0,
-    identityShift: "",
-    nextQuestion: "",
-    beliefGraph: [],
-  };
-}
+export type VortexParams = {
+  intensity: number;
+  turbulence: number;
+  depth: number;
+};
+
+export type GlowParams = {
+  strength: number;
+  colorShift: number;
+  pulseSpeed: number;
+};
+
+export type SoundParams = {
+  reverb: number;
+  bass: number;
+  clarity: number;
+};
+
+// This is the type your environment.ts file imports.
+// It MUST be exported exactly like this.
+export type EnvironmentParams = {
+  nebula: NebulaParams;
+  constellation: ConstellationParams;
+  vortex: VortexParams;
+  glow: GlowParams;
+  sound: SoundParams;
+};
