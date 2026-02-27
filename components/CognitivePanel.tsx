@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React from "react";
 import type { CognitiveAnalysis } from "../lib/cognitive/model";
 
 type Props = {
@@ -6,116 +6,134 @@ type Props = {
 };
 
 export default function CognitivePanel({ analysis }: Props) {
-  const breakthroughLevel = useMemo(() => {
-    if (!analysis) return 0;
-    return Math.round(analysis.breakthroughLikelihood * 100);
-  }, [analysis]);
-
   if (!analysis) {
     return (
-      <div className="cognitive-panel">
-        <div className="cognitive-header">Cognitive Field</div>
-        <div className="cognitive-empty">
-          Start typing to see your mindspace come alive.
+      <aside className="cognitive-panel">
+        <div className="cognitive-header">
+          <span>COGNITIVE FIELD</span>
+          <span className="breakthrough-pill">Idle</span>
         </div>
-      </div>
+        <div className="cognitive-empty">
+          The system will map beliefs, emotions, and contradictions as you type.
+        </div>
+      </aside>
     );
   }
 
+  const {
+    coreBelief,
+    impliedMeaning,
+    emotionalTone,
+    emotionalIntensity,
+    coreNeed,
+    hiddenAssumptions,
+    contradictions,
+    breakthroughLikelihood,
+    identityShift,
+    nextQuestion,
+    beliefGraph,
+  } = analysis;
+
+  const breakthroughLabel =
+    breakthroughLikelihood > 0.75
+      ? "High"
+      : breakthroughLikelihood > 0.45
+      ? "Warming"
+      : "Low";
+
+  const breakthroughClass =
+    breakthroughLikelihood > 0.75
+      ? "breakthrough-pill hot"
+      : breakthroughLikelihood > 0.45
+      ? "breakthrough-pill warm"
+      : "breakthrough-pill";
+
+  const intensityPercent = Math.round(emotionalIntensity * 100);
+  const breakthroughPercent = Math.round(breakthroughLikelihood * 100);
+
   return (
-    <div className="cognitive-panel">
+    <aside className="cognitive-panel">
       <div className="cognitive-header">
-        Cognitive Field
-        <span
-          className={
-            breakthroughLevel > 70
-              ? "breakthrough-pill hot"
-              : breakthroughLevel > 40
-              ? "breakthrough-pill warm"
-              : "breakthrough-pill"
-          }
-        >
-          Breakthrough {breakthroughLevel}%
+        <span>COGNITIVE FIELD</span>
+        <span className={breakthroughClass}>
+          Breakthrough {breakthroughLabel} · {breakthroughPercent}%
         </span>
       </div>
 
-      <div className="cognitive-section">
-        <div className="cognitive-label">Core Belief</div>
-        <div className="cognitive-text">{analysis.coreBelief}</div>
-      </div>
+      <section className="cognitive-section">
+        <div className="cognitive-label">Core belief</div>
+        <div className="cognitive-text">{coreBelief || "—"}</div>
+      </section>
 
-      <div className="cognitive-section">
-        <div className="cognitive-label">Implied Meaning</div>
-        <div className="cognitive-text">{analysis.impliedMeaning}</div>
-      </div>
+      <section className="cognitive-section">
+        <div className="cognitive-label">Implied meaning</div>
+        <div className="cognitive-text">{impliedMeaning || "—"}</div>
+      </section>
 
-      <div className="cognitive-grid">
+      <section className="cognitive-grid">
         <div className="cognitive-block">
-          <div className="cognitive-label">Emotional State</div>
-          <div className="cognitive-text">{analysis.emotionalState}</div>
-        </div>
-        <div className="cognitive-block">
-          <div className="cognitive-label">Intensity</div>
+          <div className="cognitive-label">Emotional state</div>
           <div className="cognitive-text">
-            {Math.round(analysis.emotionalIntensity * 100)}%
+            {emotionalTone || "—"} · {intensityPercent}%
           </div>
         </div>
-      </div>
-
-      {analysis.hiddenAssumptions.length > 0 && (
-        <div className="cognitive-section">
-          <div className="cognitive-label">Hidden Assumptions</div>
-          <ul className="cognitive-list">
-            {analysis.hiddenAssumptions.map((a, i) => (
-              <li key={i}>{a}</li>
-            ))}
-          </ul>
+        <div className="cognitive-block">
+          <div className="cognitive-label">Core need</div>
+          <div className="cognitive-text">{coreNeed || "—"}</div>
         </div>
-      )}
+      </section>
 
-      {analysis.contradictions.length > 0 && (
-        <div className="cognitive-section">
-          <div className="cognitive-label">Contradictions Forming</div>
-          <ul className="cognitive-list contradictions">
-            {analysis.contradictions.map((c, i) => (
-              <li key={i}>{c}</li>
-            ))}
-          </ul>
+      <section className="cognitive-section">
+        <div className="cognitive-label">Hidden assumptions</div>
+        <ul className="cognitive-list">
+          {hiddenAssumptions && hiddenAssumptions.length > 0 ? (
+            hiddenAssumptions.map((a, i) => <li key={i}>{a}</li>)
+          ) : (
+            <li>None detected yet.</li>
+          )}
+        </ul>
+      </section>
+
+      <section className="cognitive-section">
+        <div className="cognitive-label">Contradictions</div>
+        <ul className="cognitive-list contradictions">
+          {contradictions && contradictions.length > 0 ? (
+            contradictions.map((c, i) => <li key={i}>{c}</li>)
+          ) : (
+            <li>No active contradictions detected.</li>
+          )}
+        </ul>
+      </section>
+
+      <section className="cognitive-grid">
+        <div className="cognitive-block">
+          <div className="cognitive-label">Identity shift</div>
+          <div className="cognitive-text">{identityShift || "—"}</div>
         </div>
-      )}
+        <div className="cognitive-block">
+          <div className="cognitive-label">Next question</div>
+          <div className="cognitive-text">{nextQuestion || "—"}</div>
+        </div>
+      </section>
 
-      <div className="cognitive-section">
-        <div className="cognitive-label">Predicted Next Thought</div>
-        <div className="cognitive-text">{analysis.predictedNextThought}</div>
-      </div>
-
-      <div className="cognitive-section">
-        <div className="cognitive-label">Identity Shift</div>
-        <div className="cognitive-text">{analysis.identityShift}</div>
-      </div>
-
-      <div className="cognitive-section">
-        <div className="cognitive-label">Belief Graph</div>
-        <div className="belief-graph">
-          {analysis.beliefGraph.nodes.map((n) => (
-            <div
-              key={n.id}
-              className={`belief-node belief-${n.type}`}
-              style={{
-                opacity: 0.4 + n.strength * 0.6,
-                boxShadow: `0 0 ${8 + n.emotionalCharge * 18}px rgba(255,255,255,${
-                  0.1 + n.emotionalCharge * 0.5
-                })`,
-              }}
-            >
-              <div className="belief-label">{n.label}</div>
-              <div className="belief-meta">
-                {n.type} • {(n.strength * 100).toFixed(0)}%
+      {beliefGraph && beliefGraph.length > 0 && (
+        <section className="cognitive-section">
+          <div className="cognitive-label">Belief graph</div>
+          <div className="belief-graph">
+            {beliefGraph.map((node, i) => (
+              <div
+                key={i}
+                className={`belief-node belief-${node.kind || "belief"}`}
+              >
+                <div className="belief-label">{node.label}</div>
+                <div className="belief-meta">
+                  {node.kind} · strength {Math.round(node.strength * 100)}%
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+            ))}
+          </div>
+        </section>
+      )}
+    </aside>
   );
 }
