@@ -4,65 +4,8 @@ import { useState, useEffect } from 'react';
 
 export default function Home() {
   const [analysis, setAnalysis] = useState(null);
-  const [trialActive, setTrialActive] = useState(true);
-  const [timeLeft, setTimeLeft] = useState(180);
   const [showPopup, setShowPopup] = useState(false);
   const [showResults, setShowResults] = useState(false);
-
-  // Load or create persistent trial end time
-  useEffect(() => {
-    const savedEnd = localStorage.getItem('trialEnd');
-
-    if (!savedEnd) {
-      const endTime = Date.now() + 180000; // 3 minutes
-      localStorage.setItem('trialEnd', endTime.toString());
-      setTimeLeft(180);
-      setTrialActive(true);
-      return;
-    }
-
-    const endTime = parseInt(savedEnd, 10);
-    const remaining = Math.floor((endTime - Date.now()) / 1000);
-
-    if (remaining > 0) {
-      setTimeLeft(remaining);
-      setTrialActive(true);
-    } else {
-      setTimeLeft(0);
-      setTrialActive(false);
-      setShowPopup(true);
-    }
-  }, []);
-
-  // Countdown timer
-  useEffect(() => {
-    if (!trialActive) return;
-
-    const interval = setInterval(() => {
-      const savedEnd = localStorage.getItem('trialEnd');
-      if (!savedEnd) {
-        clearInterval(interval);
-        setTrialActive(false);
-        setTimeLeft(0);
-        setShowPopup(true);
-        return;
-      }
-
-      const endTime = parseInt(savedEnd, 10);
-      const remaining = Math.floor((endTime - Date.now()) / 1000);
-
-      if (remaining <= 0) {
-        clearInterval(interval);
-        setTrialActive(false);
-        setTimeLeft(0);
-        setShowPopup(true);
-      } else {
-        setTimeLeft(remaining);
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [trialActive]);
 
   // ---------- ENGINE LOGIC ----------
 
@@ -192,11 +135,6 @@ export default function Home() {
   };
 
   const handleSearch = (query) => {
-    if (!trialActive) {
-      window.location.href = 'https://buy.stripe.com/14A3cn4bXbgCh0t2pvasg04';
-      return;
-    }
-
     const trimmed = query.trim();
     if (!trimmed) return;
 
@@ -221,17 +159,8 @@ export default function Home() {
       nextQuestion,
     });
 
-    // trigger animation
     setShowResults(false);
-    requestAnimationFrame(() => {
-      setShowResults(true);
-    });
-  };
-
-  const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
+    requestAnimationFrame(() => setShowResults(true));
   };
 
   // ---------- STYLES ----------
@@ -284,64 +213,35 @@ export default function Home() {
           Your Cognitive Operating System
         </p>
 
-        {trialActive ? (
-          <p
-            style={{
-              opacity: 0.8,
-              fontSize: '0.9rem',
-              marginBottom: '20px',
-            }}
-          >
-            Free trial active — time left: {formatTime(timeLeft)}
-          </p>
-        ) : (
-          <p
-            style={{
-              opacity: 0.8,
-              fontSize: '0.9rem',
-              marginBottom: '20px',
-              color: 'red',
-            }}
-          >
-            Your free trial has ended. Search is locked.
-          </p>
-        )}
-
-        <SearchBar onSearch={handleSearch} disabled={!trialActive} />
+        <SearchBar onSearch={handleSearch} disabled={false} />
 
         {analysis && (
           <div style={animatedContainerStyle}>
-            {/* RAW INPUT */}
             <div style={cardBaseStyle}>
               <div style={labelStyle}>Input</div>
               <div>{analysis.raw}</div>
             </div>
 
-            {/* DOMAIN */}
             <div style={cardBaseStyle}>
               <div style={labelStyle}>Domain</div>
               <div>{analysis.domain}</div>
             </div>
 
-            {/* BELIEF TYPE */}
             <div style={cardBaseStyle}>
               <div style={labelStyle}>Belief Type</div>
               <div>{analysis.beliefType}</div>
             </div>
 
-            {/* EMOTIONAL CHARGE */}
             <div style={cardBaseStyle}>
               <div style={labelStyle}>Emotional Charge</div>
               <div>{analysis.emotionalCharge}</div>
             </div>
 
-            {/* HIDDEN ASSUMPTION */}
             <div style={cardBaseStyle}>
               <div style={labelStyle}>Hidden Assumption</div>
               <div>{analysis.hiddenAssumption}</div>
             </div>
 
-            {/* IMPLICATIONS */}
             <div style={cardBaseStyle}>
               <div style={labelStyle}>Implications</div>
               <ul style={{ paddingLeft: '18px', margin: 0 }}>
@@ -353,7 +253,6 @@ export default function Home() {
               </ul>
             </div>
 
-            {/* CONTRADICTIONS */}
             <div style={cardBaseStyle}>
               <div style={labelStyle}>Contradictions</div>
               <ul style={{ paddingLeft: '18px', margin: 0 }}>
@@ -365,13 +264,11 @@ export default function Home() {
               </ul>
             </div>
 
-            {/* REWRITE */}
             <div style={cardBaseStyle}>
               <div style={labelStyle}>Rewrite</div>
               <div>{analysis.rewrite}</div>
             </div>
 
-            {/* NEXT QUESTION */}
             <div style={cardBaseStyle}>
               <div style={labelStyle}>Next Question</div>
               <div>{analysis.nextQuestion}</div>
