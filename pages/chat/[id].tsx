@@ -4,6 +4,7 @@ import ChatWindow from "../../../components/ChatWindow";
 import InputBar from "../../../components/InputBar";
 import Sidebar from "../../../components/Sidebar";
 import CognitivePanel from "../../../components/CognitivePanel";
+import CognitiveField3D from "../../../components/CognitiveField3D";
 import type { CognitiveAnalysis } from "../../../lib/cognitive/model";
 
 export default function ChatPage({ conversationId }) {
@@ -33,7 +34,7 @@ export default function ChatPage({ conversationId }) {
       .join("\n");
   };
 
-  const sendMessage = async (text) => {
+  const sendMessage = async (text: string) => {
     const userMsg = {
       id: crypto.randomUUID(),
       role: "user",
@@ -50,7 +51,7 @@ export default function ChatPage({ conversationId }) {
       .eq("id", conversationId)
       .single();
 
-    if (!convo.title || convo.title === "New Conversation") {
+    if (!convo?.title || convo.title === "New Conversation") {
       const titleRes = await fetch("/api/title", {
         method: "POST",
         body: JSON.stringify({ message: text }),
@@ -81,8 +82,10 @@ export default function ChatPage({ conversationId }) {
       body: JSON.stringify({ message: text }),
     });
 
-    const reader = res.body.getReader();
-    let segments = [];
+    const reader = res.body?.getReader();
+    if (!reader) return;
+
+    let segments: string[] = [];
     let current = "";
 
     setStreaming({
@@ -105,10 +108,11 @@ export default function ChatPage({ conversationId }) {
         current += chunk;
       }
 
+      const all = [...segments, current];
       setStreaming({
         role: "assistant",
-        segments: [...segments, current],
-        visible: [...segments, current].join("\n\n"),
+        segments: all,
+        visible: all.join("\n\n"),
         isStreaming: true,
       });
     }
@@ -130,16 +134,26 @@ export default function ChatPage({ conversationId }) {
     setStreaming(null);
   };
 
+  const emotionalIntensity = analysis?.emotionalIntensity ?? 0;
+  const breakthroughLikelihood = analysis?.breakthroughLikelihood ?? 0;
+
   return (
-    <div className="layout">
-      <Sidebar />
+    <div className="chat-shell">
+      <CognitiveField3D
+        intensity={emotionalIntensity}
+        breakthrough={breakthroughLikelihood}
+      />
 
-      <div className="chat-area">
-        <ChatWindow messages={messages} streaming={streaming} />
-        <InputBar onSend={sendMessage} />
+      <div className="layout chat-foreground">
+        <Sidebar />
+
+        <div className="chat-area">
+          <ChatWindow messages={messages} streaming={streaming} />
+          <InputBar onSend={sendMessage} />
+        </div>
+
+        <CognitivePanel analysis={analysis} />
       </div>
-
-      <CognitivePanel analysis={analysis} />
     </div>
   );
 }
