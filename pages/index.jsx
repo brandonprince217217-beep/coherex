@@ -4,7 +4,6 @@ import { useState } from 'react';
 
 export default function Home() {
   const [analysis, setAnalysis] = useState(null);
-  const [showPopup, setShowPopup] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
   // ---------- ENGINE LOGIC ----------
@@ -205,7 +204,6 @@ export default function Home() {
           paddingBottom: '60px',
           textAlign: 'center',
           fontFamily: 'Inter, sans-serif',
-          position: 'relative',
         }}
       >
         <h1 style={{ fontSize: '2.4rem', marginBottom: '20px' }}>Coherex</h1>
