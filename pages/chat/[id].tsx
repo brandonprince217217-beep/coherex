@@ -3,10 +3,13 @@ import { supabase } from "../../../lib/supabase";
 import ChatWindow from "../../../components/ChatWindow";
 import InputBar from "../../../components/InputBar";
 import Sidebar from "../../../components/Sidebar";
+import CognitivePanel from "../../../components/CognitivePanel";
+import type { CognitiveAnalysis } from "../../../lib/cognitive/model";
 
 export default function ChatPage({ conversationId }) {
   const [messages, setMessages] = useState([]);
   const [streaming, setStreaming] = useState(null);
+  const [analysis, setAnalysis] = useState<CognitiveAnalysis | null>(null);
 
   useEffect(() => {
     loadMessages();
@@ -20,6 +23,14 @@ export default function ChatPage({ conversationId }) {
       .order("created_at", { ascending: true });
 
     setMessages(data || []);
+  };
+
+  const summarizeHistory = () => {
+    if (!messages || messages.length === 0) return "";
+    const last = messages.slice(-6);
+    return last
+      .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
+      .join("\n");
   };
 
   const sendMessage = async (text) => {
@@ -52,6 +63,18 @@ export default function ChatPage({ conversationId }) {
         .update({ title })
         .eq("id", conversationId);
     }
+
+    const historySummary = summarizeHistory();
+
+    fetch("/api/cognitive", {
+      method: "POST",
+      body: JSON.stringify({ message: text, historySummary }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setAnalysis(data);
+      })
+      .catch(() => {});
 
     const res = await fetch("/api/stream", {
       method: "POST",
@@ -115,6 +138,8 @@ export default function ChatPage({ conversationId }) {
         <ChatWindow messages={messages} streaming={streaming} />
         <InputBar onSend={sendMessage} />
       </div>
+
+      <CognitivePanel analysis={analysis} />
     </div>
   );
 }
