@@ -1,78 +1,28 @@
-import { useState } from "react";
-import InputBar from "./InputBar";
-import StreamingBlock from "./StreamingBlock";
+// components/ChatWindow.tsx
 
-interface Message {
-  role: "user" | "assistant";
-  content: string;
+interface ChatWindowProps {
+  messages: any[];
+  streaming: boolean;
 }
 
-export default function ChatWindow() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [streamingText, setStreamingText] = useState("");
-
-  const sendMessage = async (text: string) => {
-    // Add user message
-    setMessages((prev) => [...prev, { role: "user", content: text }]);
-
-    // Start streaming
-    setStreamingText("");
-
-    const response = await fetch("/api/stream", {
-      method: "POST",
-      body: JSON.stringify({ message: text }),
-    });
-
-    const reader = response.body?.getReader();
-    if (!reader) return;
-
-    const decoder = new TextDecoder();
-
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-
-      const chunk = decoder.decode(value);
-      setStreamingText((prev) => prev + chunk);
-    }
-
-    // Finalize assistant message
-    setMessages((prev) => [
-      ...prev,
-      { role: "assistant", content: streamingText + "" },
-    ]);
-
-    setStreamingText("");
-
-    // Trigger cognitive engine
-    fetch("/api/cognitive", {
-      method: "POST",
-      body: JSON.stringify({
-        message: text,
-        historySummary: "",
-      }),
-    });
-
-    // Trigger title generator
-    fetch("/api/title", {
-      method: "POST",
-      body: JSON.stringify({ message: text }),
-    });
-  };
-
+export default function ChatWindow({ messages, streaming }: ChatWindowProps) {
   return (
     <div className="chat-window">
-      <div className="messages">
-        {messages.map((m, i) => (
-          <div key={i} className={`msg ${m.role}`}>
-            {m.content}
-          </div>
-        ))}
+      {messages.map((msg: any, i: number) => (
+        <div key={i} className="chat-message">
+          {msg.role === "user" ? (
+            <div className="user-message">{msg.content}</div>
+          ) : (
+            <div className="assistant-message">{msg.content}</div>
+          )}
+        </div>
+      ))}
 
-        {streamingText && <StreamingBlock text={streamingText} />}
-      </div>
-
-      <InputBar onSend={sendMessage} />
+      {streaming && (
+        <div className="assistant-message typing-indicator">
+          …
+        </div>
+      )}
     </div>
   );
 }
