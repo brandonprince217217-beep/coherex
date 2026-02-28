@@ -1,5 +1,3 @@
-// pages/chat/[id].jsx
-
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -17,7 +15,7 @@ export default function ChatPage() {
       try {
         setLoading(true);
 
-        // ⭐ Send the search text to your AI engine
+        // ⭐ EXACT MATCH to your backend API
         const res = await fetch("/api/engine", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -26,9 +24,10 @@ export default function ChatPage() {
 
         const data = await res.json();
 
-        // ⭐ Show the AI result
+        // ⭐ EXACT MATCH to your backend return shape
         setResponse(data.result || "No response.");
       } catch (err) {
+        console.error(err);
         setResponse("Error loading response.");
       } finally {
         setLoading(false);
