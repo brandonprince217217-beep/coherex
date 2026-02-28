@@ -1,8 +1,14 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import dynamic from "next/dynamic";
 import InputBar from "../components/InputBar";
 import type { SearchResponse } from "./api/search";
+
+const ParticleField3D = dynamic(
+  () => import("../components/ParticleField3D"),
+  { ssr: false }
+);
 
 type LoadingPhase = "retrieving" | "synthesising" | "formatting";
 
@@ -163,6 +169,8 @@ export default function SearchPage() {
       <Head>
         <title>{q ? `${q} — Coherex` : "Search — Coherex"}</title>
       </Head>
+
+      <ParticleField3D />
 
       <div className="search-page__bar">
         <InputBar
