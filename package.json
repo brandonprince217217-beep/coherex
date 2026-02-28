@@ -13,7 +13,8 @@
     "react-dom": "18.2.0",
     "tone": "^14.8.39",
     "three": "^0.161.0",
-    "openai": "^4.0.0"
+    "openai": "^4.0.0",
+    "@supabase/supabase-js": "^2.39.7"
   },
   "devDependencies": {
     "typescript": "^5.3.3",
