@@ -75,7 +75,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     .join("\n\n");
 
   try {
-    let timeoutId: ReturnType<typeof setTimeout>;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     const timeoutPromise = new Promise<never>((_, reject) => {
       timeoutId = setTimeout(
         () => reject(new Error("Search request timed out")),
@@ -97,7 +97,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     const completion = await Promise.race([completionPromise, timeoutPromise]);
-    clearTimeout(timeoutId!);
+    clearTimeout(timeoutId);
     const answer = completion.choices[0]?.message?.content ?? "";
 
     return res.status(200).json({
