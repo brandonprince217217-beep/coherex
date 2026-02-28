@@ -10,6 +10,8 @@ jobs:
   quality:
     name: Lint / Typecheck / Test / Build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout
