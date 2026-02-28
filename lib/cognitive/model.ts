@@ -39,8 +39,11 @@ export type EnvironmentParams = {
 };
 
 export type CognitiveAnalysis = {
+  coreBelief: string;
+  impliedMeaning: string;
+  emotionalTone: string;
+  emotionalIntensity: number;
   summary: string;
   insights: string[];
-  emotionalTone: string;
   confidence: number;
 };
