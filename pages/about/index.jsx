@@ -21,10 +21,14 @@ export default function AboutPage() {
           {/* VIDEO SECTION */}
           <div className="about-video-wrapper">
             <video
-              src="/coherex-about.mp4"
-              controls
               className="about-video-placeholder"
-            />
+              controls
+              playsInline
+              preload="metadata"
+            >
+              <source src="/coherex-about.mp4" type="video/mp4" />
+              Your browser does not support HTML5 video.
+            </video>
           </div>
         </section>
 

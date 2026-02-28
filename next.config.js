@@ -18,6 +18,20 @@ const nextConfig = {
             value: "0"
           }
         ]
+      },
+      {
+        // Video files need caching + byte-range support for browsers to buffer and seek
+        source: "/:path*\\.(mp4|webm|ogg|mov)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000"
+          },
+          {
+            key: "Accept-Ranges",
+            value: "bytes"
+          }
+        ]
       }
     ];
   }

@@ -286,3 +286,22 @@
   font-size: 0.95rem;
 }
 
+/* ─── About Page Video ──────────────────────────────────────── */
+.about-video-wrapper {
+  width: 100%;
+  max-width: 800px;
+  margin: 32px auto 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 140, 255, 0.2);
+}
+
+.about-video-placeholder {
+  width: 100%;
+  display: block;
+  max-height: 450px;
+  object-fit: contain;
+  background: #000;
+}
+
