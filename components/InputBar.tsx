@@ -1,16 +1,36 @@
-// components/InputBar.jsx
+import { useEffect, useRef, useState } from "react";
 
-import { useState } from "react";
+type InputBarProps = {
+  onSend: (text: string) => void;
+  disabled?: boolean;
+  buttonLabel?: string;
+  initialValue?: string;
+};
 
-export default function InputBar({ onSend }) {
-  const [text, setText] = useState("");
+export default function InputBar({
+  onSend,
+  disabled = false,
+  buttonLabel = "Search",
+  initialValue = "",
+}: InputBarProps) {
+  const [text, setText] = useState(initialValue);
+  const lastSubmitRef = useRef(0);
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    setText(initialValue);
+  }, [initialValue]);
+
+  const canSubmit = !disabled && text.trim().length > 0;
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!text.trim()) return;
+    if (!canSubmit) return;
+
+    const now = Date.now();
+    if (now - lastSubmitRef.current < 300) return; // debounce window
+    lastSubmitRef.current = now;
 
     onSend(text);
-    setText("");
   };
 
   return (
@@ -20,8 +40,11 @@ export default function InputBar({ onSend }) {
         placeholder="Search anything..."
         value={text}
         onChange={(e) => setText(e.target.value)}
+        disabled={disabled}
       />
-      <button type="submit">Search</button>
+      <button type="submit" disabled={!canSubmit}>
+        {buttonLabel}
+      </button>
     </form>
   );
 }
