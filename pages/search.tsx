@@ -11,6 +11,7 @@ export default function SearchPage() {
   const [answer, setAnswer] = useState("");
   const [results, setResults] = useState<Result[]>([]);
   const [error, setError] = useState("");
+  const [searched, setSearched] = useState(false);
 
   useEffect(() => {
     if (!q) return;
@@ -20,26 +21,48 @@ export default function SearchPage() {
       setError("");
       setAnswer("");
       setResults([]);
+      setSearched(false);
 
       try {
         const res = await fetch("/api/search", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query: q }),
+          signal: AbortSignal.timeout(20_000),
         });
 
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.error || "Request failed");
+        let data: Record<string, unknown>;
+        try {
+          data = await res.json();
+        } catch {
+          throw new Error("Received an unexpected response from the server.");
+        }
 
-        setAnswer(data.answer || "");
-        setResults(Array.isArray(data.results) ? data.results : []);
-      } catch (e: any) {
-        setError(e?.message || "Something went wrong");
+        if (!res.ok) {
+          throw new Error(
+            typeof data?.error === "string" ? data.error : "Request failed"
+          );
+        }
+
+        setAnswer(typeof data.answer === "string" ? data.answer : "");
+        setResults(Array.isArray(data.results) ? (data.results as Result[]) : []);
+      } catch (e: unknown) {
+        if (e instanceof DOMException && e.name === "TimeoutError") {
+          setError("The search request timed out. Please try again.");
+        } else if (e instanceof Error) {
+          setError(e.message || "Something went wrong. Please try again.");
+        } else {
+          setError("Something went wrong. Please try again.");
+        }
       } finally {
         setLoading(false);
+        setSearched(true);
       }
     })();
   }, [q]);
+
+  const hasResults = answer || results.length > 0;
+  const showEmpty = searched && !loading && !error && !hasResults && q;
 
   return (
     <div style={{ padding: 20, maxWidth: 900, margin: "0 auto" }}>
@@ -49,8 +72,23 @@ export default function SearchPage() {
         <strong>Query:</strong> {q || "(none)"}
       </div>
 
-      {loading && <p style={{ marginTop: 16 }}>Thinking…</p>}
-      {error && <p style={{ marginTop: 16, color: "tomato" }}>{error}</p>}
+      {loading && (
+        <p style={{ marginTop: 16 }} aria-live="polite">
+          Thinking…
+        </p>
+      )}
+
+      {error && (
+        <p style={{ marginTop: 16, color: "tomato" }} role="alert">
+          {error}
+        </p>
+      )}
+
+      {showEmpty && (
+        <p style={{ marginTop: 16, opacity: 0.7 }} aria-live="polite">
+          No results found for &ldquo;{q}&rdquo;. Try a different search.
+        </p>
+      )}
 
       {!loading && !error && answer && (
         <div

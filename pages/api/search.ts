@@ -3,6 +3,8 @@ import { openai } from "../../lib/openai";
 
 type Source = { title: string; url: string; snippet: string; text: string };
 
+const SEARCH_TIMEOUT_MS = 15_000;
+
 function escapeRegExp(s: string) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -72,23 +74,43 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     )
     .join("\n\n");
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content:
-          "You are a search engine for the Coherex site. Answer using ONLY the provided sources. " +
-          "Add citations like [1], [2] that refer to the SOURCE numbers. Keep it concise.",
-      },
-      { role: "user", content: `Query: ${query}\n\n${context}` },
-    ],
-  });
+  try {
+    let timeoutId: ReturnType<typeof setTimeout>;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(
+        () => reject(new Error("Search request timed out")),
+        SEARCH_TIMEOUT_MS
+      );
+    });
 
-  const answer = completion.choices[0]?.message?.content || "";
+    const completionPromise = openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a search engine for the Coherex site. Answer using ONLY the provided sources. " +
+            "Add citations like [1], [2] that refer to the SOURCE numbers. Keep it concise.",
+        },
+        { role: "user", content: `Query: ${query}\n\n${context}` },
+      ],
+    });
 
-  return res.status(200).json({
-    answer,
-    results: ranked.map(({ title, url, snippet }) => ({ title, url, snippet })),
-  });
+    const completion = await Promise.race([completionPromise, timeoutPromise]);
+    clearTimeout(timeoutId!);
+    const answer = completion.choices[0]?.message?.content ?? "";
+
+    return res.status(200).json({
+      answer,
+      results: ranked.map(({ title, url, snippet }) => ({ title, url, snippet })),
+    });
+  } catch (err: unknown) {
+    const isTimeout = err instanceof Error && err.message.includes("timed out");
+    const message = isTimeout
+      ? "The search request timed out. Please try again."
+      : "Search is temporarily unavailable. Please try again later.";
+
+    console.error("[search] handler error:", err);
+    return res.status(503).json({ error: message });
+  }
 }
