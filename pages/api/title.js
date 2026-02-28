@@ -1,27 +1,20 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 import { openai } from "../../lib/openai";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    const { message } = JSON.parse(req.body || "{}");
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      temperature: 0.3,
-      messages: [
-        {
-          role: "system",
-          content: "Generate a short, clean conversation title.",
-        },
-        { role: "user", content: message },
-      ],
-    });
-
-    const title = completion.choices?.[0]?.message?.content || "Conversation";
-
-    res.status(200).json({ title });
-  } catch (err) {
-    console.error("Title API error:", err);
-    res.status(200).json({ title: "Conversation" });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
+
+  const { text } = req.body;
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      { role: "system", content: "Generate a title." },
+      { role: "user", content: text }
+    ]
+  });
+
+  res.status(200).json({ title: response.choices[0].message.content });
 }
