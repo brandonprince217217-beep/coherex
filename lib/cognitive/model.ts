@@ -43,6 +43,10 @@ export type CognitiveAnalysis = {
   impliedMeaning: string;
   emotionalTone: string;
   emotionalIntensity: number;
+  coreNeed: string;
+  hiddenAssumptions: string[];
+  contradictions: string[];
+  breakthroughLikelihood: number;
   summary: string;
   insights: string[];
   confidence: number;
