@@ -1,30 +1,27 @@
+// components/InputBar.tsx
+
 import { useState } from "react";
 
-interface InputBarProps {
-  onSend: (text: string) => void;
-}
-
-export default function InputBar({ onSend }: InputBarProps) {
+export default function InputBar({ onSend }: { onSend: (text: string) => void }) {
   const [text, setText] = useState("");
 
-  const send = () => {
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
     if (!text.trim()) return;
+
     onSend(text);
-    setText("");
+    setText(""); // clear AFTER sending
   };
 
   return (
-    <div className="input-bar">
+    <form className="input-bar" onSubmit={handleSubmit}>
       <input
-        className="input-field"
+        type="text"
+        placeholder="Search anything..."
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Type your message..."
-        onKeyDown={(e) => e.key === "Enter" && send()}
       />
-      <button className="send-btn" onClick={send}>
-        Send
-      </button>
-    </div>
+      <button type="submit">Search</button>
+    </form>
   );
 }
