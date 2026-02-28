@@ -1,16 +1,16 @@
-// components/InputBar.tsx
+// components/InputBar.jsx
 
 import { useState } from "react";
 
-export default function InputBar({ onSend }: { onSend: (text: string) => void }) {
+export default function InputBar({ onSend }) {
   const [text, setText] = useState("");
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!text.trim()) return;
 
-    onSend(text);   // ⭐ sends the text to your homepage
-    setText("");    // clears AFTER sending
+    onSend(text);
+    setText("");
   };
 
   return (
