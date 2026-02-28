@@ -31,6 +31,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "Missing query" });
   }
 
+  if (!process.env.OPENAI_API_KEY) {
+    return res.status(500).json({ error: "Missing OPENAI_API_KEY" });
+  }
+
   // STARTER INTERNAL "INDEX" (easy + works now)
   // You can expand this later to real page content / embeddings.
   const sources: Source[] = [
@@ -72,23 +76,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     )
     .join("\n\n");
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content:
-          "You are a search engine for the Coherex site. Answer using ONLY the provided sources. " +
-          "Add citations like [1], [2] that refer to the SOURCE numbers. Keep it concise.",
-      },
-      { role: "user", content: `Query: ${query}\n\n${context}` },
-    ],
-  });
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a search engine for the Coherex site. Answer using ONLY the provided sources. " +
+            "Add citations like [1], [2] that refer to the SOURCE numbers. Keep it concise.",
+        },
+        { role: "user", content: `Query: ${query}\n\n${context}` },
+      ],
+    });
 
-  const answer = completion.choices[0]?.message?.content || "";
+    const answer = completion.choices[0]?.message?.content || "";
 
-  return res.status(200).json({
-    answer,
-    results: ranked.map(({ title, url, snippet }) => ({ title, url, snippet })),
-  });
+    return res.status(200).json({
+      answer,
+      results: ranked.map(({ title, url, snippet }) => ({ title, url, snippet })),
+    });
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    return res.status(500).json({ error: "OpenAI request failed", detail });
+  }
 }
