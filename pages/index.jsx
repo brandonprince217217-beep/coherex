@@ -1,14 +1,14 @@
 // pages/index.tsx
 
-import { useState } from "react";
 import Head from "next/head";
 import InputBar from "../components/InputBar";
 
 export default function Home() {
+  // ⭐ This is the missing search function
   const handleSearch = (text: string) => {
     if (!text.trim()) return;
 
-    // Navigate to chat page with the query as the ID
+    // Go to chat page with the search text
     window.location.href = `/chat/${encodeURIComponent(text)}`;
   };
 
@@ -23,6 +23,7 @@ export default function Home() {
         <p>Your cognitive OS.</p>
 
         <div className="search-container">
+          {/* ⭐ This is the fix — pass the function into the SearchBar */}
           <InputBar onSend={handleSearch} />
         </div>
       </div>
