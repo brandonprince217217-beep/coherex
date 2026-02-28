@@ -4,7 +4,6 @@ import Head from "next/head";
 import InputBar from "../components/InputBar";
 
 export default function Home() {
-  // No TypeScript types here — pure JS
   const handleSearch = (text) => {
     if (!text.trim()) return;
     window.location.href = `/chat/${encodeURIComponent(text)}`;
