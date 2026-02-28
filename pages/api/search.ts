@@ -1,94 +1,138 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { openai } from "../../lib/openai";
+import { fetchWebResults, type WebResult } from "../../lib/webSearch";
 
-type Source = { title: string; url: string; snippet: string; text: string };
+const TIMEOUT_MS = 20_000;
 
-function escapeRegExp(s: string) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+export type SearchResponse = {
+  answer: string;
+  interpretation: string;
+  reframing: string;
+  relatedAngles: string[];
+  results: Array<{ title: string; url: string; snippet: string }>;
+  confidence: "high" | "medium" | "low";
+  retrievedAt: string;
+};
+
+export type ErrorResponse = { error: string };
+
+function normalizeQuery(q: string) {
+  return q.replace(/\s+/g, " ").trim();
 }
 
-function score(query: string, haystack: string) {
-  const q = query.toLowerCase().trim();
-  const t = haystack.toLowerCase();
-  if (!q) return 0;
+function confidenceFromSources(sources: WebResult[]): "high" | "medium" | "low" {
+  if (sources.length >= 3) return "high";
+  if (sources.length >= 1) return "medium";
+  return "low";
+}
 
-  const parts = q.split(/\s+/).filter(Boolean);
-  let s = 0;
-
-  for (const p of parts) {
-    const re = new RegExp(escapeRegExp(p), "g");
-    const m = t.match(re);
-    if (m) s += m.length;
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<SearchResponse | ErrorResponse>
+) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
-  return s;
-}
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
-
-  const { query } = req.body || {};
+  const { query } = req.body ?? {};
   if (typeof query !== "string" || !query.trim()) {
     return res.status(400).json({ error: "Missing query" });
   }
 
-  // STARTER INTERNAL "INDEX" (easy + works now)
-  // You can expand this later to real page content / embeddings.
-  const sources: Source[] = [
-    {
-      title: "Home",
-      url: "/",
-      snippet: "Coherex homepage and tagline.",
-      text: "Coherex. Your cognitive OS.",
-    },
-    {
-      title: "About",
-      url: "/about",
-      snippet: "About Coherex and what it does.",
-      text: "About Coherex and what it does.",
-    },
-    {
-      title: "Pricing",
-      url: "/pricing",
-      snippet: "Plan details and pricing.",
-      text: "Pricing plans, basic access, unlimited searches, engine access, and analysis features.",
-    },
-    {
-      title: "Demo",
-      url: "/demo",
-      snippet: "Demo experience for Coherex.",
-      text: "Demo page that shows example interactions and results.",
-    },
-  ];
+  const normalized = normalizeQuery(query);
+  const retrievedAt = new Date().toISOString();
 
-  const ranked = sources
-    .map((s) => ({ ...s, _score: score(query, `${s.title}\n${s.snippet}\n${s.text}`) }))
-    .sort((a, b) => b._score - a._score)
-    .slice(0, 4);
+  // Abort the whole pipeline after TIMEOUT_MS
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
-  const context = ranked
-    .map(
-      (s, i) =>
-        `SOURCE ${i + 1}\nTitle: ${s.title}\nURL: ${s.url}\nContent: ${s.text}`
-    )
-    .join("\n\n");
+  try {
+    // 1. Retrieve live web sources (gracefully empty when key is absent)
+    const webResults = await fetchWebResults(normalized, 5);
+    const confidence = confidenceFromSources(webResults);
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
+    // 2. Build source context for the LLM
+    const context =
+      webResults.length > 0
+        ? webResults
+            .map(
+              (s, i) =>
+                `SOURCE ${i + 1}\nTitle: ${s.title}\nURL: ${s.url}\nSnippet: ${s.snippet}`
+            )
+            .join("\n\n")
+        : "No external sources were available for this query.";
+
+    const confidenceNote =
+      confidence === "low"
+        ? " NOTE: source coverage is sparse — be transparent about uncertainty."
+        : confidence === "medium"
+        ? " NOTE: source coverage is limited — express appropriate confidence."
+        : "";
+
+    // 3. Synthesise a structured, supportive response
+    const completion = await openai.chat.completions.create(
       {
-        role: "system",
-        content:
-          "You are a search engine for the Coherex site. Answer using ONLY the provided sources. " +
-          "Add citations like [1], [2] that refer to the SOURCE numbers. Keep it concise.",
+        model: "gpt-4o-mini",
+        temperature: 0.6,
+        max_tokens: 600,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a warm, insightful assistant for Coherex, a cognitive OS for self-understanding. " +
+              "Your tone is supportive, clear, and non-prescriptive. " +
+              "Respond ONLY with valid JSON matching this exact shape:\n" +
+              "{\n" +
+              '  "interpretation": "<one short paragraph: empathetic reflection on what the user might be experiencing>",\n' +
+              '  "reframing": "<one short paragraph: a gentle reframe or constructive next step>",\n' +
+              '  "relatedAngles": ["<tag or short phrase>", ...] // 2–4 related themes\n' +
+              "}\n" +
+              "Use the provided sources to ground your answer and add citations like [1], [2] where relevant." +
+              confidenceNote,
+          },
+          {
+            role: "user",
+            content: `User query: "${normalized}"\n\nSources:\n${context}`,
+          },
+        ],
       },
-      { role: "user", content: `Query: ${query}\n\n${context}` },
-    ],
-  });
+      { signal: controller.signal as AbortSignal }
+    );
 
-  const answer = completion.choices[0]?.message?.content || "";
+    clearTimeout(timer);
 
-  return res.status(200).json({
-    answer,
-    results: ranked.map(({ title, url, snippet }) => ({ title, url, snippet })),
-  });
+    const raw = completion.choices[0]?.message?.content ?? "{}";
+
+    let parsed: { interpretation?: string; reframing?: string; relatedAngles?: string[] };
+    try {
+      // Strip possible markdown code fences and extract the first JSON object
+      const fenceStripped = raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/m, "");
+      const jsonMatch = fenceStripped.match(/\{[\s\S]*\}/);
+      parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
+    } catch {
+      parsed = {};
+    }
+
+    const interpretation = parsed.interpretation ?? raw;
+    const reframing = parsed.reframing ?? "";
+    const relatedAngles = Array.isArray(parsed.relatedAngles) ? parsed.relatedAngles : [];
+    const answer = [interpretation, reframing].filter(Boolean).join("\n\n");
+
+    return res.status(200).json({
+      answer,
+      interpretation,
+      reframing,
+      relatedAngles,
+      results: webResults.map(({ title, url, snippet }) => ({ title, url, snippet })),
+      confidence,
+      retrievedAt,
+    });
+  } catch (err: unknown) {
+    clearTimeout(timer);
+    const isTimeout =
+      err instanceof Error && (err.name === "AbortError" || err.message.includes("abort"));
+    return res
+      .status(isTimeout ? 504 : 500)
+      .json({ error: isTimeout ? "Request timed out. Please try again." : "Search failed. Please try again." });
+  }
 }
