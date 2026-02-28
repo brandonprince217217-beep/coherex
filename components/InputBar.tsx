@@ -9,8 +9,8 @@ export default function InputBar({ onSend }: { onSend: (text: string) => void })
     e.preventDefault();
     if (!text.trim()) return;
 
-    onSend(text);
-    setText(""); // clear AFTER sending
+    onSend(text);   // ⭐ sends the text to your homepage
+    setText("");    // clears AFTER sending
   };
 
   return (
