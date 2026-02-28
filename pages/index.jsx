@@ -3,8 +3,9 @@ import InputBar from "../components/InputBar";
 
 export default function Home() {
   const handleSearch = (text) => {
-    if (!text.trim()) return;
-    window.location.href = `/chat/${encodeURIComponent(text)}`;
+    const query = text.trim();
+    if (!query) return;
+    window.location.href = `/search?q=${encodeURIComponent(query)}`;
   };
 
   return (
