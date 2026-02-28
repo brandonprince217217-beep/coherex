@@ -1,3 +1,14 @@
+/* CSS variable defaults for animated canvas components */
+:root {
+  --constellation-rotation: 0.08;
+  --constellation-pulse: 0.6;
+  --constellation-spread: 0.4;
+  --global-pulse: 0;
+  --sound-tension: 0;
+  --global-rotation: 0;
+  --nebula-brightness: 0.5;
+}
+
 /* Homepage hero layout fix */
 .hero {
   display: flex;
@@ -7,6 +18,8 @@
   min-height: 80vh;          /* prevents pushing upward */
   padding-top: 40px;         /* ensures it never touches the top */
   text-align: center;
+  position: relative;        /* establishes stacking context */
+  z-index: 2;                /* renders above canvas backgrounds */
 }
 
 .search-container {
@@ -38,4 +51,64 @@
   background: #000;
   color: white;
   cursor: pointer;
+}
+
+/* Technology showcase section */
+.tech-section {
+  position: relative;
+  z-index: 2;
+  padding: 48px 24px 80px;
+  text-align: center;
+}
+
+.tech-heading {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin-bottom: 32px;
+}
+
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.tech-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 140, 255, 0.25);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.tech-card:hover {
+  border-color: rgba(0, 140, 255, 0.6);
+  box-shadow: 0 0 18px rgba(0, 140, 255, 0.25);
+}
+
+.tech-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.tech-label {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.tech-desc {
+  font-size: 0.8rem;
+  opacity: 0.55;
+  line-height: 1.5;
+  margin: 0;
 }
