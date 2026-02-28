@@ -5,7 +5,7 @@
  */
 
 const REQUIRED_SERVER_ENV: Record<string, string> = {
-  OPENAI_API_KEY: "OpenAI API key (get it at https://platform.openai.com/api-keys)",
+  GROQ_API_KEY: "Groq API key (get it at https://console.groq.com/keys)",
 };
 
 export function validateServerEnv(): void {

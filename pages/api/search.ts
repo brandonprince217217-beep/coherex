@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { openai } from "../../lib/openai";
+import { openai, groqModel } from "../../lib/openai";
 
 type Source = { title: string; url: string; snippet: string; text: string };
 
@@ -84,7 +84,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     const completionPromise = openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: groqModel,
       messages: [
         {
           role: "system",

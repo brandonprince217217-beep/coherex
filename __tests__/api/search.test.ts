@@ -14,6 +14,7 @@ jest.mock("../../lib/openai", () => ({
       },
     },
   },
+  groqModel: "llama-3.3-70b-versatile",
 }));
 
 // Silence console.error in tests

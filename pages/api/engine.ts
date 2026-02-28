@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { openai } from "../../lib/openai";
+import { openai, groqModel } from "../../lib/openai";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: groqModel,
       messages: [
         { role: "system", content: "Run the cognitive engine." },
         { role: "user", content: text }
