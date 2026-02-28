@@ -60,6 +60,7 @@ export default function Vortex() {
     };
 
     animate();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

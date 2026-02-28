@@ -24,6 +24,7 @@ export default function SearchBar({ onSearch, disabled }) {
     }, 3000);
 
     return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSearch = () => {

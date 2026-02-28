@@ -1,17 +1,23 @@
-<footer className="footer">
-  <div className="footer-inner">
+import Link from "next/link";
 
-    <div className="footer-left">
-      <div className="footer-logo">C</div>
-      <p className="footer-tagline">Coherex — A Cognitive Operating System</p>
-    </div>
+export default function Footer() {
+  return (
+    <footer className="footer">
+      <div className="footer-inner">
 
-    <div className="footer-right">
-      <a href="#" className="footer-link">About</a>
-      <a href="#" className="footer-link">Architecture</a>
-      <a href="#" className="footer-link">Pillars</a>
-      <a href="#" className="footer-link badge">Coming Soon</a>
-    </div>
+        <div className="footer-left">
+          <div className="footer-logo">C</div>
+          <p className="footer-tagline">Coherex — A Cognitive Operating System</p>
+        </div>
 
-  </div>
-</footer>
+        <div className="footer-right">
+          <Link href="/about" className="footer-link">About</Link>
+          <a href="#" className="footer-link">Architecture</a>
+          <a href="#" className="footer-link">Pillars</a>
+          <a href="#" className="footer-link badge">Coming Soon</a>
+        </div>
+
+      </div>
+    </footer>
+  );
+}
