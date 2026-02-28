@@ -1,11 +1,11 @@
-// pages/index.tsx
+// pages/index.jsx
 
 import Head from "next/head";
 import InputBar from "../components/InputBar";
 
 export default function Home() {
-  // ⭐ This is the missing search function
-  const handleSearch = (text: string) => {
+  // No TypeScript types here — pure JS
+  const handleSearch = (text) => {
     if (!text.trim()) return;
     window.location.href = `/chat/${encodeURIComponent(text)}`;
   };
@@ -21,7 +21,6 @@ export default function Home() {
         <p>Your cognitive OS.</p>
 
         <div className="search-container">
-          {/* ⭐ STEP 2 — Replace <InputBar /> with this */}
           <InputBar onSend={handleSearch} />
         </div>
       </div>
