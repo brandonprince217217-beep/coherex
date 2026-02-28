@@ -1,6 +1,6 @@
 # Coherex
 
-**Coherex** is a cognitive OS for mapping beliefs, contradictions, and meaning. This repository contains the public-facing Next.js website with AI-powered search, streaming chat, and cognitive analysis — all running on GPT-4o-mini.
+**Coherex** is a  cognitive OS for mapping beliefs, contradictions, and meaning. This repository contains the public-facing Next.js website with AI-powered search, streaming chat, and cognitive analysis — all running on GPT-4o-mini.
 
 ---
 
