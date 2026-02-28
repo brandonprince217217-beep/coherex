@@ -7,17 +7,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { text } = req.body;
+  const { text } = req.body || {};
+  if (typeof text !== "string" || !text.trim()) {
+    return res.status(400).json({ error: "Missing text" });
+  }
 
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      { role: "system", content: "Perform cognitive analysis." },
-      { role: "user", content: text }
-    ]
-  });
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: "Perform cognitive analysis." },
+        { role: "user", content: text }
+      ]
+    });
 
-  res.status(200).json({
-    analysis: response.choices[0].message.content || emptyAnalysis
-  });
+    res.status(200).json({
+      analysis: response.choices[0].message.content || emptyAnalysis
+    });
+  } catch (err) {
+    console.error("[cognitive] handler error:", err);
+    res.status(503).json({ error: "Cognitive analysis is temporarily unavailable. Please try again." });
+  }
 }

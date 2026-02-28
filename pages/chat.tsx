@@ -18,11 +18,11 @@ export default function ChatPage() {
 
     const res = await fetch("/api/stream", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: text }),
     });
 
     const reader = res.body.getReader();
-    let full = "";
     let segments: string[] = [];
     let currentSegment = "";
 
