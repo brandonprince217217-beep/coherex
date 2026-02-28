@@ -1,12 +1,10 @@
-// pages/index.jsx
-
 import Head from "next/head";
 import InputBar from "../components/InputBar";
 
 export default function Home() {
   const handleSearch = (text) => {
     if (!text.trim()) return;
-    window.location.href = `/chat/${encodeURIComponent(text)}`;
+    window.location.href = `/search?q=${encodeURIComponent(text)}`;
   };
 
   return (
