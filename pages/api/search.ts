@@ -1,9 +1,20 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { openai } from "../../lib/openai";
+import { getMissingServerEnv } from "../../lib/env";
 
 type Source = { title: string; url: string; snippet: string; text: string };
 
 const SEARCH_TIMEOUT_MS = 15_000;
+const RELEVANCE_THRESHOLD = 1;
+const MAX_RESULTS = 4;
+
+// Lightweight greeting / small-talk detector — no retrieval for these
+const GREETING_RE =
+  /^(hi|hey|hello|howdy|yo|sup|good\s+(morning|afternoon|evening|day)|how\s+are\s+you|what'?s\s+up|thank(?:s|s?\s+you)?|bye|goodbye)\W*$/i;
+
+function isGreeting(q: string): boolean {
+  return GREETING_RE.test(q.trim());
+}
 
 function escapeRegExp(s: string) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -31,6 +42,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { query } = req.body || {};
   if (typeof query !== "string" || !query.trim()) {
     return res.status(400).json({ error: "Missing query" });
+  }
+
+  // Validate required env vars at request time and return a structured error
+  const missingEnv = getMissingServerEnv();
+  if (missingEnv.length > 0) {
+    return res.status(503).json({
+      error: `Missing required configuration: ${missingEnv.join(", ")}. Set the environment variable(s) and redeploy.`,
+    });
+  }
+
+  const debugEnabled = process.env.SEARCH_DEBUG === "true";
+
+  // Greeting / small-talk: skip retrieval, return friendly prompt
+  if (isGreeting(query)) {
+    return res.status(200).json({
+      answer:
+        "Hi! I'm the Coherex search assistant. Ask me a specific question to get started.",
+      results: [],
+      ...(debugEnabled
+        ? { _debug: { retrievalPerformed: false, fallbackUsed: true, fallbackReason: "greeting" } }
+        : {}),
+    });
   }
 
   // STARTER INTERNAL "INDEX" (easy + works now)
@@ -62,10 +95,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     },
   ];
 
+  // Score and filter to only sources that actually match the query
   const ranked = sources
     .map((s) => ({ ...s, _score: score(query, `${s.title}\n${s.snippet}\n${s.text}`) }))
+    .filter((s) => s._score >= RELEVANCE_THRESHOLD)
     .sort((a, b) => b._score - a._score)
-    .slice(0, 4);
+    .slice(0, MAX_RESULTS);
+
+  const debugBase = debugEnabled
+    ? {
+        model: "gpt-4o-mini",
+        retrievalPerformed: true,
+        candidatesRetrieved: sources.length,
+        passingThreshold: ranked.length,
+        threshold: RELEVANCE_THRESHOLD,
+        fallbackUsed: false as boolean,
+        fallbackReason: null as string | null,
+      }
+    : null;
+
+  // No relevant docs — return truthful response without calling the LLM
+  if (ranked.length === 0) {
+    return res.status(200).json({
+      answer:
+        "I couldn't find any relevant information for that query. Try rephrasing or ask something specific about Coherex.",
+      results: [],
+      ...(debugBase
+        ? { _debug: { ...debugBase, fallbackUsed: true, fallbackReason: "no-relevant-sources" } }
+        : {}),
+    });
+  }
 
   const context = ranked
     .map(
@@ -103,6 +162,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({
       answer,
       results: ranked.map(({ title, url, snippet }) => ({ title, url, snippet })),
+      ...(debugBase ? { _debug: debugBase } : {}),
     });
   } catch (err: unknown) {
     const isTimeout = err instanceof Error && err.message.includes("timed out");
