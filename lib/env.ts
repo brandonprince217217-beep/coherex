@@ -24,3 +24,11 @@ export function validateServerEnv(): void {
     );
   }
 }
+
+/**
+ * Returns an array of missing required env var names (does not throw).
+ * Use in API route handlers to return structured error responses.
+ */
+export function getMissingServerEnv(): string[] {
+  return Object.keys(REQUIRED_SERVER_ENV).filter((key) => !process.env[key]);
+}
