@@ -1,6 +1,6 @@
 # Coherex
 
-**Coherex** is a  cognitive OS for mapping beliefs, contradictions, and meaning. This repository contains the public-facing Next.js website with AI-powered search, streaming chat, and cognitive analysis — all running on GPT-4o-mini.
+**Coherex** is a  cognitive OS for mapping beliefs, contradictions, and meaning. This repository contains the public-facing Next.js website with AI-powered search, streaming chat, and cognitive analysis — all running on Groq's fast LLaMA models.
 
 ---
 
@@ -49,17 +49,16 @@ npm install
 
 This downloads all packages into a `node_modules` folder. It only needs to run once (or again after pulling new changes).
 
-### Step 4 — Get your OpenAI API key *(required)*
+### Step 4 — Get your Groq API key *(required)*
 
-The AI features (search summaries, chat, analysis) all require an OpenAI key.
+The AI features (search summaries, chat, analysis) all require a Groq API key.
 
-1. Go to **https://platform.openai.com/api-keys**
+1. Go to **https://console.groq.com/keys**
 2. Sign in or create a free account
-3. Click **"Create new secret key"**
-4. Give it a name like `coherex-local`, then click **Create**
-5. **Copy the key immediately** — it starts with `sk-` and you can't see it again after closing the dialog
+3. Click **"Create API Key"**, give it a name like `coherex-local`, then click **Submit**
+4. **Copy the key immediately** — it starts with `gsk_` and you can't see it again after closing the dialog
 
-> **Cost:** The site uses `gpt-4o-mini` which is very cheap (~$0.15 per 1M input tokens). Normal use costs pennies per day.
+> **Cost:** Groq has a generous free tier. Normal development use is free.
 
 ### Step 5 — Get your Supabase keys *(needed for database features)*
 
@@ -83,7 +82,7 @@ cp .env.example .env.local
 Now open `.env.local` in any text editor and replace the placeholder values:
 
 ```
-OPENAI_API_KEY=sk-...your-key-here...
+GROQ_API_KEY=gsk_...your-key-here...
 
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...your-anon-key...
@@ -107,7 +106,7 @@ A quick reference if you already have accounts:
 
 | Key | Where to find it |
 |---|---|
-| `OPENAI_API_KEY` | https://platform.openai.com/api-keys → Create new secret key |
+| `GROQ_API_KEY` | https://console.groq.com/keys → Create API Key |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase dashboard → Settings → API → Project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase dashboard → Settings → API → anon / public |
 
@@ -131,11 +130,12 @@ A quick reference if you already have accounts:
 
 | Variable | Required | Where to get it |
 |---|---|---|
-| `OPENAI_API_KEY` | **Yes** — site won't start without it | https://platform.openai.com/api-keys |
+| `GROQ_API_KEY` | **Yes** — site won't start without it | https://console.groq.com/keys |
+| `GROQ_MODEL` | No — defaults to `llama-3.3-70b-versatile` | See https://console.groq.com/docs/models |
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes for database features | Supabase Settings → API |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes for database features | Supabase Settings → API |
 
-> **Scope note:** `OPENAI_API_KEY` is server-side only (safe — never sent to the browser). Variables starting with `NEXT_PUBLIC_` are also embedded in the client bundle, so they must only ever contain non-secret public values (the Supabase anon key is intentionally public).
+> **Scope note:** `GROQ_API_KEY` is server-side only (safe — never sent to the browser). Variables starting with `NEXT_PUBLIC_` are also embedded in the client bundle, so they must only ever contain non-secret public values (the Supabase anon key is intentionally public).
 
 ---
 
@@ -146,7 +146,7 @@ A quick reference if you already have accounts:
 1. Push this repo to GitHub (it's already there)
 2. Go to **https://vercel.com**, sign in with GitHub, and click **"Add New Project"**
 3. Import the `coherex` repository
-4. Under **Environment Variables**, add all three keys from Step 4–5 above
+4. Under **Environment Variables**, add `GROQ_API_KEY` (and optionally `GROQ_MODEL`) plus both Supabase keys from Steps 4–5 above
 5. Click **Deploy** — Vercel builds and hosts it automatically
 
 Every `git push` to `main` will auto-redeploy.
@@ -161,7 +161,7 @@ npm run build
 npm start
 ```
 
-Set the three environment variables in your hosting dashboard before starting. The app listens on `PORT` (default 3000).
+Set the environment variables (`GROQ_API_KEY`, Supabase URL, Supabase anon key) in your hosting dashboard before starting. The app listens on `PORT` (default 3000).
 
 ---
 
@@ -178,7 +178,7 @@ coherex/
 │   ├── pricing.jsx      # Pricing page
 │   ├── demo.jsx         # Interactive demo
 │   └── api/             # Server-side AI routes
-│       ├── search.ts    # AI search (GPT-4o-mini + ranked results)
+│       ├── search.ts    # AI search (Groq LLaMA + ranked results)
 │       ├── stream.ts    # Streaming chat responses
 │       ├── engine.ts    # Cognitive engine
 │       ├── analyze.ts   # Message analysis
@@ -186,7 +186,7 @@ coherex/
 │       └── title.ts     # Auto title generation
 ├── components/          # Reusable UI components
 ├── lib/
-│   ├── openai.ts        # OpenAI client (server-only)
+│   ├── openai.ts        # Groq client via OpenAI-compatible SDK (server-only)
 │   ├── supabase.ts      # Supabase client
 │   └── env.ts           # Startup env validation
 ├── styles/
