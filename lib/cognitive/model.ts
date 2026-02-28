@@ -1,16 +1,20 @@
 // lib/cognitive/model.ts
 
 export interface CognitiveAnalysis {
-  beliefType: string;
-  emotionalCharge: number;
+  coreBelief: string;
+  impliedMeaning: string;
+  emotionalTone: string;
+  emotionalIntensity: number;
   coreNeed: string;
   rewrite: string;
   nextQuestion: string;
 }
 
 export const emptyAnalysis: CognitiveAnalysis = {
-  beliefType: "",
-  emotionalCharge: 0,
+  coreBelief: "",
+  impliedMeaning: "",
+  emotionalTone: "",
+  emotionalIntensity: 0,
   coreNeed: "",
   rewrite: "",
   nextQuestion: ""
