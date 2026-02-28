@@ -47,6 +47,9 @@ export type CognitiveAnalysis = {
   hiddenAssumptions: string[];
   contradictions: string[];
   breakthroughLikelihood: number;
+  identityShift: string;
+  nextQuestion: string;
+  beliefGraph: any;
   summary: string;
   insights: string[];
   confidence: number;
