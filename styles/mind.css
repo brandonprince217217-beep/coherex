@@ -1,0 +1,51 @@
+/* Mind Engine — adaptive state styling
+ *
+ * Tied to [data-mind-state] set on <html> by the client engine.
+ * All rules are additive; they do not break existing styles.
+ */
+
+/* Smooth transitions for adaptively-updated elements */
+[data-mind-role='headline'],
+[data-mind-role='cta'] {
+  transition: color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* ── confused: softer, reassuring palette ── */
+[data-mind-state='confused'] [data-mind-role='headline'] {
+  color: #c8c8ff;
+}
+
+[data-mind-state='confused'] [data-mind-role='cta'] {
+  background: rgba(120, 120, 255, 0.85);
+}
+
+/* ── comparing: analytical, clear contrast ── */
+[data-mind-state='comparing'] [data-mind-role='headline'] {
+  color: #a0d4ff;
+}
+
+[data-mind-state='comparing'] [data-mind-role='cta'] {
+  background: rgba(0, 140, 255, 0.9);
+  box-shadow: 0 0 18px rgba(0, 140, 255, 0.55);
+}
+
+/* ── ready_to_act: high-energy, conversion-focused ── */
+[data-mind-state='ready_to_act'] [data-mind-role='headline'] {
+  color: #b0ffcc;
+}
+
+[data-mind-state='ready_to_act'] [data-mind-role='cta'] {
+  background: rgba(0, 200, 120, 0.92);
+  box-shadow: 0 0 22px rgba(0, 200, 120, 0.65);
+}
+
+/* ── curious: exploratory, slightly warmer tint ── */
+[data-mind-state='curious'] [data-mind-role='headline'] {
+  color: #c8f0c0;
+}
+
+[data-mind-state='curious'] [data-mind-role='cta'] {
+  background: rgba(80, 200, 140, 0.88);
+}
+
+/* ── neutral: no overrides (rely on site defaults) ── */

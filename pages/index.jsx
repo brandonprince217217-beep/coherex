@@ -32,8 +32,8 @@ export default function Home() {
         <title>Coherex</title>
       </Head>
 
-      <div className="hero">
-        <h1>Coherex</h1>
+      <div className="hero" data-mind-section="hero">
+        <h1 data-mind-role="headline">Coherex</h1>
         <p>Your cognitive OS.</p>
 
         <div className="search-container">
@@ -43,6 +43,13 @@ export default function Home() {
             buttonLabel={isSearching ? "Searching..." : "Search"}
             initialValue={initialQuery}
           />
+        </div>
+
+        <div data-mind-role="blocks" style={{ display: 'none' }}>
+          <span data-block-id="intro" />
+          <span data-block-id="features" />
+          <span data-block-id="how" />
+          <span data-block-id="pricing" />
         </div>
       </div>
     </div>
