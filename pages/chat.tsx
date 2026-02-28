@@ -1,5 +1,5 @@
 // pages/chat.tsx
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import ChatWindow from "../components/ChatWindow";
 import InputBar from "../components/InputBar";
 

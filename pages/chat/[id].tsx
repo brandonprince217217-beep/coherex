@@ -25,7 +25,7 @@ export default function ChatPage() {
         const data = await res.json();
 
         // ⭐ EXACT MATCH to your backend return shape
-        setResponse(data.result || "No response.");
+        setResponse(data.output || "No response.");
       } catch (err) {
         console.error(err);
         setResponse("Error loading response.");

@@ -1,8 +1,6 @@
-import Layout from '../components/Layout';
-
 export default function Pricing() {
   return (
-    <Layout>
+    <>
       <div
         style={{
           width: '100%',
@@ -70,6 +68,6 @@ export default function Pricing() {
           </a>
         </div>
       </div>
-    </Layout>
+    </>
   );
 }
