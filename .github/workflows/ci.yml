@@ -36,13 +36,13 @@ jobs:
         run: npm run test:ci
         env:
           # Provide stub values so env validation doesn't block tests
-          OPENAI_API_KEY: "sk-test-placeholder"
+          GROQ_API_KEY: "gsk-test-placeholder"
           NEXT_PUBLIC_SUPABASE_URL: "https://placeholder.supabase.co"
           NEXT_PUBLIC_SUPABASE_ANON_KEY: "placeholder-anon-key"
 
       - name: Build
         run: npm run build
         env:
-          OPENAI_API_KEY: "sk-test-placeholder"
+          GROQ_API_KEY: "gsk-test-placeholder"
           NEXT_PUBLIC_SUPABASE_URL: "https://placeholder.supabase.co"
           NEXT_PUBLIC_SUPABASE_ANON_KEY: "placeholder-anon-key"
