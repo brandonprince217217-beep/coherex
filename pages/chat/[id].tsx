@@ -1,181 +1,93 @@
-import { useEffect, useState } from "react";
-import { supabase } from "../../lib/supabase";
+// pages/chat/[id].tsx
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import ChatWindow from "../../components/ChatWindow";
 import InputBar from "../../components/InputBar";
-import Sidebar from "../../components/Sidebar";
-import CognitivePanel from "../../components/CognitivePanel";
 import CognitiveField3D from "../../components/CognitiveField3D";
-import type { CognitiveAnalysis } from "../../lib/cognitive/model";
 
-type Message = {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  conversation_id: string;
-};
+export default function ChatPage() {
+  const router = useRouter();
+  const { id } = router.query;
 
-type StreamingState = {
-  role: "assistant";
-  segments: string[];
-  visible: string;
-  isStreaming: boolean;
-} | null;
+  const [messages, setMessages] = useState<any[]>([]);
+  const [streaming, setStreaming] = useState<{
+    role: "assistant";
+    segments: string[];
+    visible: string;
+    isStreaming: boolean;
+  } | null>(null);
 
-type Props = {
-  conversationId: string;
-};
-
-export default function ChatPage({ conversationId }: Props) {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [streaming, setStreaming] = useState<StreamingState>(null);
-  const [analysis, setAnalysis] = useState<CognitiveAnalysis | null>(null);
+  const [emotionalIntensity, setEmotionalIntensity] = useState(0);
+  const [breakthroughLikelihood, setBreakthroughLikelihood] = useState(0);
 
   useEffect(() => {
-    loadMessages();
-  }, []);
+    if (!id) return;
 
-  const loadMessages = async () => {
-    const { data } = await supabase
-      .from("messages")
-      .select("*")
-      .eq("conversation_id", conversationId)
-      .order("created_at", { ascending: true });
-
-    setMessages((data as Message[]) || []);
-  };
-
-  const summarizeHistory = () => {
-    if (!messages || messages.length === 0) return "";
-    const last = messages.slice(-6);
-    return last
-      .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
-      .join("\n");
-  };
+    setMessages([
+      { role: "assistant", content: "Welcome back. How are you feeling today?" }
+    ]);
+  }, [id]);
 
   const sendMessage = async (text: string) => {
-    const userMsg: Message = {
-      id: crypto.randomUUID(),
-      role: "user",
-      content: text,
-      conversation_id: conversationId,
-    };
-
-    setMessages((prev) => [...prev, userMsg]);
-    await supabase.from("messages").insert(userMsg);
-
-    const { data: convo } = await supabase
-      .from("conversations")
-      .select("title")
-      .eq("id", conversationId)
-      .single();
-
-    if (!convo?.title || convo.title === "New Conversation") {
-      const titleRes = await fetch("/api/title", {
-        method: "POST",
-        body: JSON.stringify({ message: text }),
-      });
-
-      const { title } = await titleRes.json();
-
-      await supabase
-        .from("conversations")
-        .update({ title })
-        .eq("id", conversationId);
-    }
-
-    const historySummary = summarizeHistory();
-
-    fetch("/api/cognitive", {
-      method: "POST",
-      body: JSON.stringify({ message: text, historySummary }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setAnalysis(data);
-      })
-      .catch(() => {});
-
-    const res = await fetch("/api/stream", {
-      method: "POST",
-      body: JSON.stringify({ message: text }),
-    });
-
-    const reader = res.body?.getReader();
-    if (!reader) return;
-
-    let segments: string[] = [];
-    let current = "";
+    const userMessage = { role: "user", content: text };
+    setMessages((prev) => [...prev, userMessage]);
 
     setStreaming({
       role: "assistant",
       segments: [],
       visible: "",
-      isStreaming: true,
+      isStreaming: true
     });
 
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
+    let visible = "";
+    const fakeResponse = "I'm here with you. Tell me more.";
 
-      const chunk = new TextDecoder().decode(value);
+    for (let i = 0; i < fakeResponse.length; i++) {
+      visible += fakeResponse[i];
+      await new Promise((res) => setTimeout(res, 20));
 
-      if (chunk.includes("[SEGMENT]")) {
-        if (current.trim().length > 0) segments.push(current.trim());
-        current = "";
-      } else {
-        current += chunk;
-      }
-
-      const all = [...segments, current];
       setStreaming({
         role: "assistant",
-        segments: all,
-        visible: all.join("\n\n"),
-        isStreaming: true,
+        segments: [],
+        visible,
+        isStreaming: true
       });
     }
 
-    if (current.trim().length > 0) segments.push(current.trim());
-
-    const finalText = segments.join("\n\n");
-
-    const assistantMsg: Message = {
-      id: crypto.randomUUID(),
+    setStreaming({
       role: "assistant",
-      content: finalText,
-      conversation_id: conversationId,
-    };
+      segments: [],
+      visible,
+      isStreaming: false
+    });
 
-    await supabase.from("messages").insert(assistantMsg);
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: fakeResponse }
+    ]);
 
-    setMessages((prev) => [...prev, assistantMsg]);
-    setStreaming(null);
+    setEmotionalIntensity(Math.floor(Math.random() * 100));
+    setBreakthroughLikelihood(Math.floor(Math.random() * 100));
   };
 
-  const emotionalIntensity = analysis?.emotionalIntensity ?? 0;
-  const breakthroughLikelihood = analysis?.breakthroughLikelihood ?? 0;
-
   return (
-    <div className="chat-shell">
+    <div className="chat-page">
       <CognitiveField3D
         intensity={emotionalIntensity}
         breakthrough={breakthroughLikelihood}
       />
 
       <div className="layout chat-foreground">
-        <Sidebar />
-
         <div className="chat-area">
-          <ChatWindow messages={messages} streaming={streaming} />
+          <ChatWindow
+            messages={messages}
+            streaming={streaming?.isStreaming ?? false}
+          />
+
           <InputBar onSend={sendMessage} />
         </div>
-
-        <CognitivePanel analysis={analysis} />
       </div>
     </div>
   );
 }
-
-ChatPage.getInitialProps = ({ query }) => ({
-  conversationId: query.id as string,
-});
