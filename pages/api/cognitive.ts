@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { openai } from "@/lib/cognitive/openai";
+import { openai } from "../../../lib/cognitive/openai";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -9,7 +9,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: "Missing query" });
     }
 
-    // Call GPT‑4o with a structured JSON instruction
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       response_format: { type: "json_object" },
@@ -44,7 +43,23 @@ Rules:
       ]
     });
 
-    const result = JSON.parse(completion.choices[0].message.content);
+    let result;
+
+    try {
+      result = JSON.parse(completion.choices[0].message.content);
+    } catch (e) {
+      // fallback if model returns malformed JSON
+      result = {
+        belief_type: "other",
+        emotional_charge: 0,
+        core_need: "clarity",
+        hidden_assumption: "The user expects a specific type of response.",
+        contradiction: "There is no conflict in the user's message.",
+        rewrite: "The user is initiating interaction.",
+        next_question: "What would you like to explore?",
+        answer: "It looks like you're starting a conversation. How can I help you today?"
+      };
+    }
 
     return res.status(200).json({
       belief_type: result.belief_type,
@@ -59,6 +74,16 @@ Rules:
 
   } catch (err) {
     console.error("Cognitive API error:", err);
-    return res.status(500).json({ error: "Internal error" });
+
+    return res.status(500).json({
+      belief_type: "other",
+      emotional_charge: 0,
+      core_need: "stability",
+      hidden_assumption: "Something went wrong in processing.",
+      contradiction: "The system expected valid output but failed.",
+      rewrite: "There was an issue, but it can be resolved.",
+      next_question: "Can you try your request again?",
+      answer: "There was an internal issue processing your request. Please try again."
+    });
   }
 }
