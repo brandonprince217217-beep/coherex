@@ -11,6 +11,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "Missing text" });
   }
 
+  if (!process.env.OPENAI_API_KEY) {
+    return res.status(503).json({ error: "Missing OPENAI_API_KEY" });
+  }
+
   try {
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -20,9 +24,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       ]
     });
 
-    res.status(200).json({ result: response.choices[0].message.content });
-  } catch (err) {
+    res.status(200).json({ result: response.choices[0]?.message?.content });
+  } catch (err: any) {
     console.error("[analyze] handler error:", err);
-    res.status(503).json({ error: "Analysis is temporarily unavailable. Please try again." });
+    res.status(503).json({ error: "OpenAI request failed", detail: err?.message ?? "" });
   }
 }
