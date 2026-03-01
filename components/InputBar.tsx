@@ -1,50 +1,96 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 type InputBarProps = {
-  onSend: (text: string) => void;
   disabled?: boolean;
-  buttonLabel?: string;
-  initialValue?: string;
 };
 
-export default function InputBar({
-  onSend,
-  disabled = false,
-  buttonLabel = "Search",
-  initialValue = "",
-}: InputBarProps) {
-  const [text, setText] = useState(initialValue);
-  const lastSubmitRef = useRef(0);
+export default function InputBar({ disabled = false }: InputBarProps) {
+  const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setText(initialValue);
-  }, [initialValue]);
-
-  const canSubmit = !disabled && text.trim().length > 0;
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canSubmit) return;
+    if (!text.trim() || disabled) return;
 
-    const now = Date.now();
-    if (now - lastSubmitRef.current < 300) return; // debounce window
-    lastSubmitRef.current = now;
+    setLoading(true);
+    setError(null);
+    setResult(null);
 
-    onSend(text);
+    try {
+      const response = await fetch("/api/search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ query: text })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Search failed");
+      } else {
+        setResult(data);
+      }
+    } catch (err) {
+      setError("Network error");
+    }
+
+    setLoading(false);
   };
 
   return (
-    <form className="input-bar" onSubmit={handleSubmit}>
-      <input
-        type="text"
-        placeholder="Search anything..."
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        disabled={disabled}
-      />
-      <button type="submit" disabled={!canSubmit}>
-        {buttonLabel}
-      </button>
-    </form>
+    <div style={{ width: "100%", maxWidth: 600, margin: "0 auto" }}>
+      <form onSubmit={handleSearch} style={{ display: "flex", gap: 8 }}>
+        <input
+          type="text"
+          placeholder="Search anything..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          disabled={disabled}
+          style={{
+            flex: 1,
+            padding: "12px",
+            borderRadius: "8px",
+            border: "1px solid #ccc"
+          }}
+        />
+        <button
+          type="submit"
+          disabled={disabled || !text.trim()}
+          style={{
+            padding: "12px 20px",
+            borderRadius: "8px",
+            background: "black",
+            color: "white",
+            border: "none"
+          }}
+        >
+          {loading ? "..." : "Search"}
+        </button>
+      </form>
+
+      {error && (
+        <div style={{ marginTop: 16, color: "red" }}>
+          {error}
+        </div>
+      )}
+
+      {result && (
+        <pre
+          style={{
+            marginTop: 16,
+            padding: 12,
+            background: "#f5f5f5",
+            borderRadius: 8,
+            whiteSpace: "pre-wrap"
+          }}
+        >
+          {JSON.stringify(result, null, 2)}
+        </pre>
+      )}
+    </div>
   );
 }
