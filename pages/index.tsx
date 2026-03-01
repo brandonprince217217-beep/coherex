@@ -235,7 +235,7 @@ const HomePage: React.FC = () => {
           Coherex Cognitive Field
         </h1>
         <p className="text-sm text-slate-400">
-          Type what's on your mind. Coherex will break it down into beliefs, needs, and the next
+          Type what&apos;s on your mind. Coherex will break it down into beliefs, needs, and the next
           question to explore.
         </p>
       </div>
