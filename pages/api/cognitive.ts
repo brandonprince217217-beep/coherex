@@ -1,31 +1,64 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { groq } from "../../lib/groq";
-import { emptyAnalysis } from "../../lib/cognitive/model";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { openai } from "@/lib/cognitive/openai";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
-  const { text } = req.body || {};
-  if (typeof text !== "string" || !text.trim()) {
-    return res.status(400).json({ error: "Missing text" });
-  }
-
   try {
-    const response = await groq.chat.completions.create({
-      model: "llama3-8b-8192",
+    const { query } = req.body;
+
+    if (!query || typeof query !== "string") {
+      return res.status(400).json({ error: "Missing query" });
+    }
+
+    // Call GPT‑4o with a structured JSON instruction
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      response_format: { type: "json_object" },
       messages: [
-        { role: "system", content: "Perform cognitive analysis." },
-        { role: "user", content: text }
+        {
+          role: "system",
+          content: `
+You are Coherex, a cognitive engine. 
+Always return a JSON object with these fields:
+
+belief_type
+emotional_charge
+core_need
+hidden_assumption
+contradiction
+rewrite
+next_question
+answer
+
+Rules:
+- Never leave any field empty.
+- If the input is simple (like "hi"), still fill all fields with neutral interpretations.
+- emotional_charge must be a number from -10 to +10.
+- belief_type must be one of: limiting, empowering, observational, identity, fear-based, assumption, other.
+- answer must be a clear, human explanation of what the user is expressing.
+`
+        },
+        {
+          role: "user",
+          content: query
+        }
       ]
     });
 
-    res.status(200).json({
-      analysis: response.choices[0].message.content || emptyAnalysis
+    const result = JSON.parse(completion.choices[0].message.content);
+
+    return res.status(200).json({
+      belief_type: result.belief_type,
+      emotional_charge: result.emotional_charge,
+      core_need: result.core_need,
+      hidden_assumption: result.hidden_assumption,
+      contradiction: result.contradiction,
+      rewrite: result.rewrite,
+      next_question: result.next_question,
+      answer: result.answer
     });
+
   } catch (err) {
-    console.error("[cognitive] handler error:", err);
-    res.status(503).json({ error: "Cognitive analysis is temporarily unavailable. Please try again." });
+    console.error("Cognitive API error:", err);
+    return res.status(500).json({ error: "Internal error" });
   }
 }
