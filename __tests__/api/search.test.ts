@@ -190,4 +190,144 @@ describe("POST /api/search", () => {
     const data = res._getJSONData();
     expect(data.answer).toBe("");
   });
+
+  it("handles null content in choices gracefully", async () => {
+    mockCreate.mockResolvedValueOnce({
+      choices: [{ message: { content: null } }],
+    });
+
+    const { req, res } = createMocks({
+      method: "POST",
+      body: { query: "about coherex" },
+    });
+
+    await handler(req as any, res as any);
+
+    expect(res._getStatusCode()).toBe(200);
+    const data = res._getJSONData();
+    expect(data.answer).toBe("");
+  });
+
+  it.each(["hi", "hey", "howdy", "sup", "yo"])(
+    'greeting "%s" returns 200 with empty results and no LLM call',
+    async (greeting) => {
+      const { req, res } = createMocks({ method: "POST", body: { query: greeting } });
+      await handler(req as any, res as any);
+
+      expect(res._getStatusCode()).toBe(200);
+      const data = res._getJSONData();
+      expect(typeof data.answer).toBe("string");
+      expect(data.answer.length).toBeGreaterThan(0);
+      expect(data.results).toHaveLength(0);
+      expect(mockCreate).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each(["PUT", "PATCH", "DELETE"])(
+    "%s request returns 405",
+    async (method) => {
+      const { req, res } = createMocks({ method });
+      await handler(req as any, res as any);
+      expect(res._getStatusCode()).toBe(405);
+      expect(res._getJSONData()).toEqual({ error: "Method not allowed" });
+    }
+  );
+
+  it("demo query returns the Demo source", async () => {
+    mockCreate.mockResolvedValueOnce({
+      choices: [{ message: { content: "Check out the demo. [1]" } }],
+    });
+
+    const { req, res } = createMocks({
+      method: "POST",
+      body: { query: "demo" },
+    });
+
+    await handler(req as any, res as any);
+
+    expect(res._getStatusCode()).toBe(200);
+    const data = res._getJSONData();
+    expect(Array.isArray(data.results)).toBe(true);
+    expect(data.results.length).toBeGreaterThan(0);
+    expect(data.results.some((r: { title: string }) => r.title === "Demo")).toBe(true);
+  });
+
+  it("about query returns the About source", async () => {
+    mockCreate.mockResolvedValueOnce({
+      choices: [{ message: { content: "About Coherex. [1]" } }],
+    });
+
+    const { req, res } = createMocks({
+      method: "POST",
+      body: { query: "about coherex" },
+    });
+
+    await handler(req as any, res as any);
+
+    expect(res._getStatusCode()).toBe(200);
+    const data = res._getJSONData();
+    expect(Array.isArray(data.results)).toBe(true);
+    expect(data.results.length).toBeGreaterThan(0);
+    expect(data.results.some((r: { title: string }) => r.title === "About")).toBe(true);
+  });
+
+  it("calls LLM with user query and source context", async () => {
+    mockCreate.mockResolvedValueOnce({
+      choices: [{ message: { content: "Pricing answer [1]" } }],
+    });
+
+    const { req, res } = createMocks({
+      method: "POST",
+      body: { query: "pricing plans" },
+    });
+
+    await handler(req as any, res as any);
+
+    expect(mockCreate).toHaveBeenCalledTimes(1);
+    const callArgs = mockCreate.mock.calls[0][0];
+    expect(callArgs.messages).toBeDefined();
+    const userMsg = callArgs.messages.find((m: { role: string }) => m.role === "user");
+    expect(userMsg).toBeDefined();
+    expect(userMsg.content).toContain("pricing plans");
+    expect(userMsg.content).toContain("SOURCE");
+  });
+
+  it("answer is passed through verbatim from LLM", async () => {
+    const llmAnswer = "Coherex is your cognitive OS. It helps you think clearly. [1]";
+    mockCreate.mockResolvedValueOnce({
+      choices: [{ message: { content: llmAnswer } }],
+    });
+
+    const { req, res } = createMocks({
+      method: "POST",
+      body: { query: "what is coherex" },
+    });
+
+    await handler(req as any, res as any);
+
+    expect(res._getStatusCode()).toBe(200);
+    expect(res._getJSONData().answer).toBe(llmAnswer);
+  });
+
+  it("results contain required fields: title, url, snippet", async () => {
+    mockCreate.mockResolvedValueOnce({
+      choices: [{ message: { content: "Pricing details [1]" } }],
+    });
+
+    const { req, res } = createMocks({
+      method: "POST",
+      body: { query: "pricing" },
+    });
+
+    await handler(req as any, res as any);
+
+    const data = res._getJSONData();
+    for (const result of data.results) {
+      expect(result).toHaveProperty("title");
+      expect(result).toHaveProperty("url");
+      expect(result).toHaveProperty("snippet");
+      expect(result).not.toHaveProperty("text");
+      expect(result).not.toHaveProperty("_score");
+    }
+  });
 });
