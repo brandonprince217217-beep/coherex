@@ -1,9 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import Groq from "groq-sdk";
+import { openai } from "../../lib/openai";
 
 type Source = { title: string; url: string; snippet: string; text: string };
 
 const SEARCH_TIMEOUT_MS = 15000;
+const MIN_RELEVANCE_SCORE = 1;
+const GREETINGS = /^(hi|hello|hey|howdy|yo|greetings|sup|what'?s\s+up)[!?\s.,]*$/i;
 
 function escapeRegExp(s: string) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -33,6 +35,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { query } = req.body || {};
   if (typeof query !== "string" || !query.trim()) {
     return res.status(400).json({ error: "Missing query" });
+  }
+
+  if (!process.env.OPENAI_API_KEY) {
+    return res.status(503).json({ error: "Missing OPENAI_API_KEY" });
+  }
+
+  // Short-circuit for greetings — no LLM call needed
+  if (GREETINGS.test(query.trim())) {
+    return res.status(200).json({
+      answer: "Hi there! I'm Coherex, your cognitive OS. Ask me anything!",
+      results: [],
+    });
   }
 
   const sources: Source[] = [
@@ -67,8 +81,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       ...s,
       _score: score(query, `${s.title}\n${s.snippet}\n${s.text}`),
     }))
+    .filter((s) => s._score >= MIN_RELEVANCE_SCORE)
     .sort((a, b) => b._score - a._score)
     .slice(0, 4);
+
+  // Short-circuit if no sources are relevant — no LLM call needed
+  if (ranked.length === 0) {
+    return res.status(200).json({ answer: "", results: [] });
+  }
 
   const context = ranked
     .map(
@@ -78,8 +98,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     .join("\n\n");
 
   try {
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
     let timeoutId: NodeJS.Timeout | undefined;
     const timeoutPromise = new Promise<never>((_, reject) => {
       timeoutId = setTimeout(
@@ -88,8 +106,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       );
     });
 
-    const completionPromise = groq.chat.completions.create({
-      model: "llama3-70b-8192",
+    const completionPromise = openai.chat.completions.create({
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
@@ -127,3 +145,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(503).json({ error: message });
   }
 }
+
