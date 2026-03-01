@@ -226,7 +226,7 @@ describe("POST /api/search", () => {
   it.each(["PUT", "PATCH", "DELETE"])(
     "%s request returns 405",
     async (method) => {
-      const { req, res } = createMocks({ method });
+      const { req, res } = createMocks({ method: method as any });
       await handler(req as any, res as any);
       expect(res._getStatusCode()).toBe(405);
       expect(res._getJSONData()).toEqual({ error: "Method not allowed" });
