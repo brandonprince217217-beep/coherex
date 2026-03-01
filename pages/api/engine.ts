@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { openai } from "../../lib/openai";
 
 type EngineResult = {
   belief_type: string;
@@ -19,12 +20,10 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { query, apiKey } = req.body as { query?: string; apiKey?: string };
+  const { query } = req.body as { query?: string };
 
-  if (!query || !apiKey) {
-    return res
-      .status(400)
-      .json({ error: "Missing query or apiKey in request body" });
+  if (!query) {
+    return res.status(400).json({ error: "Missing query in request body" });
   }
 
   try {
@@ -48,31 +47,16 @@ Rules:
 - No extra keys.
 `;
 
-    const response = await fetch("https://api.together.xyz/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: query },
-        ],
-        response_format: { type: "json_object" }
-      }),
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: query },
+      ],
+      response_format: { type: "json_object" },
     });
 
-    if (!response.ok) {
-      const text = await response.text();
-      return res
-        .status(500)
-        .json({ error: `Together API error: ${response.status} - ${text}` });
-    }
-
-    const data = await response.json();
-    const content = data?.choices?.[0]?.message?.content ?? "{}";
+    const content = response.choices?.[0]?.message?.content ?? "{}";
 
     let parsed: EngineResult;
     try {
@@ -90,8 +74,9 @@ Rules:
 
     return res.status(200).json(parsed);
   } catch (err: any) {
-    return res.status(500).json({
-      error: `Engine error: ${err?.message ?? "Unknown error"}`,
+    console.error("[engine] handler error:", err);
+    return res.status(503).json({
+      error: "Engine is temporarily unavailable. Please try again later.",
     });
   }
 }

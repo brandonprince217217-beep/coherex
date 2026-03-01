@@ -5,6 +5,8 @@ type Source = { title: string; url: string; snippet: string; text: string };
 
 const SEARCH_TIMEOUT_MS = 15000;
 
+const GREETING_RE = /^(hi|hello|hey|howdy|greetings|sup|yo|what['\u2019]?s up)[\s!?,.*]*$/i;
+
 function escapeRegExp(s: string) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -33,6 +35,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { query } = req.body || {};
   if (typeof query !== "string" || !query.trim()) {
     return res.status(400).json({ error: "Missing query" });
+  }
+
+  if (!process.env.OPENAI_API_KEY) {
+    return res.status(503).json({ error: "OPENAI_API_KEY is not configured." });
+  }
+
+  if (GREETING_RE.test(query.trim())) {
+    return res.status(200).json({
+      answer: "Hello! How can I help you with Coherex today?",
+      results: [],
+    });
   }
 
   const sources: Source[] = [
@@ -67,8 +80,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       ...s,
       _score: score(query, `${s.title}\n${s.snippet}\n${s.text}`),
     }))
+    .filter((s) => s._score > 0)
     .sort((a, b) => b._score - a._score)
     .slice(0, 4);
+
+  if (ranked.length === 0) {
+    return res.status(200).json({ answer: "", results: [] });
+  }
 
   const context = ranked
     .map(
