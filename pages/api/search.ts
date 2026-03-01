@@ -1,110 +1,89 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { openai } from "../../lib/openai";
-import { embed, cosine } from "../../lib/embeddings";
+import { groq } from "../../lib/groq";
 
-type Source = {
-  title: string;
-  url: string;
-  snippet: string;
-  text: string;
-  embedding?: number[];
+const SYSTEM_PROMPT = `You are Coherex AI, a cognitive engine that breaks down any thought into its underlying structure.
+
+For every user input, return a JSON object with:
+
+beliefType: classify the belief (fear, shame, control, doubt, identity, worth, abandonment, other)
+emotionalCharge: number from 0 to 1
+coreNeed: the core psychological need behind the belief
+hiddenAssumption: the assumption the user is making without realizing it
+contradiction: any internal conflict or tension in the belief
+rewrite: a clearer, more grounded version of the belief
+nextQuestion: the single most important question the user should explore next
+answer: a full, multi-paragraph natural-language explanation using real AI reasoning, written clearly and conversationally
+
+Always respond in JSON. Always be direct, deep, and psychologically precise.`;
+
+type CoherexResponse = {
+  query: string;
+  beliefType: string;
+  emotionalCharge: number;
+  coreNeed: string;
+  hiddenAssumption: string;
+  contradiction: string;
+  rewrite: string;
+  nextQuestion: string;
+  answer: string;
 };
 
-const sources: Source[] = [
-  {
-    title: "Home",
-    url: "/",
-    snippet: "Coherex homepage and tagline.",
-    text: "Coherex. Your cognitive OS.",
-  },
-  {
-    title: "About",
-    url: "/about",
-    snippet: "About Coherex and what it does.",
-    text: "About Coherex and what it does.",
-  },
-  {
-    title: "Pricing",
-    url: "/pricing",
-    snippet: "Plan details and pricing.",
-    text: "Pricing plans, basic access, unlimited searches, engine access, and analysis features.",
-  },
-  {
-    title: "Demo",
-    url: "/demo",
-    snippet: "Demo experience for Coherex.",
-    text: "Demo page that shows example interactions and results.",
-  },
-];
-
-let cached = false;
-
-async function ensureEmbeddings() {
-  if (cached) return;
-
-  for (const s of sources) {
-    s.embedding = await embed(s.text);
-  }
-
-  cached = true;
-}
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { query } = req.body || {};
-  if (!query || typeof query !== "string") {
-    return res.status(400).json({ error: "Missing query" });
+  try {
+    const { query } = req.body;
+
+    if (!query || typeof query !== "string") {
+      return res.status(400).json({ error: "Query is required" });
+    }
+
+    const completion = await groq.chat.completions.create({
+      model: "llama3-8b-8192",
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: query },
+      ],
+    });
+
+    const rawContent = completion.choices[0]?.message?.content;
+
+    if (!rawContent) {
+      return res.status(500).json({ error: "No response from AI" });
+    }
+
+    let parsed: Partial<CoherexResponse>;
+
+    try {
+      parsed = JSON.parse(rawContent);
+    } catch (parseError) {
+      console.error("Failed to parse AI response:", rawContent);
+      return res.status(500).json({ error: "Invalid AI response format" });
+    }
+
+    const response: CoherexResponse = {
+      query,
+      beliefType: parsed.beliefType || "other",
+      emotionalCharge:
+        typeof parsed.emotionalCharge === "number" ? parsed.emotionalCharge : 0.5,
+      coreNeed: parsed.coreNeed || "Unknown",
+      hiddenAssumption: parsed.hiddenAssumption || "None identified",
+      contradiction: parsed.contradiction || "None identified",
+      rewrite: parsed.rewrite || query,
+      nextQuestion: parsed.nextQuestion || "What matters most to you here?",
+      answer:
+        parsed.answer ||
+        "I couldn't generate a detailed explanation. Please try rephrasing your question.",
+    };
+
+    return res.status(200).json(response);
+  } catch (error) {
+    console.error("Error in /api/search:", error);
+    return res.status(500).json({ error: "Internal error" });
   }
-
-  if (!process.env.OPENAI_API_KEY) {
-    return res.status(503).json({ error: "Missing OPENAI_API_KEY" });
-  }
-
-  await ensureEmbeddings();
-
-  const qEmbed = await embed(query);
-
-  const ranked = sources
-    .map((s) => ({
-      ...s,
-      score: cosine(qEmbed, s.embedding!),
-    }))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 4);
-
-  const context = ranked
-    .map(
-      (s, i) =>
-        `SOURCE ${i + 1}\nTitle: ${s.title}\nURL: ${s.url}\nContent: ${s.text}`
-    )
-    .join("\n\n");
-
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content:
-          "You are the Coherex AI search engine. Use ONLY the provided sources. Cite them using [1], [2], etc.",
-      },
-      {
-        role: "user",
-        content: `Query: ${query}\n\n${context}`,
-      },
-    ],
-  });
-
-  const answer = completion.choices?.[0]?.message?.content ?? "";
-
-  return res.status(200).json({
-    answer,
-    results: ranked.map((s) => ({
-      title: s.title,
-      url: s.url,
-      snippet: s.snippet,
-    })),
-  });
 }
