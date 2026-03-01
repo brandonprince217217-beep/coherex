@@ -1,19 +1,19 @@
-import ResultCard from './ResultCard';
+import React from "react";
+import ResultCard from "./ResultCard";
 
-export default function Results({ results }) {
-  if (!results || results.length === 0) return null;
+export interface CoherexResult {
+  answer: string;
+}
 
+interface Props {
+  results: CoherexResult[];
+}
+
+export default function Results({ results }: Props) {
   return (
-    <div
-      style={{
-        marginTop: 30,
-        maxWidth: 700,
-        marginInline: "auto",
-        width: "90%",
-      }}
-    >
-      {results.map((result) => (
-        <ResultCard key={result._id || result.query} result={result} isNested={false} />
+    <div className="flex flex-col items-center mt-10 space-y-8">
+      {results.map((r, i) => (
+        <ResultCard key={i} answer={r.answer} />
       ))}
     </div>
   );
