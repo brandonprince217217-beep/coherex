@@ -1,30 +1,52 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { openai } from "../../lib/openai";
+import { embed, cosine } from "../../lib/embeddings";
 
-type Source = { title: string; url: string; snippet: string; text: string };
+type Source = {
+  title: string;
+  url: string;
+  snippet: string;
+  text: string;
+  embedding?: number[];
+};
 
-const SEARCH_TIMEOUT_MS = 15000;
-const MIN_RELEVANCE_SCORE = 1;
-const GREETINGS = /^(hi|hello|hey|howdy|yo|greetings|sup|what'?s\s+up)[!?\s.,]*$/i;
+const sources: Source[] = [
+  {
+    title: "Home",
+    url: "/",
+    snippet: "Coherex homepage and tagline.",
+    text: "Coherex. Your cognitive OS.",
+  },
+  {
+    title: "About",
+    url: "/about",
+    snippet: "About Coherex and what it does.",
+    text: "About Coherex and what it does.",
+  },
+  {
+    title: "Pricing",
+    url: "/pricing",
+    snippet: "Plan details and pricing.",
+    text: "Pricing plans, basic access, unlimited searches, engine access, and analysis features.",
+  },
+  {
+    title: "Demo",
+    url: "/demo",
+    snippet: "Demo experience for Coherex.",
+    text: "Demo page that shows example interactions and results.",
+  },
+];
 
-function escapeRegExp(s: string) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+let cached = false;
 
-function score(query: string, haystack: string) {
-  const q = query.toLowerCase().trim();
-  const t = haystack.toLowerCase();
-  if (!q) return 0;
+async function ensureEmbeddings() {
+  if (cached) return;
 
-  const parts = q.split(/\s+/).filter(Boolean);
-  let s = 0;
-
-  for (const p of parts) {
-    const re = new RegExp(escapeRegExp(p), "g");
-    const m = t.match(re);
-    if (m) s += m.length;
+  for (const s of sources) {
+    s.embedding = await embed(s.text);
   }
-  return s;
+
+  cached = true;
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -33,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const { query } = req.body || {};
-  if (typeof query !== "string" || !query.trim()) {
+  if (!query || typeof query !== "string") {
     return res.status(400).json({ error: "Missing query" });
   }
 
@@ -41,54 +63,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(503).json({ error: "Missing OPENAI_API_KEY" });
   }
 
-  // Short-circuit for greetings — no LLM call needed
-  if (GREETINGS.test(query.trim())) {
-    return res.status(200).json({
-      answer: "Hi there! I'm Coherex, your cognitive OS. Ask me anything!",
-      results: [],
-    });
-  }
+  await ensureEmbeddings();
 
-  const sources: Source[] = [
-    {
-      title: "Home",
-      url: "/",
-      snippet: "Coherex homepage and tagline.",
-      text: "Coherex. Your cognitive OS.",
-    },
-    {
-      title: "About",
-      url: "/about",
-      snippet: "About Coherex and what it does.",
-      text: "About Coherex and what it does.",
-    },
-    {
-      title: "Pricing",
-      url: "/pricing",
-      snippet: "Plan details and pricing.",
-      text: "Pricing plans, basic access, unlimited searches, engine access, and analysis features.",
-    },
-    {
-      title: "Demo",
-      url: "/demo",
-      snippet: "Demo experience for Coherex.",
-      text: "Demo page that shows example interactions and results.",
-    },
-  ];
+  const qEmbed = await embed(query);
 
   const ranked = sources
     .map((s) => ({
       ...s,
-      _score: score(query, `${s.title}\n${s.snippet}\n${s.text}`),
+      score: cosine(qEmbed, s.embedding!),
     }))
-    .filter((s) => s._score >= MIN_RELEVANCE_SCORE)
-    .sort((a, b) => b._score - a._score)
+    .sort((a, b) => b.score - a.score)
     .slice(0, 4);
-
-  // Short-circuit if no sources are relevant — no LLM call needed
-  if (ranked.length === 0) {
-    return res.status(200).json({ answer: "", results: [] });
-  }
 
   const context = ranked
     .map(
@@ -97,52 +82,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     )
     .join("\n\n");
 
-  try {
-    let timeoutId: NodeJS.Timeout | undefined;
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      timeoutId = setTimeout(
-        () => reject(new Error("Search request timed out")),
-        SEARCH_TIMEOUT_MS
-      );
-    });
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are the Coherex AI search engine. Use ONLY the provided sources. Cite them using [1], [2], etc.",
+      },
+      {
+        role: "user",
+        content: `Query: ${query}\n\n${context}`,
+      },
+    ],
+  });
 
-    const completionPromise = openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are the Coherex AI search engine. Use ONLY the provided sources. " +
-            "Cite them using [1], [2], etc. Keep answers concise but helpful.",
-        },
-        {
-          role: "user",
-          content: `Query: ${query}\n\n${context}`,
-        },
-      ],
-    });
+  const answer = completion.choices?.[0]?.message?.content ?? "";
 
-    const completion = await Promise.race([completionPromise, timeoutPromise]);
-    clearTimeout(timeoutId);
-
-    const answer = completion.choices?.[0]?.message?.content ?? "";
-
-    return res.status(200).json({
-      answer,
-      results: ranked.map(({ title, url, snippet }) => ({
-        title,
-        url,
-        snippet,
-      })),
-    });
-  } catch (err: any) {
-    const isTimeout = err?.message?.includes("timed out");
-    const message = isTimeout
-      ? "The search request timed out. Please try again."
-      : "Search is temporarily unavailable. Please try again later.";
-
-    console.error("[search] handler error:", err);
-    return res.status(503).json({ error: message });
-  }
+  return res.status(200).json({
+    answer,
+    results: ranked.map((s) => ({
+      title: s.title,
+      url: s.url,
+      snippet: s.snippet,
+    })),
+  });
 }
-
