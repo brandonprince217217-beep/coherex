@@ -48,14 +48,13 @@ Rules:
     try {
       result = JSON.parse(completion.choices[0].message.content);
     } catch (e) {
-      // fallback if model returns malformed JSON
       result = {
         belief_type: "other",
         emotional_charge: 0,
         core_need: "clarity",
-        hidden_assumption: "The user expects a specific type of response.",
+        hidden_assumption: "The user is initiating a conversation.",
         contradiction: "There is no conflict in the user's message.",
-        rewrite: "The user is initiating interaction.",
+        rewrite: "The user is opening communication.",
         next_question: "What would you like to explore?",
         answer: "It looks like you're starting a conversation. How can I help you today?"
       };
