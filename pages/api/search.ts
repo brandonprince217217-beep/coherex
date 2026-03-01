@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { groq } from "../../lib/groq";
 
-const SYSTEM_PROMPT = `You are Coherex AI, a cognitive engine that breaks down any thought into its underlying structure.
+const SYSTEM_PROMPT = `
+You are Coherex AI, a cognitive engine that breaks down any thought into its underlying structure.
 
 For every user input, return a JSON object with:
 
@@ -14,19 +15,8 @@ rewrite: a clearer, more grounded version of the belief
 nextQuestion: the single most important question the user should explore next
 answer: a full, multi-paragraph natural-language explanation using real AI reasoning, written clearly and conversationally
 
-Always respond in JSON. Always be direct, deep, and psychologically precise.`;
-
-type CoherexResponse = {
-  query: string;
-  beliefType: string;
-  emotionalCharge: number;
-  coreNeed: string;
-  hiddenAssumption: string;
-  contradiction: string;
-  rewrite: string;
-  nextQuestion: string;
-  answer: string;
-};
+Always respond in JSON. Always be direct, deep, and psychologically precise.
+`;
 
 export default async function handler(
   req: NextApiRequest,
@@ -39,51 +29,37 @@ export default async function handler(
   try {
     const { query } = req.body;
 
-    if (!query || typeof query !== "string") {
-      return res.status(400).json({ error: "Query is required" });
-    }
-
     const completion = await groq.chat.completions.create({
-      model: "llama3-8b-8192",
+      model: "llama-3.1-8b-instant",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: query },
       ],
+      temperature: 0.4,
     });
 
-    const rawContent = completion.choices[0]?.message?.content;
-
-    if (!rawContent) {
-      return res.status(500).json({ error: "No response from AI" });
-    }
-
-    let parsed: Partial<CoherexResponse>;
+    const raw = completion.choices?.[0]?.message?.content || "{}";
+    let parsed;
 
     try {
-      parsed = JSON.parse(rawContent);
-    } catch (parseError) {
-      console.error("Failed to parse AI response:", rawContent);
-      return res.status(500).json({ error: "Invalid AI response format" });
+      parsed = JSON.parse(raw);
+    } catch {
+      parsed = {};
     }
 
-    const response: CoherexResponse = {
+    res.status(200).json({
       query,
       beliefType: parsed.beliefType || "other",
-      emotionalCharge:
-        typeof parsed.emotionalCharge === "number" ? parsed.emotionalCharge : 0.5,
-      coreNeed: parsed.coreNeed || "Unknown",
-      hiddenAssumption: parsed.hiddenAssumption || "None identified",
-      contradiction: parsed.contradiction || "None identified",
-      rewrite: parsed.rewrite || query,
-      nextQuestion: parsed.nextQuestion || "What matters most to you here?",
-      answer:
-        parsed.answer ||
-        "I couldn't generate a detailed explanation. Please try rephrasing your question.",
-    };
-
-    return res.status(200).json(response);
-  } catch (error) {
-    console.error("Error in /api/search:", error);
+      emotionalCharge: parsed.emotionalCharge || 0,
+      coreNeed: parsed.coreNeed || "",
+      hiddenAssumption: parsed.hiddenAssumption || "",
+      contradiction: parsed.contradiction || "",
+      rewrite: parsed.rewrite || "",
+      nextQuestion: parsed.nextQuestion || "",
+      answer: parsed.answer || "",
+    });
+  } catch (err) {
+    console.error("Error in /api/search:", err);
     return res.status(500).json({ error: "Internal error" });
   }
 }
