@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import Groq from "groq-sdk";
+import { openai } from "../../lib/openai";
 
 type Source = { title: string; url: string; snippet: string; text: string };
 
@@ -78,8 +78,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     .join("\n\n");
 
   try {
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
     let timeoutId: NodeJS.Timeout | undefined;
     const timeoutPromise = new Promise<never>((_, reject) => {
       timeoutId = setTimeout(
@@ -88,8 +86,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       );
     });
 
-    const completionPromise = groq.chat.completions.create({
-      model: "llama3-70b-8192",
+    const completionPromise = openai.chat.completions.create({
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
