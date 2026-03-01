@@ -1,11 +1,7 @@
 import React from "react";
 import { TypeAnimation } from "react-type-animation";
 
-interface Props {
-  answer: string;
-}
-
-export default function ResultCard({ answer }: Props) {
+export default function ResultCard({ answer }) {
   return (
     <div className="w-full max-w-3xl mx-auto mt-6">
       <TypeAnimation
