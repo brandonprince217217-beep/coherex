@@ -30,6 +30,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  if (!process.env.GROQ_API_KEY) {
+    return res.status(500).json({ error: "Search service not configured" });
+  }
+
   const { query } = req.body || {};
   if (typeof query !== "string" || !query.trim()) {
     return res.status(400).json({ error: "Missing query" });

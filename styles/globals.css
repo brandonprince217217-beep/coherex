@@ -1,6 +1,12 @@
 /* ============================================================
    GLOBAL RESET & BASE
    ============================================================ */
+:root {
+  --constellation-rotation: 0.3;
+  --constellation-pulse: 0.6;
+  --constellation-spread: 0.4;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -40,6 +46,8 @@ a {
   min-height: 80vh;
   padding-top: 40px;
   text-align: center;
+  position: relative;
+  z-index: 2;
 }
 
 .hero h1 {
@@ -59,6 +67,54 @@ a {
   width: 100%;
   max-width: 480px;
   margin-top: 20px;
+}
+
+/* ============================================================
+   FEATURES SECTION
+   ============================================================ */
+.features-section {
+  position: relative;
+  z-index: 2;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+  text-align: center;
+}
+
+.features-heading {
+  font-size: 1.3rem;
+  font-weight: 700;
+  opacity: 0.6;
+  letter-spacing: 0.04em;
+  margin-bottom: 32px;
+  text-transform: uppercase;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.feature-card {
+  padding: 24px 20px;
+  border: 1px solid rgba(0, 140, 255, 0.25);
+  border-radius: 14px;
+  background: rgba(0, 140, 255, 0.05);
+  text-align: left;
+}
+
+.feature-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(0, 180, 255, 0.9);
+  margin-bottom: 8px;
+}
+
+.feature-card p {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  line-height: 1.6;
 }
 
 /* ============================================================

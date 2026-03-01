@@ -6,6 +6,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  if (!process.env.OPENAI_API_KEY || !openai) {
+    return res.status(500).json({ error: "OpenAI API key not configured" });
+  }
+
   const { text } = req.body || {};
   if (typeof text !== "string" || !text.trim()) {
     return res.status(400).json({ error: "Missing text" });

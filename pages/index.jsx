@@ -2,10 +2,26 @@ import Head from "next/head";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import InputBar from "../components/InputBar";
+import Constellation from "../components/Constellation";
 
 function normalizeQuery(value) {
   return value.replace(/\s+/g, " ").trim();
 }
+
+const FEATURES = [
+  {
+    title: "GPT-4o mini",
+    description: "Fast, cost-efficient reasoning powered by OpenAI's latest small model.",
+  },
+  {
+    title: "Three.js",
+    description: "Hardware-accelerated 3D visualizations rendered directly in the browser.",
+  },
+  {
+    title: "Streaming",
+    description: "Token-by-token streaming responses for a fluid, low-latency experience.",
+  },
+];
 
 export default function Home() {
   const router = useRouter();
@@ -32,6 +48,8 @@ export default function Home() {
         <title>Coherex</title>
       </Head>
 
+      <Constellation />
+
       <div className="hero">
         <h1>Coherex</h1>
         <p>Your cognitive OS.</p>
@@ -45,6 +63,18 @@ export default function Home() {
           />
         </div>
       </div>
+
+      <section className="features-section">
+        <h2 className="features-heading">Powered by advanced technology</h2>
+        <div className="features-grid">
+          {FEATURES.map(({ title, description }) => (
+            <div key={title} className="feature-card">
+              <h3>{title}</h3>
+              <p>{description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
