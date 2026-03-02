@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { openai } from "../../../lib/cognitive/openai";
+import { openai } from "../../lib/cognitive/openai";
 
 export default async function handler(
   req: NextApiRequest,
@@ -68,16 +68,7 @@ Rules:
       };
     }
 
-    return res.status(200).json({
-      belief_type: result.belief_type,
-      emotional_charge: result.emotional_charge,
-      core_need: result.core_need,
-      hidden_assumption: result.hidden_assumption,
-      contradiction: result.contradiction,
-      rewrite: result.rewrite,
-      next_question: result.next_question,
-      answer: result.answer
-    });
+    return res.status(200).json(result);
   } catch (err) {
     console.error("Cognitive API error:", err);
 
