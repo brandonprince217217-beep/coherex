@@ -131,11 +131,46 @@ A quick reference if you already have accounts:
 
 | Variable | Required | Where to get it |
 |---|---|---|
-| `OPENAI_API_KEY` | **Yes** — site won't start without it | https://platform.openai.com/api-keys |
+| `OPENAI_API_KEY` | **Yes** — search returns an error without it | https://platform.openai.com/api-keys |
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes for database features | Supabase Settings → API |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes for database features | Supabase Settings → API |
+| `SEARCH_DEBUG` | No — set to `true` to enable debug metadata in API responses | — |
 
 > **Scope note:** `OPENAI_API_KEY` is server-side only (safe — never sent to the browser). Variables starting with `NEXT_PUBLIC_` are also embedded in the client bundle, so they must only ever contain non-secret public values (the Supabase anon key is intentionally public).
+
+### Search API response shape
+
+`POST /api/search` returns JSON with the following shape:
+
+```json
+{
+  "answer": "...",
+  "results": [
+    { "title": "...", "url": "...", "snippet": "..." }
+  ]
+}
+```
+
+- **`results`** contains only the sources that were actually retrieved and used to generate the answer. For greeting queries or queries with no matching sources it will be an empty array.
+- When **`SEARCH_DEBUG=true`** an additional `_debug` key is included:
+
+```json
+{
+  "answer": "...",
+  "results": [...],
+  "_debug": {
+    "model": "gpt-4o-mini",
+    "retrievalPerformed": true,
+    "candidatesRetrieved": 4,
+    "passingThreshold": 2,
+    "threshold": 1,
+    "fallbackUsed": false,
+    "fallbackReason": null
+  }
+}
+```
+
+For greeting queries `retrievalPerformed` is `false` and `fallbackReason` is `"greeting"`. When no sources pass the threshold, `fallbackReason` is `"no-relevant-sources"`.
 
 ---
 

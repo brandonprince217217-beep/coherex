@@ -1,13 +1,13 @@
 /**
  * Tests for the /api/search route handler.
- * The openai module is mocked so tests run without real API calls.
+ * The groq module is mocked so tests run without real API calls.
  */
 
 import { createMocks } from "node-mocks-http";
 
-// Mock lib/openai before importing the handler
-jest.mock("../../lib/openai", () => ({
-  openai: {
+// Mock lib/groq before importing the handler
+jest.mock("../../lib/groq", () => ({
+  groq: {
     chat: {
       completions: {
         create: jest.fn(),
@@ -25,9 +25,20 @@ afterAll(() => {
 });
 
 import handler from "../../pages/api/search";
-import { openai } from "../../lib/openai";
+import { groq } from "../../lib/groq";
 
-const mockCreate = openai.chat.completions.create as jest.Mock;
+const mockCreate = groq.chat.completions.create as jest.Mock;
+
+const validAIResponse = JSON.stringify({
+  beliefType: "fear",
+  emotionalCharge: 0.8,
+  coreNeed: "Safety",
+  hiddenAssumption: "Success means losing control",
+  contradiction: "Wants success but fears it",
+  rewrite: "I can succeed and still feel safe",
+  nextQuestion: "What specifically feels unsafe about success?",
+  answer: "This is a fear response.\n\nIt stems from early experiences.",
+});
 
 describe("GET /api/search", () => {
   it("returns 405 for non-POST requests", async () => {
@@ -47,80 +58,107 @@ describe("POST /api/search", () => {
     const { req, res } = createMocks({ method: "POST", body: {} });
     await handler(req as any, res as any);
     expect(res._getStatusCode()).toBe(400);
-    expect(res._getJSONData()).toEqual({ error: "Missing query" });
+    expect(res._getJSONData()).toEqual({ error: "Query is required" });
   });
 
-  it("returns 400 when query is empty string", async () => {
-    const { req, res } = createMocks({ method: "POST", body: { query: "   " } });
+  it("returns 400 when query is not a string", async () => {
+    const { req, res } = createMocks({ method: "POST", body: { query: 123 } });
     await handler(req as any, res as any);
     expect(res._getStatusCode()).toBe(400);
   });
 
-  it("happy path: returns answer and results for a valid query", async () => {
+  it("happy path: returns structured CoherexResponse for a valid query", async () => {
     mockCreate.mockResolvedValueOnce({
-      choices: [{ message: { content: "Coherex is a cognitive OS. [1]" } }],
+      choices: [{ message: { content: validAIResponse } }],
     });
 
     const { req, res } = createMocks({
       method: "POST",
-      body: { query: "what is coherex" },
+      body: { query: "Why do I keep sabotaging myself?" },
     });
 
     await handler(req as any, res as any);
 
     expect(res._getStatusCode()).toBe(200);
     const data = res._getJSONData();
-    expect(typeof data.answer).toBe("string");
-    expect(data.answer).toContain("Coherex");
-    expect(Array.isArray(data.results)).toBe(true);
-    expect(data.results.length).toBeGreaterThan(0);
-    expect(data.results[0]).toHaveProperty("title");
-    expect(data.results[0]).toHaveProperty("url");
-    expect(data.results[0]).toHaveProperty("snippet");
+    expect(data.query).toBe("Why do I keep sabotaging myself?");
+    expect(data.beliefType).toBe("fear");
+    expect(data.emotionalCharge).toBe(0.8);
+    expect(data.coreNeed).toBe("Safety");
+    expect(data.hiddenAssumption).toBe("Success means losing control");
+    expect(data.contradiction).toBe("Wants success but fears it");
+    expect(data.rewrite).toBe("I can succeed and still feel safe");
+    expect(data.nextQuestion).toBe("What specifically feels unsafe about success?");
+    expect(data.answer).toContain("fear response");
   });
 
-  it("returns 503 when OpenAI throws an error", async () => {
-    mockCreate.mockRejectedValueOnce(new Error("OpenAI network error"));
+  it("returns defaults when AI response fields are missing", async () => {
+    mockCreate.mockResolvedValueOnce({
+      choices: [{ message: { content: JSON.stringify({ answer: "Some answer" }) } }],
+    });
 
     const { req, res } = createMocks({
       method: "POST",
-      body: { query: "pricing" },
+      body: { query: "test query" },
     });
 
     await handler(req as any, res as any);
 
-    expect(res._getStatusCode()).toBe(503);
+    expect(res._getStatusCode()).toBe(200);
+    const data = res._getJSONData();
+    expect(data.beliefType).toBe("other");
+    expect(data.emotionalCharge).toBe(0.5);
+    expect(data.coreNeed).toBe("Unknown");
+    expect(data.hiddenAssumption).toBe("None identified");
+    expect(data.contradiction).toBe("None identified");
+    expect(data.rewrite).toBe("test query");
+    expect(data.nextQuestion).toBe("What matters most to you here?");
+  });
+
+  it("returns 500 when AI returns no content", async () => {
+    mockCreate.mockResolvedValueOnce({
+      choices: [{ message: { content: null } }],
+    });
+
+    const { req, res } = createMocks({
+      method: "POST",
+      body: { query: "test query" },
+    });
+
+    await handler(req as any, res as any);
+
+    expect(res._getStatusCode()).toBe(500);
+    expect(res._getJSONData()).toEqual({ error: "No response from AI" });
+  });
+
+  it("returns 500 when AI returns invalid JSON", async () => {
+    mockCreate.mockResolvedValueOnce({
+      choices: [{ message: { content: "not valid json" } }],
+    });
+
+    const { req, res } = createMocks({
+      method: "POST",
+      body: { query: "test query" },
+    });
+
+    await handler(req as any, res as any);
+
+    expect(res._getStatusCode()).toBe(500);
+    expect(res._getJSONData()).toEqual({ error: "Invalid AI response format" });
+  });
+
+  it("returns 500 when Groq throws an error", async () => {
+    mockCreate.mockRejectedValueOnce(new Error("Groq network error"));
+
+    const { req, res } = createMocks({
+      method: "POST",
+      body: { query: "test query" },
+    });
+
+    await handler(req as any, res as any);
+
+    expect(res._getStatusCode()).toBe(500);
     const data = res._getJSONData();
     expect(typeof data.error).toBe("string");
-  });
-
-  it("returns 503 with timeout message when request times out", async () => {
-    mockCreate.mockRejectedValueOnce(new Error("Search request timed out"));
-
-    const { req, res } = createMocks({
-      method: "POST",
-      body: { query: "demo" },
-    });
-
-    await handler(req as any, res as any);
-
-    expect(res._getStatusCode()).toBe(503);
-    const data = res._getJSONData();
-    expect(data.error).toMatch(/timed out/i);
-  });
-
-  it("handles malformed response: missing choices gracefully", async () => {
-    mockCreate.mockResolvedValueOnce({ choices: [] });
-
-    const { req, res } = createMocks({
-      method: "POST",
-      body: { query: "about" },
-    });
-
-    await handler(req as any, res as any);
-
-    expect(res._getStatusCode()).toBe(200);
-    const data = res._getJSONData();
-    expect(data.answer).toBe("");
   });
 });
