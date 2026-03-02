@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
-type Result = { title: string; url: string; snippet: string };
+type Result = { title: string; url: string; snippet: string }; 
 
 export default function SearchPage() {
   const router = useRouter();
@@ -64,6 +64,10 @@ export default function SearchPage() {
   const hasResults = answer || results.length > 0;
   const showEmpty = searched && !loading && !error && !hasResults && q;
 
+  const githubSearchUrl = q
+    ? `https://github.com/brandonprince217217-beep/coherex/search?q=${encodeURIComponent(q)}&type=code`
+    : "";
+
   return (
     <div style={{ padding: 20, maxWidth: 900, margin: "0 auto" }}>
       <h1>Search</h1>
@@ -119,6 +123,33 @@ export default function SearchPage() {
               </li>
             ))}
           </ul>
+
+          {q && (
+            <div style={{ marginTop: 10 }}>
+              <a
+                href={githubSearchUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "rgba(0,140,255,0.95)" }}
+              >
+                View more on GitHub
+              </a>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* If no results but the query exists, still show the GitHub link so users can expand search */}
+      {!loading && !error && results.length === 0 && q && (
+        <div style={{ marginTop: 18 }}>
+          <a
+            href={githubSearchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "rgba(0,140,255,0.95)" }}
+          >
+            View more on GitHub
+          </a>
         </div>
       )}
     </div>
