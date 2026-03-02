@@ -1,27 +1,31 @@
 import { useState, useEffect } from 'react';
 
-export default function SearchBar({ onSearch, disabled }) {
-  const suggestions = [
-    "Why do I feel stuck right now?",
-    "Why do I keep overthinking things?",
-    "Why am I scared to make a decision?",
-    "Why do I feel like I'm not enough?",
-    "Why do I repeat the same patterns?",
-    "Why does this situation bother me so much?"
-  ];
+const EXAMPLE_QUERIES = [
+  "Why do I keep sabotaging myself when things start going well?",
+  "Why do I feel guilty resting, even when I'm exhausted?",
+  "Why do I always assume people are mad at me?",
+  "Why do I shut down when someone tries to get close to me?",
+  "Why do I feel like I'm behind in life all the time?",
+  "Why do I replay old mistakes over and over in my head?",
+  "Why do I panic when plans change at the last minute?",
+  "Why do I feel responsible for everyone else's emotions?",
+  "Why do I feel like I'm never doing enough, no matter what I do?",
+  "Why do I stay in situations that I know are bad for me?"
+];
 
-  const [placeholder, setPlaceholder] = useState(suggestions[0]);
+export default function SearchBar({ onSearch, disabled }) {
+  const [placeholder, setPlaceholder] = useState(EXAMPLE_QUERIES[0]);
   const [index, setIndex] = useState(0);
   const [input, setInput] = useState("");
 
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex(prev => {
-        const next = (prev + 1) % suggestions.length;
-        setPlaceholder(suggestions[next]);
+        const next = (prev + 1) % EXAMPLE_QUERIES.length;
+        setPlaceholder(EXAMPLE_QUERIES[next]);
         return next;
       });
-    }, 3000);
+    }, 5000);
 
     return () => clearInterval(interval);
   // eslint-disable-next-line react-hooks/exhaustive-deps
