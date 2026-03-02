@@ -16,6 +16,8 @@ answer: a full, multi-paragraph natural-language explanation using real AI reaso
 
 Always respond in JSON. Always be direct, deep, and psychologically precise.`;
 
+type Result = { title: string; url: string; snippet: string };
+
 type CoherexResponse = {
   query: string;
   beliefType: string;
@@ -26,6 +28,8 @@ type CoherexResponse = {
   rewrite: string;
   nextQuestion: string;
   answer: string;
+  // Added results for front-end (array of sources)
+  results?: Result[];
 };
 
 export default async function handler(
@@ -79,11 +83,15 @@ export default async function handler(
       answer:
         parsed.answer ||
         "I couldn't generate a detailed explanation. Please try rephrasing your question.",
+      // Ensure results is present for the frontend shape; allow AI to supply them if available.
+      results: Array.isArray(parsed.results) ? (parsed.results as Result[]) : [],
     };
 
     return res.status(200).json(response);
   } catch (error) {
     console.error("Error in /api/search:", error);
-    return res.status(500).json({ error: "Internal error" });
+    return res
+      .status(500)
+      .json({ error: "An unexpected error occurred. Please try again." });
   }
 }
