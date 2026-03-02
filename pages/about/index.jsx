@@ -1,11 +1,13 @@
 import React from "react";
+import Layout from "../../components/Layout";
 
 export default function AboutPage() {
   return (
+    <Layout>
     <div
       className="about-root"
       style={{
-        background: "black",
+        background: "transparent",
         color: "white",
         minHeight: "100vh",
         paddingTop: "100px" // prevents header overlap
@@ -142,5 +144,6 @@ export default function AboutPage() {
         Coherex © {new Date().getFullYear()}
       </div>
     </div>
+    </Layout>
   );
 }
