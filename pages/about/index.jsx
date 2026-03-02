@@ -1,121 +1,49 @@
-import Head from "next/head";
-
-export default function AboutPage() {
+export default function About() {
   return (
-    <>
-      <Head>
-        <title>About Coherex</title>
-      </Head>
+    <div
+      className="min-h-screen text-slate-100 px-6 py-16 flex flex-col items-center"
+      style={{
+        fontFamily: "Inter, system-ui, -apple-system, sans-serif",
+      }}
+    >
+      <h1 className="text-4xl font-bold mb-4 tracking-tight">
+        About Coherex
+      </h1>
 
-      <main className="about-root">
-        {/* HERO */}
-        <section className="about-hero">
-          <h1>Understand your mind. Build your clarity.</h1>
-          <p>
-            Coherex is a next-generation cognitive operating system that reveals
-            the deeper structure behind your thoughts, beliefs, and emotional
-            signals—so you can make decisions with intention instead of
-            uncertainty.
-          </p>
+      <p className="text-lg text-slate-400 max-w-2xl text-center mb-12 leading-relaxed">
+        Coherex is a cognitive operating system designed to reveal the structure
+        behind your thinking — beliefs, contradictions, emotional patterns, and
+        the deeper architecture of meaning.
+      </p>
 
-          {/* VIDEO SECTION */}
-          <div className="about-video-wrapper">
-            <video
-              src="/coherex-about.mp4"
-              controls
-              className="about-video-placeholder"
-            />
-          </div>
-        </section>
-
-        {/* PERSPECTIVE */}
-        <section className="about-section">
-          <h2>The Coherex perspective</h2>
-          <p>
-            Your thoughts, emotions, and decisions follow patterns. They&apos;re
-            shaped by beliefs, experiences, and signals you may not always
-            notice. Coherex is designed to help you see those patterns clearly,
-            so you can make choices with confidence instead of uncertainty.
-          </p>
-          <p>
-            When you express a thought, Coherex breaks it down into meaningful
-            components—belief type, emotional charge, hidden assumptions,
-            contradictions, core needs, and more. It doesn&apos;t just respond.
-            It interprets. It helps you understand not just what you think, but
-            why you think it.
+      <div className="max-w-3xl space-y-10">
+        <section>
+          <h2 className="text-2xl font-semibold mb-2">The Vision</h2>
+          <p className="text-slate-400 leading-relaxed">
+            Human thinking is powerful but unstructured. Coherex brings order to
+            that complexity by mapping the relationships between your beliefs,
+            assumptions, and emotional drivers.
           </p>
         </section>
 
-        {/* MISSION */}
-        <section className="about-section">
-          <h2>Our mission</h2>
-          <p>
-            Coherex exists to help you understand your mind with clarity and
-            precision. We believe that self-awareness is not a mystery—it&apos;s
-            a skill. By revealing the structure behind your thoughts and
-            emotions, Coherex gives you tools to navigate life with confidence,
-            intention, and insight.
+        <section>
+          <h2 className="text-2xl font-semibold mb-2">The Architecture</h2>
+          <p className="text-slate-400 leading-relaxed">
+            At its core, Coherex is a cognitive engine that analyzes your
+            statements, identifies hidden patterns, and generates a clear model
+            of your internal logic.
           </p>
         </section>
 
-        {/* VISION */}
-        <section className="about-section">
-          <h2>Our vision</h2>
-          <p>
-            We envision a world where every person has access to a cognitive
-            operating system—a companion that helps them understand their
-            patterns, challenge their assumptions, and build a more aligned
-            version of themselves. Coherex is the first step toward that future.
+        <section>
+          <h2 className="text-2xl font-semibold mb-2">The Creator</h2>
+          <p className="text-slate-400 leading-relaxed">
+            Coherex was created by <strong>Brandon Prince</strong>, a systems
+            architect focused on building tools that turn complexity into
+            clarity.
           </p>
         </section>
-
-        {/* VALUES */}
-        <section className="about-section">
-          <h2>Our values</h2>
-          <ul className="about-values">
-            <li>
-              <strong>Clarity:</strong> Understanding begins with seeing things
-              as they are.
-            </li>
-            <li>
-              <strong>Agency:</strong> You deserve tools that help you take
-              control of your thinking.
-            </li>
-            <li>
-              <strong>Insight:</strong> The mind has structure, and structure
-              can be understood.
-            </li>
-            <li>
-              <strong>Integrity:</strong> Your data, your privacy, your growth.
-            </li>
-            <li>
-              <strong>Exploration:</strong> Curiosity drives transformation.
-            </li>
-          </ul>
-        </section>
-
-        {/* STORY */}
-        <section className="about-section">
-          <h2>Why Coherex exists</h2>
-          <p>
-            Coherex was created to close the gap between what you feel and what
-            you understand. Traditional tools help you organize your tasks.
-            Coherex helps you organize your mind. By analyzing the deeper layers
-            behind your thoughts—belief type, emotional charge, hidden
-            assumptions, contradictions, core needs—the system reveals what&apos;s
-            really driving your decisions.
-          </p>
-        </section>
-
-        {/* FOUNDERS */}
-        <section className="about-section about-founders">
-          <p>
-            Coherex is crafted as a living cognitive universe, architected by{" "}
-            <strong>Brandon and Denise Prince</strong> with a single intention:
-            to give you a clearer relationship with your own mind.
-          </p>
-        </section>
-      </main>
-    </>
+      </div>
+    </div>
   );
 }
