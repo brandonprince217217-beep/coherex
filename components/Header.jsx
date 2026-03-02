@@ -1,6 +1,17 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 export default function Header() {
+  const router = useRouter();
+
+  const linkStyle = (href) => ({
+    color: 'white',
+    textDecoration: 'none',
+    opacity: router.pathname === href ? 1 : 0.6,
+    borderBottom: router.pathname === href ? '2px solid rgba(0,140,255,0.8)' : '2px solid transparent',
+    paddingBottom: '4px',
+  });
+
   return (
     <header
       style={{
@@ -24,15 +35,15 @@ export default function Header() {
           fontSize: '1.2rem'
         }}
       >
-        <Link href="/" style={{ color: 'white', textDecoration: 'none' }}>
+        <Link href="/" style={linkStyle('/')}>
           Home
         </Link>
 
-        <Link href="/about" style={{ color: 'white', textDecoration: 'none' }}>
+        <Link href="/about" style={linkStyle('/about')}>
           About
         </Link>
 
-        <Link href="/pricing" style={{ color: 'white', textDecoration: 'none' }}>
+        <Link href="/pricing" style={linkStyle('/pricing')}>
           Pricing
         </Link>
       </nav>

@@ -1,9 +1,10 @@
 /* eslint-disable react/no-unescaped-entities */
 import React, { useEffect, useState, useCallback } from "react";
 import Constellation from "../components/Constellation";
+import InputBar from "../components/InputBar";
+import Layout from "../components/Layout";
 
 export default function HomePage() {
-  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [lines, setLines] = useState([]);
   const [displayedText, setDisplayedText] = useState("");
@@ -55,19 +56,16 @@ export default function HomePage() {
     setIsTyping(true);
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading || isTyping) return;
+  const handleSubmit = async (text) => {
+    if (!text.trim() || isLoading || isTyping) return;
 
-    const userMessage = input.trim();
-    setInput("");
     setIsLoading(true);
 
     try {
       const response = await fetch("/api/cognitive", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: userMessage }),
+        body: JSON.stringify({ query: text }),
       });
 
       const data = await response.json();
@@ -96,67 +94,93 @@ export default function HomePage() {
   };
 
   return (
-    <>
+    <Layout>
       <Constellation />
-      <div className="min-h-screen text-slate-100 flex flex-col items-center px-4 py-8 relative z-10">
-        <h1 className="text-xl font-semibold mb-2">Coherex Cognitive Field</h1>
-        <p className="text-sm text-slate-400 mb-6">
-          Type what's on your mind. Coherex will break it down.
-        </p>
-
-        <form onSubmit={handleSubmit} className="w-full max-w-2xl mb-6">
-          <div className="relative w-full">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="w-full bg-transparent border border-slate-700 rounded-full px-4 py-3 text-sm text-slate-100 outline-none focus:border-sky-500"
-            />
-            <button
-              type="submit"
+      <div className="home-page">
+        <section className="hero">
+          <h1>Coherex Cognitive Field</h1>
+          <p>Type what's on your mind. Coherex will break it down.</p>
+          <div className="search-container">
+            <InputBar
+              onSend={handleSubmit}
               disabled={isLoading || isTyping}
-              className="absolute right-1 top-1 bottom-1 px-4 rounded-full text-xs font-medium bg-sky-500 text-black disabled:opacity-40"
-            >
-              {isLoading ? "Thinking..." : "Send"}
-            </button>
+              buttonLabel={isLoading ? "Thinking..." : "Send"}
+            />
           </div>
-        </form>
+        </section>
 
-        <div className="w-full max-w-2xl border border-slate-800 rounded-xl p-4 bg-black/40">
-          {lines.map((line) => (
-            <div key={line.id} className="whitespace-pre-wrap text-sm mb-2">
-              {line.text}
+        {(lines.length > 0 || displayedText) && (
+          <div style={{ maxWidth: '640px', margin: '0 auto 48px', padding: '0 24px', position: 'relative', zIndex: 2 }}>
+            <div style={{
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '14px',
+              padding: '20px',
+              background: 'rgba(0,0,0,0.4)',
+            }}>
+              {lines.map((line) => (
+                <div key={line.id} style={{ whiteSpace: 'pre-wrap', fontSize: '0.9rem', marginBottom: '8px', opacity: 0.85 }}>
+                  {line.text}
+                </div>
+              ))}
+              {displayedText && (
+                <div style={{ whiteSpace: 'pre-wrap', fontSize: '0.9rem' }}>
+                  {displayedText}
+                  <span className="soft-cursor" style={{ display: 'inline-block', width: '8px', height: '16px', background: '#cbd5e1', marginLeft: '4px' }} />
+                </div>
+              )}
+              {lastNextQuestion && !isTyping && (
+                <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                  <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em', opacity: 0.5, marginBottom: '8px' }}>
+                    Continue the conversation
+                  </div>
+                  <div style={{ fontSize: '0.9rem', opacity: 0.85, marginBottom: '12px' }}>{lastNextQuestion}</div>
+                  <InputBar
+                    onSend={handleSubmit}
+                    disabled={isLoading || isTyping}
+                    buttonLabel="Send"
+                  />
+                </div>
+              )}
             </div>
-          ))}
+          </div>
+        )}
 
-          {displayedText && (
-            <div className="whitespace-pre-wrap text-sm">
-              {displayedText}
-              <span className="inline-block w-2 h-4 bg-slate-300 ml-1 animate-pulse" />
+        <section className="tech-section">
+          <p className="tech-heading">Built on a Cognitive Stack</p>
+          <div className="tech-grid">
+            <div className="tech-card">
+              <span className="tech-icon">🧠</span>
+              <span className="tech-label">Belief Engine</span>
+              <p className="tech-desc">Maps the structure of your beliefs and underlying assumptions.</p>
             </div>
-          )}
-
-          {lastNextQuestion && !isTyping && (
-            <div className="mt-6 pt-4 border-t border-slate-800">
-              <div className="text-xs uppercase tracking-wide text-slate-500 mb-2">
-                Continue the conversation
-              </div>
-              <div className="text-sm text-slate-200 mb-3">
-                {lastNextQuestion}
-              </div>
-              <form onSubmit={handleSubmit}>
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type your response..."
-                  className="w-full bg-transparent border border-slate-700 rounded-full px-4 py-2 text-sm text-slate-100 outline-none focus:border-sky-500"
-                />
-              </form>
+            <div className="tech-card">
+              <span className="tech-icon">⚡</span>
+              <span className="tech-label">Emotional Parser</span>
+              <p className="tech-desc">Detects emotional charge and energy patterns in your statements.</p>
             </div>
-          )}
-        </div>
+            <div className="tech-card">
+              <span className="tech-icon">🔍</span>
+              <span className="tech-label">Contradiction Finder</span>
+              <p className="tech-desc">Surfaces hidden contradictions and cognitive dissonance.</p>
+            </div>
+            <div className="tech-card">
+              <span className="tech-icon">✨</span>
+              <span className="tech-label">Rewrite Generator</span>
+              <p className="tech-desc">Proposes clearer, more coherent reformulations of your thinking.</p>
+            </div>
+            <div className="tech-card">
+              <span className="tech-icon">🎯</span>
+              <span className="tech-label">Need Mapper</span>
+              <p className="tech-desc">Identifies the core need driving your thoughts and questions.</p>
+            </div>
+            <div className="tech-card">
+              <span className="tech-icon">🔗</span>
+              <span className="tech-label">Inquiry Engine</span>
+              <p className="tech-desc">Generates the next most generative question for your growth.</p>
+            </div>
+          </div>
+        </section>
       </div>
-    </>
+    </Layout>
   );
 }
