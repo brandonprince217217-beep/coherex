@@ -1,71 +1,148 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { groq } from "../../lib/groq";
+import { openai } from "../../lib/openai";
 
-const SYSTEM_PROMPT = `
-You are Coherex AI, a cognitive engine that breaks down any thought into its underlying structure.
+type Source = { title: string; url: string; snippet: string; text: string };
 
-For every user input, return a JSON object with:
+const SEARCH_TIMEOUT_MS = 15000;
+const MIN_RELEVANCE_SCORE = 1;
+const GREETINGS = /^(hi|hello|hey|howdy|yo|greetings|sup|what'?s\s+up)[!?\s.,]*$/i;
 
-beliefType: classify the belief (fear, shame, control, doubt, identity, worth, abandonment, other)
-emotionalCharge: number from 0 to 1
-coreNeed: the core psychological need behind the belief
-hiddenAssumption: the assumption the user is making without realizing it
-contradiction: any internal conflict or tension in the belief
-rewrite: a clearer, more grounded version of the belief
-nextQuestion: the single most important question the user should explore next
-answer: a full, multi-paragraph natural-language explanation using real AI reasoning, written clearly and conversationally
+function escapeRegExp(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
-Always respond in JSON. Always be direct, deep, and psychologically precise.
-`;
+function score(query: string, haystack: string) {
+  const q = query.toLowerCase().trim();
+  const t = haystack.toLowerCase();
+  if (!q) return 0;
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+  const parts = q.split(/\s+/).filter(Boolean);
+  let s = 0;
+
+  for (const p of parts) {
+    const re = new RegExp(escapeRegExp(p), "g");
+    const m = t.match(re);
+    if (m) s += m.length;
+  }
+  return s;
+}
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   const { query } = req.body || {};
-  if (!query || typeof query !== "string") {
-    return res.status(400).json({ error: "Query is required" });
+  if (typeof query !== "string" || !query.trim()) {
+    return res.status(400).json({ error: "Missing query" });
   }
+
+  if (!process.env.OPENAI_API_KEY) {
+    return res.status(503).json({ error: "Missing OPENAI_API_KEY" });
+  }
+
+  // Short-circuit for greetings — no LLM call needed
+  if (GREETINGS.test(query.trim())) {
+    return res.status(200).json({
+      answer: "Hi there! I'm Coherex, your cognitive OS. Ask me anything!",
+      results: [],
+    });
+  }
+
+  const sources: Source[] = [
+    {
+      title: "Home",
+      url: "/",
+      snippet: "Coherex homepage and tagline.",
+      text: "Coherex. Your cognitive OS.",
+    },
+    {
+      title: "About",
+      url: "/about",
+      snippet: "About Coherex and what it does.",
+      text: "About Coherex and what it does.",
+    },
+    {
+      title: "Pricing",
+      url: "/pricing",
+      snippet: "Plan details and pricing.",
+      text: "Pricing plans, basic access, unlimited searches, engine access, and analysis features.",
+    },
+    {
+      title: "Demo",
+      url: "/demo",
+      snippet: "Demo experience for Coherex.",
+      text: "Demo page that shows example interactions and results.",
+    },
+  ];
+
+  const ranked = sources
+    .map((s) => ({
+      ...s,
+      _score: score(query, `${s.title}\n${s.snippet}\n${s.text}`),
+    }))
+    .filter((s) => s._score >= MIN_RELEVANCE_SCORE)
+    .sort((a, b) => b._score - a._score)
+    .slice(0, 4);
+
+  // Short-circuit if no sources are relevant — no LLM call needed
+  if (ranked.length === 0) {
+    return res.status(200).json({ answer: "", results: [] });
+  }
+
+  const context = ranked
+    .map(
+      (s, i) =>
+        `SOURCE ${i + 1}\nTitle: ${s.title}\nURL: ${s.url}\nContent: ${s.text}`
+    )
+    .join("\n\n");
 
   try {
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+    let timeoutId: NodeJS.Timeout | undefined;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(
+        () => reject(new Error("Search request timed out")),
+        SEARCH_TIMEOUT_MS
+      );
+    });
+
+    const completionPromise = openai.chat.completions.create({
+      model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: query },
+        {
+          role: "system",
+          content:
+            "You are the Coherex AI search engine. Use ONLY the provided sources. " +
+            "Cite them using [1], [2], etc. Keep answers concise but helpful.",
+        },
+        {
+          role: "user",
+          content: `Query: ${query}\n\n${context}`,
+        },
       ],
-      temperature: 0.4,
     });
 
-    const raw = completion.choices?.[0]?.message?.content;
-    if (!raw) {
-      return res.status(500).json({ error: "No response from AI" });
-    }
+    const completion = await Promise.race([completionPromise, timeoutPromise]);
+    clearTimeout(timeoutId);
 
-    let parsed: Record<string, unknown>;
-    try {
-      parsed = JSON.parse(raw);
-    } catch {
-      return res.status(500).json({ error: "Invalid AI response format" });
-    }
+    const answer = completion.choices?.[0]?.message?.content ?? "";
 
-    res.status(200).json({
-      query,
-      beliefType: parsed.beliefType || "other",
-      emotionalCharge: parsed.emotionalCharge ?? 0.5,
-      coreNeed: parsed.coreNeed || "Unknown",
-      hiddenAssumption: parsed.hiddenAssumption || "None identified",
-      contradiction: parsed.contradiction || "None identified",
-      rewrite: parsed.rewrite || query,
-      nextQuestion: parsed.nextQuestion || "What matters most to you here?",
-      answer: parsed.answer || "",
+    return res.status(200).json({
+      answer,
+      results: ranked.map(({ title, url, snippet }) => ({
+        title,
+        url,
+        snippet,
+      })),
     });
-  } catch (err) {
-    console.error("Error in /api/search:", err);
-    return res.status(500).json({ error: (err as Error).message || "Internal error" });
+  } catch (err: any) {
+    const isTimeout = err?.message?.includes("timed out");
+    const message = isTimeout
+      ? "The search request timed out. Please try again."
+      : "Search is temporarily unavailable. Please try again later.";
+
+    console.error("[search] handler error:", err);
+    return res.status(503).json({ error: message });
   }
 }
+
