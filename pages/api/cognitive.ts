@@ -1,8 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { openai } from "../../lib/cognitive/openai";
+import { openai } from "../../../lib/cognitive/openai";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   try {
+    if (req.method !== "POST") {
+      return res.status(405).json({ error: "Method not allowed" });
+    }
+
     const { query } = req.body;
 
     if (!query || typeof query !== "string") {
@@ -16,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         {
           role: "system",
           content: `
-You are Coherex, a cognitive engine. 
+You are Coherex, a cognitive engine.
 Always return a JSON object with these fields:
 
 belief_type
@@ -56,7 +63,8 @@ Rules:
         contradiction: "There is no conflict in the user's message.",
         rewrite: "The user is opening communication.",
         next_question: "What would you like to explore?",
-        answer: "It looks like you're starting a conversation. How can I help you today?"
+        answer:
+          "It looks like you're starting a conversation. How can I help you today?"
       };
     }
 
@@ -70,7 +78,6 @@ Rules:
       next_question: result.next_question,
       answer: result.answer
     });
-
   } catch (err) {
     console.error("Cognitive API error:", err);
 
@@ -82,7 +89,8 @@ Rules:
       contradiction: "The system expected valid output but failed.",
       rewrite: "There was an issue, but it can be resolved.",
       next_question: "Can you try your request again?",
-      answer: "There was an internal issue processing your request. Please try again."
+      answer:
+        "There was an internal issue processing your request. Please try again."
     });
   }
 }
