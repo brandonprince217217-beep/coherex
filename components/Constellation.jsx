@@ -17,7 +17,6 @@ export default function Constellation() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    // Read CSS variables safely
     const getVars = () => {
       const styles = getComputedStyle(document.documentElement);
       return {
@@ -27,7 +26,6 @@ export default function Constellation() {
       };
     };
 
-    // Initialize particles ONCE
     if (particlesRef.current.length === 0) {
       for (let i = 0; i < particleCount; i++) {
         particlesRef.current.push({
@@ -38,12 +36,7 @@ export default function Constellation() {
       }
     }
 
-    let lastTime = performance.now();
-
     const animate = (time) => {
-      const delta = time - lastTime;
-      lastTime = time;
-
       const { rotation, pulse, spread } = getVars();
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -71,16 +64,12 @@ export default function Constellation() {
       });
 
       ctx.restore();
-
       animationRef.current = requestAnimationFrame(animate);
     };
 
     animationRef.current = requestAnimationFrame(animate);
 
-    // Cleanup
-    return () => {
-      cancelAnimationFrame(animationRef.current);
-    };
+    return () => cancelAnimationFrame(animationRef.current);
   }, []);
 
   return (
