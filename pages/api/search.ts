@@ -26,9 +26,12 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  try {
-    const { query } = req.body;
+  const { query } = req.body || {};
+  if (!query || typeof query !== "string") {
+    return res.status(400).json({ error: "Query is required" });
+  }
 
+  try {
     const completion = await groq.chat.completions.create({
       model: "llama-3.1-8b-instant",
       messages: [
@@ -38,28 +41,31 @@ export default async function handler(
       temperature: 0.4,
     });
 
-    const raw = completion.choices?.[0]?.message?.content || "{}";
-    let parsed;
+    const raw = completion.choices?.[0]?.message?.content;
+    if (!raw) {
+      return res.status(500).json({ error: "No response from AI" });
+    }
 
+    let parsed: Record<string, unknown>;
     try {
       parsed = JSON.parse(raw);
     } catch {
-      parsed = {};
+      return res.status(500).json({ error: "Invalid AI response format" });
     }
 
     res.status(200).json({
       query,
       beliefType: parsed.beliefType || "other",
-      emotionalCharge: parsed.emotionalCharge || 0,
-      coreNeed: parsed.coreNeed || "",
-      hiddenAssumption: parsed.hiddenAssumption || "",
-      contradiction: parsed.contradiction || "",
-      rewrite: parsed.rewrite || "",
-      nextQuestion: parsed.nextQuestion || "",
+      emotionalCharge: parsed.emotionalCharge ?? 0.5,
+      coreNeed: parsed.coreNeed || "Unknown",
+      hiddenAssumption: parsed.hiddenAssumption || "None identified",
+      contradiction: parsed.contradiction || "None identified",
+      rewrite: parsed.rewrite || query,
+      nextQuestion: parsed.nextQuestion || "What matters most to you here?",
       answer: parsed.answer || "",
     });
   } catch (err) {
     console.error("Error in /api/search:", err);
-    return res.status(500).json({ error: "Internal error" });
+    return res.status(500).json({ error: (err as Error).message || "Internal error" });
   }
 }

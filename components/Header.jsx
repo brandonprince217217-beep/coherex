@@ -12,7 +12,7 @@ export default function Header() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'black',
+        backgroundColor: 'rgba(0,0,0,0.55)',
         zIndex: 9999,
         borderBottom: '1px solid rgba(255,255,255,0.1)'
       }}
