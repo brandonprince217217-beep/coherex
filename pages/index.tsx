@@ -3,6 +3,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import Constellation from "../components/Constellation";
 import InputBar from "../components/InputBar";
 import Layout from "../components/Layout";
+import Link from "next/link";
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -148,36 +149,41 @@ export default function HomePage() {
         <section className="tech-section">
           <p className="tech-heading">Built on a Cognitive Stack</p>
           <div className="tech-grid">
-            <div className="tech-card">
+            <Link href={`/search?q=${encodeURIComponent("Belief Engine")}`} className="tech-card">
               <span className="tech-icon">🧠</span>
               <span className="tech-label">Belief Engine</span>
               <p className="tech-desc">Maps the structure of your beliefs and underlying assumptions.</p>
-            </div>
-            <div className="tech-card">
+            </Link>
+
+            <Link href={`/search?q=${encodeURIComponent("Emotional Parser")}`} className="tech-card">
               <span className="tech-icon">⚡</span>
               <span className="tech-label">Emotional Parser</span>
               <p className="tech-desc">Detects emotional charge and energy patterns in your statements.</p>
-            </div>
-            <div className="tech-card">
+            </Link>
+
+            <Link href={`/search?q=${encodeURIComponent("Contradiction Finder")}`} className="tech-card">
               <span className="tech-icon">🔍</span>
               <span className="tech-label">Contradiction Finder</span>
               <p className="tech-desc">Surfaces hidden contradictions and cognitive dissonance.</p>
-            </div>
-            <div className="tech-card">
+            </Link>
+
+            <Link href={`/search?q=${encodeURIComponent("Rewrite Generator")}`} className="tech-card">
               <span className="tech-icon">✨</span>
               <span className="tech-label">Rewrite Generator</span>
               <p className="tech-desc">Proposes clearer, more coherent reformulations of your thinking.</p>
-            </div>
-            <div className="tech-card">
+            </Link>
+
+            <Link href={`/search?q=${encodeURIComponent("Need Mapper")}`} className="tech-card">
               <span className="tech-icon">🎯</span>
               <span className="tech-label">Need Mapper</span>
               <p className="tech-desc">Identifies the core need driving your thoughts and questions.</p>
-            </div>
-            <div className="tech-card">
+            </Link>
+
+            <Link href={`/search?q=${encodeURIComponent("Inquiry Engine")}`} className="tech-card">
               <span className="tech-icon">🔗</span>
               <span className="tech-label">Inquiry Engine</span>
               <p className="tech-desc">Generates the next most generative question for your growth.</p>
-            </div>
+            </Link>
           </div>
         </section>
       </div>
