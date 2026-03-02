@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 
 import React, { useEffect, useState, useCallback } from "react";
+import Constellation from "../components/Constellation";
 
 type CognitiveResult = {
   belief_type: string;
@@ -210,12 +211,16 @@ const HomePage: React.FC = () => {
     !isFocused && input.length === 0 ? SHADOW_PROMPTS[shadowIndex] : "";
 
   return (
-    <div
-      className="min-h-screen bg-black text-slate-100 flex flex-col items-center justify-start px-4 py-8"
-      style={{
-        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif"
-      }}
-    >
+    <>
+      <Constellation />
+      <div
+        className="min-h-screen text-slate-100 flex flex-col items-center justify-start px-4 py-8"
+        style={{
+          fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif",
+          position: "relative",
+          zIndex: 2,
+        }}
+      >
       <div className="w-full max-w-2xl mb-8">
         <h1 className="text-xl font-semibold text-slate-100 mb-2 tracking-tight">
           Coherex Cognitive Field
@@ -294,7 +299,34 @@ const HomePage: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+
+      <section className="tech-section">
+        <p className="tech-heading">Powered by advanced technology</p>
+        <div className="tech-grid">
+          <div className="tech-card">
+            <span className="tech-icon">🤖</span>
+            <span className="tech-label">GPT-4o mini</span>
+            <p className="tech-desc">Fast, affordable reasoning for cognitive analysis</p>
+          </div>
+          <div className="tech-card">
+            <span className="tech-icon">🌐</span>
+            <span className="tech-label">Three.js</span>
+            <p className="tech-desc">Real-time 3D visuals and immersive space background</p>
+          </div>
+          <div className="tech-card">
+            <span className="tech-icon">⚡</span>
+            <span className="tech-label">Real-time streaming</span>
+            <p className="tech-desc">Instant response delivery as your thoughts are processed</p>
+          </div>
+          <div className="tech-card">
+            <span className="tech-icon">🔍</span>
+            <span className="tech-label">Semantic search</span>
+            <p className="tech-desc">Deep semantic understanding of beliefs and patterns</p>
+          </div>
+        </div>
+      </section>
+      </div>
+    </>
   );
 };
 
