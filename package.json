@@ -12,15 +12,12 @@
     "test:ci": "jest --ci --forceExit"
   },
   "dependencies": {
-    "@react-three/fiber": "^8.18.0",
     "@supabase/supabase-js": "^2.98.0",
     "groq-sdk": "^0.37.0",
     "next": "15.5.12",
-    "openai": "^4.98.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "standardized-audio-context": "^25.3.77",
-    "three": "^0.161.0",
     "tonal": "^6.4.3",
     "tone": "^15.1.22"
   },

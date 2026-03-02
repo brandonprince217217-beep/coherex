@@ -1,53 +1,41 @@
 import Head from "next/head";
-import { useMemo, useState } from "react";
-import { useRouter } from "next/router";
-import InputBar from "../components/InputBar";
+import { useState } from "react";
+import SearchBar from "../components/SearchBar";
+import Results from "../components/Results";
 import Constellation from "../components/Constellation";
 
-function normalizeQuery(value) {
-  return value.replace(/\s+/g, " ").trim();
-}
-
-const TECH_STACK = [
-  {
-    icon: "🧠",
-    label: "GPT-4o mini",
-    desc: "OpenAI large language model for deep semantic reasoning",
-  },
-  {
-    icon: "🌐",
-    label: "Three.js",
-    desc: "GPU-accelerated 3D graphics rendered directly in the browser",
-  },
-  {
-    icon: "⚡",
-    label: "Real-time streaming",
-    desc: "Token-by-token AI responses with zero-latency perception",
-  },
-  {
-    icon: "🔍",
-    label: "Semantic search",
-    desc: "Ranked retrieval with citation-grounded AI summaries",
-  },
-];
-
 export default function Home() {
-  const router = useRouter();
-  const [isSearching, setIsSearching] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState([]);
+  const [error, setError] = useState(null);
 
-  const initialQuery = useMemo(() => {
-    const q = typeof router.query.q === "string" ? router.query.q : "";
-    return normalizeQuery(q);
-  }, [router.query.q]);
+  const handleSearch = async (query) => {
+    if (!query.trim()) return;
 
-  const handleSearch = (text) => {
-    if (isSearching) return;
+    setLoading(true);
+    setError(null);
 
-    const query = normalizeQuery(text);
-    if (query.length < 2) return;
+    try {
+      const response = await fetch("/api/search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ query })
+      });
 
-    setIsSearching(true);
-    window.location.href = `/search?q=${encodeURIComponent(query)}`;
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Search failed");
+      } else {
+        setResults((prev) => [{ ...data, _id: Date.now() }, ...prev]);
+      }
+    } catch (err) {
+      setError("Network error");
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -63,27 +51,20 @@ export default function Home() {
         <p>Your cognitive OS.</p>
 
         <div className="search-container">
-          <InputBar
-            onSend={handleSearch}
-            disabled={isSearching}
-            buttonLabel={isSearching ? "Searching..." : "Search"}
-            initialValue={initialQuery}
+          <SearchBar
+            onSearch={handleSearch}
+            disabled={loading}
           />
         </div>
       </div>
 
-      <div className="tech-section">
-        <h2 className="tech-heading">Powered by advanced technology</h2>
-        <div className="tech-grid">
-          {TECH_STACK.map(({ icon, label, desc }) => (
-            <div key={label} className="tech-card">
-              <span className="tech-icon">{icon}</span>
-              <strong className="tech-label">{label}</strong>
-              <p className="tech-desc">{desc}</p>
-            </div>
-          ))}
+      {error && (
+        <div style={{ marginTop: 20, color: "red", textAlign: "center" }}>
+          {error}
         </div>
-      </div>
+      )}
+
+      <Results results={results} />
     </div>
   );
 }

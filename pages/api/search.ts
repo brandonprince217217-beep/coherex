@@ -1,148 +1,89 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { openai } from "../../lib/openai";
+import { groq } from "../../lib/groq";
 
-type Source = { title: string; url: string; snippet: string; text: string };
+const SYSTEM_PROMPT = `You are Coherex AI, a cognitive engine that breaks down any thought into its underlying structure.
 
-const SEARCH_TIMEOUT_MS = 15000;
-const MIN_RELEVANCE_SCORE = 1;
-const GREETINGS = /^(hi|hello|hey|howdy|yo|greetings|sup|what'?s\s+up)[!?\s.,]*$/i;
+For every user input, return a JSON object with:
 
-function escapeRegExp(s: string) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+beliefType: classify the belief (fear, shame, control, doubt, identity, worth, abandonment, other)
+emotionalCharge: number from 0 to 1
+coreNeed: the core psychological need behind the belief
+hiddenAssumption: the assumption the user is making without realizing it
+contradiction: any internal conflict or tension in the belief
+rewrite: a clearer, more grounded version of the belief
+nextQuestion: the single most important question the user should explore next
+answer: a full, multi-paragraph natural-language explanation using real AI reasoning, written clearly and conversationally
 
-function score(query: string, haystack: string) {
-  const q = query.toLowerCase().trim();
-  const t = haystack.toLowerCase();
-  if (!q) return 0;
+Always respond in JSON. Always be direct, deep, and psychologically precise.`;
 
-  const parts = q.split(/\s+/).filter(Boolean);
-  let s = 0;
+type CoherexResponse = {
+  query: string;
+  beliefType: string;
+  emotionalCharge: number;
+  coreNeed: string;
+  hiddenAssumption: string;
+  contradiction: string;
+  rewrite: string;
+  nextQuestion: string;
+  answer: string;
+};
 
-  for (const p of parts) {
-    const re = new RegExp(escapeRegExp(p), "g");
-    const m = t.match(re);
-    if (m) s += m.length;
-  }
-  return s;
-}
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { query } = req.body || {};
-  if (typeof query !== "string" || !query.trim()) {
-    return res.status(400).json({ error: "Missing query" });
-  }
-
-  if (!process.env.OPENAI_API_KEY) {
-    return res.status(503).json({ error: "Missing OPENAI_API_KEY" });
-  }
-
-  // Short-circuit for greetings — no LLM call needed
-  if (GREETINGS.test(query.trim())) {
-    return res.status(200).json({
-      answer: "Hi there! I'm Coherex, your cognitive OS. Ask me anything!",
-      results: [],
-    });
-  }
-
-  const sources: Source[] = [
-    {
-      title: "Home",
-      url: "/",
-      snippet: "Coherex homepage and tagline.",
-      text: "Coherex. Your cognitive OS.",
-    },
-    {
-      title: "About",
-      url: "/about",
-      snippet: "About Coherex and what it does.",
-      text: "About Coherex and what it does.",
-    },
-    {
-      title: "Pricing",
-      url: "/pricing",
-      snippet: "Plan details and pricing.",
-      text: "Pricing plans, basic access, unlimited searches, engine access, and analysis features.",
-    },
-    {
-      title: "Demo",
-      url: "/demo",
-      snippet: "Demo experience for Coherex.",
-      text: "Demo page that shows example interactions and results.",
-    },
-  ];
-
-  const ranked = sources
-    .map((s) => ({
-      ...s,
-      _score: score(query, `${s.title}\n${s.snippet}\n${s.text}`),
-    }))
-    .filter((s) => s._score >= MIN_RELEVANCE_SCORE)
-    .sort((a, b) => b._score - a._score)
-    .slice(0, 4);
-
-  // Short-circuit if no sources are relevant — no LLM call needed
-  if (ranked.length === 0) {
-    return res.status(200).json({ answer: "", results: [] });
-  }
-
-  const context = ranked
-    .map(
-      (s, i) =>
-        `SOURCE ${i + 1}\nTitle: ${s.title}\nURL: ${s.url}\nContent: ${s.text}`
-    )
-    .join("\n\n");
-
   try {
-    let timeoutId: NodeJS.Timeout | undefined;
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      timeoutId = setTimeout(
-        () => reject(new Error("Search request timed out")),
-        SEARCH_TIMEOUT_MS
-      );
-    });
+    const { query } = req.body;
 
-    const completionPromise = openai.chat.completions.create({
-      model: "gpt-4o-mini",
+    if (!query || typeof query !== "string") {
+      return res.status(400).json({ error: "Query is required" });
+    }
+
+    const completion = await groq.chat.completions.create({
+      model: "llama3-8b-8192",
       messages: [
-        {
-          role: "system",
-          content:
-            "You are the Coherex AI search engine. Use ONLY the provided sources. " +
-            "Cite them using [1], [2], etc. Keep answers concise but helpful.",
-        },
-        {
-          role: "user",
-          content: `Query: ${query}\n\n${context}`,
-        },
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: query },
       ],
     });
 
-    const completion = await Promise.race([completionPromise, timeoutPromise]);
-    clearTimeout(timeoutId);
+    const rawContent = completion.choices[0]?.message?.content;
 
-    const answer = completion.choices?.[0]?.message?.content ?? "";
+    if (!rawContent) {
+      return res.status(500).json({ error: "No response from AI" });
+    }
 
-    return res.status(200).json({
-      answer,
-      results: ranked.map(({ title, url, snippet }) => ({
-        title,
-        url,
-        snippet,
-      })),
-    });
-  } catch (err: any) {
-    const isTimeout = err?.message?.includes("timed out");
-    const message = isTimeout
-      ? "The search request timed out. Please try again."
-      : "Search is temporarily unavailable. Please try again later.";
+    let parsed: Partial<CoherexResponse>;
 
-    console.error("[search] handler error:", err);
-    return res.status(503).json({ error: message });
+    try {
+      parsed = JSON.parse(rawContent);
+    } catch (parseError) {
+      console.error("Failed to parse AI response:", rawContent);
+      return res.status(500).json({ error: "Invalid AI response format" });
+    }
+
+    const response: CoherexResponse = {
+      query,
+      beliefType: parsed.beliefType || "other",
+      emotionalCharge:
+        typeof parsed.emotionalCharge === "number" ? parsed.emotionalCharge : 0.5,
+      coreNeed: parsed.coreNeed || "Unknown",
+      hiddenAssumption: parsed.hiddenAssumption || "None identified",
+      contradiction: parsed.contradiction || "None identified",
+      rewrite: parsed.rewrite || query,
+      nextQuestion: parsed.nextQuestion || "What matters most to you here?",
+      answer:
+        parsed.answer ||
+        "I couldn't generate a detailed explanation. Please try rephrasing your question.",
+    };
+
+    return res.status(200).json(response);
+  } catch (error) {
+    console.error("Error in /api/search:", error);
+    return res.status(500).json({ error: "Internal error" });
   }
 }
-
