@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unescaped-entities */
+
 import React, { useEffect, useState, useCallback } from "react";
 
 type CognitiveResult = {
@@ -18,7 +20,7 @@ type TypedLine = {
 };
 
 const SHADOW_PROMPTS = [
-  "What's really on your mind?",
+  "What’s really on your mind?",
   "What emotion is strongest right now?",
   "What pattern keeps repeating?",
   "What are you avoiding?",
@@ -28,7 +30,7 @@ const SHADOW_PROMPTS = [
   "What do you need right now?"
 ];
 
-const TYPING_SPEED = 20; // ms per character
+const TYPING_SPEED = 20;
 
 const HomePage: React.FC = () => {
   const [input, setInput] = useState("");
@@ -47,7 +49,6 @@ const HomePage: React.FC = () => {
   const [awaitingUserResponse, setAwaitingUserResponse] = useState(false);
   const [lastNextQuestion, setLastNextQuestion] = useState<string>("");
 
-  // Rotate shadow prompts
   useEffect(() => {
     if (isFocused || input.length > 0) return;
     const interval = setInterval(() => {
@@ -56,7 +57,6 @@ const HomePage: React.FC = () => {
     return () => clearInterval(interval);
   }, [isFocused, input]);
 
-  // Typewriter effect
   useEffect(() => {
     if (!isTyping || pendingLines.length === 0) return;
 
@@ -78,7 +78,6 @@ const HomePage: React.FC = () => {
       }, TYPING_SPEED);
       return () => clearTimeout(timeout);
     } else {
-      // Line finished
       const timeout = setTimeout(() => {
         setLines((prev) => [...prev, currentLine]);
         setDisplayedText("");
@@ -89,7 +88,6 @@ const HomePage: React.FC = () => {
     }
   }, [isTyping, pendingLines, currentLineIndex, currentCharIndex]);
 
-  // When all pending lines are done, stop typing
   useEffect(() => {
     if (pendingLines.length > 0 && currentLineIndex >= pendingLines.length && isTyping) {
       setIsTyping(false);
@@ -120,49 +118,41 @@ const HomePage: React.FC = () => {
 
     lines.push({
       id: baseId + "-belief_type",
-      label: "Belief Type",
       text: `Belief Type: ${result.belief_type}`
     });
 
     lines.push({
       id: baseId + "-emotional_charge",
-      label: "Emotional Charge",
       text: `Emotional Charge: ${result.emotional_charge}`
     });
 
     lines.push({
       id: baseId + "-core_need",
-      label: "Core Need",
       text: `Core Need: ${result.core_need}`
     });
 
     lines.push({
       id: baseId + "-hidden_assumption",
-      label: "Hidden Assumption",
       text: `Hidden Assumption: ${result.hidden_assumption}`
     });
 
     lines.push({
       id: baseId + "-contradiction",
-      label: "Contradiction",
       text: `Contradiction: ${result.contradiction}`
     });
 
     lines.push({
       id: baseId + "-rewrite",
-      label: "Rewrite",
       text: `Rewrite: ${result.rewrite}`
     });
 
     lines.push({
       id: baseId + "-answer",
-      label: "Reflection",
       text: result.answer
     });
 
     lines.push({
       id: baseId + "-next_question",
-      label: "Next Question",
       text: `Next Question: ${result.next_question}`
     });
 
@@ -178,7 +168,6 @@ const HomePage: React.FC = () => {
     setIsLoading(true);
     setAwaitingUserResponse(false);
 
-    // Add to conversation history
     setConversationHistory((prev) => [...prev, userMessage]);
 
     try {
@@ -200,8 +189,6 @@ const HomePage: React.FC = () => {
       const newLines = buildLinesFromResult(data);
       startTypingSequence(newLines);
 
-      // After typing finishes, we want to allow user to respond again
-      // We'll watch isTyping to flip awaitingUserResponse
       setTimeout(() => {
         setAwaitingUserResponse(true);
       }, newLines.reduce((acc, line) => acc + line.text.length * TYPING_SPEED + 300, 0));
@@ -229,22 +216,16 @@ const HomePage: React.FC = () => {
         fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif"
       }}
     >
-      {/* Top section: title / subtle framing */}
       <div className="w-full max-w-2xl mb-8">
         <h1 className="text-xl font-semibold text-slate-100 mb-2 tracking-tight">
           Coherex Cognitive Field
         </h1>
         <p className="text-sm text-slate-400">
-          Type what&apos;s on your mind. Coherex will break it down into beliefs, needs, and the next
-          question to explore.
+          Type what's on your mind. Coherex will break it down into beliefs, needs, and the next question to explore.
         </p>
       </div>
 
-      {/* Search bar */}
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-2xl mb-6"
-      >
+      <form onSubmit={handleSubmit} className="w-full max-w-2xl mb-6">
         <div className="relative w-full">
           <input
             type="text"
@@ -271,7 +252,6 @@ const HomePage: React.FC = () => {
         </div>
       </form>
 
-      {/* Results area */}
       <div className="w-full max-w-2xl flex-1 overflow-y-auto border border-slate-800 rounded-xl p-4 bg-black/40">
         {lines.length === 0 && !displayedText && (
           <div className="text-sm text-slate-500">
@@ -279,7 +259,6 @@ const HomePage: React.FC = () => {
           </div>
         )}
 
-        {/* Typed lines */}
         <div className="space-y-2 text-sm leading-relaxed">
           {lines.map((line) => (
             <div key={line.id} className="whitespace-pre-wrap">
@@ -287,7 +266,6 @@ const HomePage: React.FC = () => {
             </div>
           ))}
 
-          {/* Currently typing line */}
           {displayedText && (
             <div className="whitespace-pre-wrap">
               {displayedText}
@@ -296,7 +274,6 @@ const HomePage: React.FC = () => {
           )}
         </div>
 
-        {/* After results: prompt user to respond */}
         {!isTyping && !isLoading && lastNextQuestion && (
           <div className="mt-6 pt-4 border-t border-slate-800">
             <div className="text-xs uppercase tracking-wide text-slate-500 mb-2">
