@@ -10,39 +10,7 @@ export default function Pricing() {
           Choose the plan that fits your cognitive workflow.
         </p>
 
-        <div style={{ display: 'grid', gap: '24px', maxWidth: '720px' }}>
-          <div style={{
-            border: '1px solid rgba(255,255,255,0.12)',
-            borderRadius: '14px',
-            padding: '32px',
-            background: 'rgba(0,0,0,0.45)',
-          }}>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '8px' }}>Free Tier</h2>
-            <p style={{ fontSize: '2rem', fontWeight: 800, color: 'rgba(0,180,255,0.9)', marginBottom: '16px' }}>
-              $0 <span style={{ fontSize: '1rem', opacity: 0.6 }}>/ month</span>
-            </p>
-            <p style={{ opacity: 0.65, marginBottom: '20px' }}>Basic cognitive analysis to get started.</p>
-            <ul style={{ paddingLeft: '20px', marginBottom: '28px', lineHeight: 1.8, opacity: 0.8 }}>
-              <li>10 cognitive queries per day</li>
-              <li>Belief type &amp; emotional charge detection</li>
-              <li>Core need identification</li>
-              <li>Basic rewrite suggestions</li>
-            </ul>
-            <Link href="/chat" style={{
-              display: 'inline-block',
-              padding: '12px 28px',
-              borderRadius: '8px',
-              background: 'rgba(0,140,255,0.2)',
-              border: '1px solid rgba(0,140,255,0.5)',
-              color: 'rgba(0,180,255,0.9)',
-              textDecoration: 'none',
-              fontWeight: 600,
-              fontSize: '0.95rem',
-            }}>
-              Get Started Free
-            </Link>
-          </div>
-
+        <div style={{ display: 'grid', gap: '24px', maxWidth: '480px' }}>
           <div style={{
             border: '1px solid rgba(0,140,255,0.4)',
             borderRadius: '14px',
@@ -50,9 +18,9 @@ export default function Pricing() {
             background: 'rgba(0,0,0,0.55)',
             boxShadow: '0 0 32px rgba(0,140,255,0.12)',
           }}>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '8px' }}>Pro</h2>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '8px' }}>Coherex</h2>
             <p style={{ fontSize: '2rem', fontWeight: 800, color: 'rgba(0,180,255,0.9)', marginBottom: '16px' }}>
-              $19 <span style={{ fontSize: '1rem', opacity: 0.6 }}>/ month</span>
+              $4.99 <span style={{ fontSize: '1rem', opacity: 0.6 }}>/ month</span>
             </p>
             <p style={{ opacity: 0.65, marginBottom: '20px' }}>Full cognitive engine access for deep work.</p>
             <ul style={{ paddingLeft: '20px', marginBottom: '28px', lineHeight: 1.8, opacity: 0.8 }}>
@@ -73,7 +41,7 @@ export default function Pricing() {
               fontWeight: 600,
               fontSize: '0.95rem',
             }}>
-              Upgrade to Pro
+              Get Started
             </Link>
           </div>
         </div>
