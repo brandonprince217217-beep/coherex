@@ -13,8 +13,9 @@ contradiction: any internal conflict or tension in the belief
 rewrite: a clearer, more grounded version of the belief
 nextQuestion: the single most important question the user should explore next
 answer: a full, multi-paragraph natural-language explanation using real AI reasoning, written clearly and conversationally
+results: an array of 3 to 5 plausible, relevant search results related to the query, each with {title, url, snippet} fields
 
-Always respond in JSON. Always be direct, deep, and psychologically precise.`;
+Always respond in raw JSON with no markdown formatting. Always be direct, deep, and psychologically precise.`;
 
 type Result = { title: string; url: string; snippet: string };
 type CoherexResponse = {
@@ -45,22 +46,10 @@ export default async function handler(
       return res.status(400).json({ error: "Query is required" });
     }
 
-    let retrievedResults: Result[] = [];
-
-    const messages: any[] = [{ role: "system", content: SYSTEM_PROMPT }];
-
-    if (retrievedResults.length > 0) {
-      const sourcesText = retrievedResults
-        .map((r, i) => `[[${i + 1}]] ${r.title} - ${r.url}\n${r.snippet}`)
-        .join("\n\n");
-
-      messages.push({
-        role: "system",
-        content: `The following sources were retrieved for this query:\n\n${sourcesText}\n\nWhen returning JSON, include a top-level \"results\" array containing these sources (or a subset) in the same {title, url, snippet} shape.`,
-      });
-    }
-
-    messages.push({ role: "user", content: query });
+    const messages: any[] = [
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user", content: query },
+    ];
 
     const completion = await groq.chat.completions.create({
       model: "llama3-8b-8192",
@@ -76,7 +65,8 @@ export default async function handler(
     let parsed: Partial<CoherexResponse> = {};
 
     try {
-      parsed = JSON.parse(rawContent);
+      const cleaned = rawContent.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+      parsed = JSON.parse(cleaned);
     } catch (parseError) {
       console.error("Failed to parse AI response as JSON.", rawContent);
       return res.status(500).json({ error: "Invalid AI response format" });
@@ -95,9 +85,7 @@ export default async function handler(
       answer:
         parsed.answer ||
         "I couldn't generate a detailed explanation. Please try rephrasing your question.",
-      results: retrievedResults.length > 0
-        ? retrievedResults
-        : Array.isArray(parsed.results)
+      results: Array.isArray(parsed.results)
         ? (parsed.results as Result[])
         : [],
     };

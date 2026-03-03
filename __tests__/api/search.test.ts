@@ -147,6 +147,68 @@ describe("POST /api/search", () => {
     expect(res._getJSONData()).toEqual({ error: "Invalid AI response format" });
   });
 
+  it("parses AI response wrapped in markdown code fences", async () => {
+    const fencedResponse = "```json\n" + validAIResponse + "\n```";
+    mockCreate.mockResolvedValueOnce({
+      choices: [{ message: { content: fencedResponse } }],
+    });
+
+    const { req, res } = createMocks({
+      method: "POST",
+      body: { query: "Why do I keep sabotaging myself?" },
+    });
+
+    await handler(req as any, res as any);
+
+    expect(res._getStatusCode()).toBe(200);
+    const data = res._getJSONData();
+    expect(data.beliefType).toBe("fear");
+    expect(data.emotionalCharge).toBe(0.8);
+  });
+
+  it("parses AI response wrapped in plain code fences (no language tag)", async () => {
+    const fencedResponse = "```\n" + validAIResponse + "\n```";
+    mockCreate.mockResolvedValueOnce({
+      choices: [{ message: { content: fencedResponse } }],
+    });
+
+    const { req, res } = createMocks({
+      method: "POST",
+      body: { query: "test query" },
+    });
+
+    await handler(req as any, res as any);
+
+    expect(res._getStatusCode()).toBe(200);
+    const data = res._getJSONData();
+    expect(data.beliefType).toBe("fear");
+  });
+
+  it("includes results array from AI response", async () => {
+    const responseWithResults = JSON.stringify({
+      ...JSON.parse(validAIResponse),
+      results: [
+        { title: "Test Result", url: "https://example.com", snippet: "A snippet." },
+      ],
+    });
+    mockCreate.mockResolvedValueOnce({
+      choices: [{ message: { content: responseWithResults } }],
+    });
+
+    const { req, res } = createMocks({
+      method: "POST",
+      body: { query: "test query" },
+    });
+
+    await handler(req as any, res as any);
+
+    expect(res._getStatusCode()).toBe(200);
+    const data = res._getJSONData();
+    expect(Array.isArray(data.results)).toBe(true);
+    expect(data.results[0].title).toBe("Test Result");
+  });
+
+
   it("returns 500 when Groq throws an error", async () => {
     mockCreate.mockRejectedValueOnce(new Error("Groq network error"));
 
