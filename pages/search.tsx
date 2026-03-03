@@ -14,7 +14,7 @@ export default function SearchPage() {
   const [searched, setSearched] = useState(false);
 
   useEffect(() => {
-    if (!q) return;
+    if (!router.isReady || !q) return;
 
     (async () => {
       setLoading(true);
@@ -59,7 +59,7 @@ export default function SearchPage() {
         setSearched(true);
       }
     })();
-  }, [q]);
+  }, [router.isReady, q]);
 
   const hasResults = answer || results.length > 0;
   const showEmpty = searched && !loading && !error && !hasResults && q;

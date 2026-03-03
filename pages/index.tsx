@@ -61,6 +61,7 @@ export default function HomePage() {
     if (!text.trim() || isLoading || isTyping) return;
 
     setIsLoading(true);
+    setLines([]);
 
     try {
       const response = await fetch("/api/cognitive", {
