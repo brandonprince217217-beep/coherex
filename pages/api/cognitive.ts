@@ -1,62 +1,97 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { groq } from "../../lib/groq";
+import type { NextApiRequest, NextApiResponse } from "next";
 
-const SYSTEM_PROMPT = `You are Coherex Cognitive Engine. Analyze the user's input and return a JSON object with exactly these fields:
+type EngineResult = {
+  belief_type: string;
+  emotional_charge: string;
+  core_need: string;
+  rewrite: string;
+  next_question: string;
+  raw?: string;
+};
 
-{
-  "belief_type": "classify the belief (fear, shame, control, doubt, identity, worth, abandonment, other)",
-  "emotional_charge": <number from 0 to 1>,
-  "core_need": "the core psychological need behind the belief",
-  "hidden_assumption": "the assumption the user is making without realizing it",
-  "contradiction": "any internal conflict or tension in the belief",
-  "rewrite": "a clearer, more grounded version of the belief",
-  "answer": "a full, multi-paragraph natural-language explanation",
-  "next_question": "the single most important question the user should explore next"
-}
+type ErrorResponse = { error: string };
 
-Always respond with valid JSON only. No markdown, no extra text.`;
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<EngineResult | ErrorResponse>
+) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { text } = req.body || {};
-  if (typeof text !== "string" || !text.trim()) {
-    return res.status(400).json({ error: "Missing text" });
+  const { query, apiKey } = req.body as { query?: string; apiKey?: string };
+
+  if (!query || !apiKey) {
+    return res
+      .status(400)
+      .json({ error: "Missing query or apiKey in request body" });
   }
 
   try {
-    const response = await groq.chat.completions.create({
-      model: "llama3-8b-8192",
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: text }
-      ]
+    const systemPrompt = `
+You are the Coherex Cognitive Engine.
+
+Given a single user input (which may be emotional, messy, or vague), you must analyze it and return a JSON object with this exact shape:
+
+{
+  "belief_type": string,
+  "emotional_charge": string,
+  "core_need": string,
+  "rewrite": string,
+  "next_question": string
+}
+
+Rules:
+- Respond with valid JSON only.
+- No markdown.
+- No commentary.
+- No extra keys.
+`;
+
+    const response = await fetch("https://api.together.xyz/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: query },
+        ],
+        response_format: { type: "json_object" }
+      }),
     });
 
-    const rawContent = response.choices[0]?.message?.content || "";
-
-    let parsed: Record<string, unknown> = {};
-    try {
-      parsed = JSON.parse(rawContent);
-    } catch (parseError) {
-      console.error("[cognitive] failed to parse AI response as JSON:", parseError);
-      parsed = {};
+    if (!response.ok) {
+      const text = await response.text();
+      return res
+        .status(500)
+        .json({ error: `Together API error: ${response.status} - ${text}` });
     }
 
-    res.status(200).json({
-      belief_type: parsed.belief_type || "other",
-      emotional_charge: typeof parsed.emotional_charge === "number" ? parsed.emotional_charge : 0.5,
-      core_need: parsed.core_need || "Unknown",
-      hidden_assumption: parsed.hidden_assumption || "None identified",
-      contradiction: parsed.contradiction || "None identified",
-      rewrite: parsed.rewrite || text,
-      answer: parsed.answer || "Unable to analyze.",
-      next_question: parsed.next_question || "What matters most to you here?",
+    const data = await response.json();
+    const content = data?.choices?.[0]?.message?.content ?? "{}";
+
+    let parsed: EngineResult;
+    try {
+      parsed = JSON.parse(content);
+    } catch {
+      parsed = {
+        belief_type: "unknown",
+        emotional_charge: "unknown",
+        core_need: "unknown",
+        rewrite: "Unable to parse structured output.",
+        next_question: "What feels most important to explore next?",
+        raw: content,
+      };
+    }
+
+    return res.status(200).json(parsed);
+  } catch (err: any) {
+    return res.status(500).json({
+      error: `Engine error: ${err?.message ?? "Unknown error"}`,
     });
-  } catch (err) {
-    console.error("[cognitive] handler error:", err);
-    res.status(503).json({ error: "Cognitive analysis is temporarily unavailable. Please try again." });
   }
 }
