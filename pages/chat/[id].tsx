@@ -15,8 +15,7 @@ export default function ChatPage() {
       try {
         setLoading(true);
 
-        // ⭐ EXACT MATCH to your backend API
-        const res = await fetch("/api/engine", {
+        const res = await fetch("/api/cognitive", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text: id }),
@@ -24,8 +23,7 @@ export default function ChatPage() {
 
         const data = await res.json();
 
-        // ⭐ EXACT MATCH to your backend return shape
-        setResponse(data.output || "No response.");
+        setResponse(data.answer || "No response.");
       } catch (err) {
         console.error(err);
         setResponse("Error loading response.");
