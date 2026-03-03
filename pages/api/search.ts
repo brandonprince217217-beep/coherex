@@ -46,32 +46,6 @@ export default async function handler(
     }
 
     let retrievedResults: Result[] = [];
-    try {
-      const g: any = groq as any;
-
-      if (typeof g.documents?.search === "function") {
-        const docs = await g.documents.search(query, { limit: 10 });
-        if (Array.isArray(docs)) {
-          retrievedResults = docs.map((d: any) => ({
-            title: d.title || d.path || d.id || "Source",
-            url: d.url || d.path || "",
-            snippet: d.excerpt || d.snippet || (typeof d.content === "string" ? d.content.slice(0, 240) : ""),
-          }));
-        }
-      } else if (typeof g.search === "function") {
-        const docs = await g.search(query, { limit: 10 });
-        if (Array.isArray(docs)) {
-          retrievedResults = docs.map((d: any) => ({
-            title: d.title || d.path || d.id || "Source",
-            url: d.url || d.path || "",
-            snippet: d.excerpt || d.snippet || (typeof d.content === "string" ? d.content.slice(0, 240) : ""),
-          }));
-        }
-      }
-    } catch (retrievalErr) {
-      console.error("[search][retrieval] error:", retrievalErr);
-      retrievedResults = [];
-    }
 
     const messages: any[] = [{ role: "system", content: SYSTEM_PROMPT }];
 
@@ -104,22 +78,8 @@ export default async function handler(
     try {
       parsed = JSON.parse(rawContent);
     } catch (parseError) {
-      console.error("Failed to parse AI response as JSON. Returning fallback.", rawContent);
-
-      const fallbackResponse: CoherexResponse = {
-        query,
-        beliefType: "other",
-        emotionalCharge: 0.5,
-        coreNeed: "Unknown",
-        hiddenAssumption: "None identified",
-        contradiction: "None identified",
-        rewrite: query,
-        nextQuestion: "What matters most to you here?",
-        answer: String(rawContent || ""),
-        results: retrievedResults,
-      };
-
-      return res.status(200).json(fallbackResponse);
+      console.error("Failed to parse AI response as JSON.", rawContent);
+      return res.status(500).json({ error: "Invalid AI response format" });
     }
 
     const response: CoherexResponse = {
