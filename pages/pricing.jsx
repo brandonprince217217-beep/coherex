@@ -20,29 +20,35 @@ export default function Pricing() {
           }}>
             <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '8px' }}>Coherex</h2>
             <p style={{ fontSize: '2rem', fontWeight: 800, color: 'rgba(0,180,255,0.9)', marginBottom: '16px' }}>
-              $4.99 <span style={{ fontSize: '1rem', opacity: 0.6 }}>/ month</span>
+              $4.99 <span style={{ fontSize: '1rem', opacity: 0.6 }}>/ lifetime</span>
             </p>
-            <p style={{ opacity: 0.65, marginBottom: '20px' }}>Full cognitive engine access for deep work.</p>
+            <p style={{ opacity: 0.65, marginBottom: '20px' }}>Full cognitive engine access for deep work — pay once, use forever.</p>
             <ul style={{ paddingLeft: '20px', marginBottom: '28px', lineHeight: 1.8, opacity: 0.8 }}>
               <li>Unlimited cognitive queries</li>
               <li>Full contradiction &amp; hidden assumption detection</li>
               <li>Advanced rewrite generation</li>
               <li>Generative next-question engine</li>
               <li>Priority processing &amp; API access</li>
+              <li>Lifetime access — no recurring fees</li>
             </ul>
-            <Link href="/chat" style={{
-              display: 'inline-block',
-              padding: '12px 28px',
-              borderRadius: '8px',
-              background: 'rgba(0,140,255,0.85)',
-              border: '1px solid rgba(0,140,255,0.9)',
-              color: 'white',
-              textDecoration: 'none',
-              fontWeight: 600,
-              fontSize: '0.95rem',
-            }}>
-              Get Started
-            </Link>
+            <a
+              href="https://buy.stripe.com/8x214f23P3Oa25z3tzasg00"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-block',
+                padding: '12px 28px',
+                borderRadius: '8px',
+                background: 'rgba(0,140,255,0.85)',
+                border: '1px solid rgba(0,140,255,0.9)',
+                color: 'white',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: '0.95rem',
+              }}
+            >
+              Get Lifetime Access
+            </a>
           </div>
         </div>
       </div>
