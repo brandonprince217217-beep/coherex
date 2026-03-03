@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/router";
 
 type InputBarProps = {
   onSend?: (text: string) => void | Promise<void>;
@@ -13,6 +14,7 @@ export default function InputBar({
   buttonLabel = "Search",
   initialValue = "",
 }: InputBarProps) {
+  const router = useRouter();
   const [text, setText] = useState(initialValue);
   const [loading, setLoading] = useState(false);
   const lastSubmitRef = useRef(0);
@@ -37,23 +39,8 @@ export default function InputBar({
       return;
     }
 
-    // Otherwise, perform homepage search
-    setLoading(true);
-
-    try {
-      const response = await fetch("/api/search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: text }),
-      });
-
-      const data = await response.json();
-      console.log("Search result:", data);
-    } catch (err) {
-      console.error("Search failed:", err);
-    }
-
-    setLoading(false);
+    // Otherwise, navigate to the search results page
+    router.push({ pathname: '/search', query: { q: text } });
   };
 
   return (

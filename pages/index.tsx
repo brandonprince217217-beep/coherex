@@ -66,7 +66,7 @@ export default function HomePage() {
       const response = await fetch("/api/cognitive", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: text }),
+        body: JSON.stringify({ text: text }),
       });
 
       const data = await response.json();
