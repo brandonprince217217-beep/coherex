@@ -38,12 +38,16 @@ User thought: "${input}"
       });
 
       const data = await res.json();
-      let parsed;
+
+      let parsed: any = null;
 
       try {
         parsed = JSON.parse(data.reply);
       } catch {
-        parsed = { error: "Invalid response format." };
+        parsed = {
+          error: "Invalid JSON returned from engine.",
+          raw: data.reply,
+        };
       }
 
       setResult(parsed);
@@ -132,6 +136,13 @@ User thought: "${input}"
                     <p className="text-neutral-300">{result.reasoning}</p>
                   </div>
                 </>
+              )}
+
+              {result.raw && (
+                <div>
+                  <h2 className="text-xl font-semibold">Raw Output</h2>
+                  <p className="text-neutral-300 whitespace-pre-wrap">{result.raw}</p>
+                </div>
               )}
             </div>
           )}
