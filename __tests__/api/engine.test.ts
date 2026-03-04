@@ -7,6 +7,16 @@ import { createMocks } from "node-mocks-http";
 
 const mockCreate = jest.fn();
 
+jest.mock("../../lib/groq", () => ({
+  groq: {
+    chat: {
+      completions: {
+        create: jest.fn(),
+      },
+    },
+  },
+}));
+
 jest.mock("groq-sdk", () => {
   return jest.fn().mockImplementation(() => ({
     chat: {
@@ -26,6 +36,9 @@ afterAll(() => {
 });
 
 import handler from "../../pages/api/engine";
+import { groq as sharedGroq } from "../../lib/groq";
+
+const mockSharedCreate = sharedGroq!.chat.completions.create as jest.Mock;
 
 const validAIResponse = JSON.stringify({
   predictedNextThought: "I will fail again",
@@ -47,7 +60,9 @@ describe("GET /api/engine", () => {
 describe("POST /api/engine", () => {
   beforeEach(() => {
     mockCreate.mockReset();
+    mockSharedCreate.mockReset();
     delete process.env.GROQ_API_KEY;
+    delete process.env.NEXT_PUBLIC_GROQ_API_KEY;
   });
 
   it("returns 400 when both thought and query are missing", async () => {
@@ -105,9 +120,28 @@ describe("POST /api/engine", () => {
     expect(data.predictedNextThought).toBe("I will fail again");
   });
 
+  it("uses shared Groq client (lib/groq) when env key is set", async () => {
+    process.env.GROQ_API_KEY = "env-key";
+    mockSharedCreate.mockResolvedValueOnce({
+      choices: [{ message: { content: validAIResponse } }],
+    });
+
+    const { req, res } = createMocks({
+      method: "POST",
+      body: { thought: "I feel stuck" },
+    });
+
+    await handler(req as any, res as any);
+
+    expect(res._getStatusCode()).toBe(200);
+    expect(mockSharedCreate).toHaveBeenCalledTimes(1);
+    expect(mockCreate).not.toHaveBeenCalled();
+    expect(res._getJSONData().predictedNextThought).toBe("I will fail again");
+  });
+
   it("falls back to process.env.GROQ_API_KEY when no body apiKey", async () => {
     process.env.GROQ_API_KEY = "env-key";
-    mockCreate.mockResolvedValueOnce({
+    mockSharedCreate.mockResolvedValueOnce({
       choices: [{ message: { content: validAIResponse } }],
     });
 
@@ -173,7 +207,7 @@ describe("POST /api/engine", () => {
     expect(data.raw).toBe("not valid json");
   });
 
-  it("returns 500 when Groq throws an error", async () => {
+  it("surfaces upstream Groq error message in response", async () => {
     mockCreate.mockRejectedValueOnce(new Error("Groq network error"));
 
     const { req, res } = createMocks({
@@ -184,6 +218,6 @@ describe("POST /api/engine", () => {
     await handler(req as any, res as any);
 
     expect(res._getStatusCode()).toBe(500);
-    expect(typeof res._getJSONData().error).toBe("string");
+    expect(res._getJSONData()).toEqual({ error: "Groq network error" });
   });
 });
