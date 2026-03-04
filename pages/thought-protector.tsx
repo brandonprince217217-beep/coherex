@@ -4,6 +4,7 @@ import Layout from "../components/Layout";
 
 export default function ThoughtProtector() {
   const [input, setInput] = useState("");
+  const [apiKey, setApiKey] = useState("");
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
@@ -15,10 +16,13 @@ export default function ThoughtProtector() {
     setResult(null);
 
     try {
+      const body: Record<string, string> = { thought: input };
+      if (apiKey.trim()) body.apiKey = apiKey.trim();
+
       const res = await fetch("/api/engine", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ thought: input }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
@@ -59,6 +63,24 @@ export default function ThoughtProtector() {
           </p>
 
           <form onSubmit={analyzeThought} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <input
+              type="password"
+              aria-label="Groq API key"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                borderRadius: '12px',
+                background: 'rgba(0,0,0,0.55)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                color: '#f1f5f9',
+                fontSize: '0.95rem',
+                boxSizing: 'border-box',
+              }}
+              placeholder="Groq API key (optional — uses server key if omitted)"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+            />
+
             <textarea
               style={{
                 width: '100%',

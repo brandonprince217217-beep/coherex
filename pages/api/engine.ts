@@ -58,8 +58,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     return res.status(200).json(parsed);
-  } catch (err) {
+  } catch (err: any) {
     console.error("Engine error:", err);
+    if (err?.status === 401) {
+      return res.status(401).json({ error: "Invalid API key. Please provide a valid Groq API key." });
+    }
     return res.status(500).json({ error: err instanceof Error ? err.message : "Engine error." });
   }
 }

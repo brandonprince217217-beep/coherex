@@ -207,6 +207,23 @@ describe("POST /api/engine", () => {
     expect(data.raw).toBe("not valid json");
   });
 
+  it("returns 401 when Groq throws an authentication error", async () => {
+    const authError = Object.assign(new Error("Invalid API Key"), { status: 401 });
+    mockCreate.mockRejectedValueOnce(authError);
+
+    const { req, res } = createMocks({
+      method: "POST",
+      body: { thought: "I feel stuck", apiKey: "bad-key" },
+    });
+
+    await handler(req as any, res as any);
+
+    expect(res._getStatusCode()).toBe(401);
+    expect(res._getJSONData()).toEqual({
+      error: "Invalid API key. Please provide a valid Groq API key.",
+    });
+  });
+
   it("surfaces upstream Groq error message in response", async () => {
     mockCreate.mockRejectedValueOnce(new Error("Groq network error"));
 
