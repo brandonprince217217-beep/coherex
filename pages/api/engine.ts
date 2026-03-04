@@ -3,30 +3,55 @@ import Groq from "groq-sdk";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    const { message } = req.body;
+const SYSTEM_PROMPT = `You are Thought Protector. Analyze the user's thought and respond ONLY with a raw JSON object — no markdown, no code fences, no extra text before or after the JSON.
 
-    if (!message) {
-      return res.status(400).json({ reply: "No message provided." });
+The JSON must have exactly these fields:
+{
+  "predictedNextThought": "",
+  "whyItAppears": "",
+  "patternDetected": "",
+  "protectedThought": "",
+  "reasoning": ""
+}`;
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  try {
+    const { thought } = req.body;
+
+    if (!thought || typeof thought !== "string") {
+      return res.status(400).json({ error: "thought is required" });
     }
 
     const completion = await groq.chat.completions.create({
       model: "llama3-70b-8192",
       messages: [
-        {
-          role: "user",
-          content: message,
-        },
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: thought },
       ],
       temperature: 0.2,
     });
 
-    const reply = completion.choices?.[0]?.message?.content || "";
+    const raw = completion.choices?.[0]?.message?.content || "";
 
-    res.status(200).json({ reply });
+    if (!raw) {
+      return res.status(500).json({ error: "No response from AI" });
+    }
+
+    let parsed: unknown;
+    try {
+      const cleaned = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+      parsed = JSON.parse(cleaned);
+    } catch {
+      return res.status(500).json({ error: "Invalid AI response format", raw });
+    }
+
+    return res.status(200).json(parsed);
   } catch (err) {
     console.error("Engine error:", err);
-    res.status(500).json({ reply: "Engine error." });
+    return res.status(500).json({ error: "Engine error." });
   }
 }

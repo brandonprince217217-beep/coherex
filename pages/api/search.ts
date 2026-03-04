@@ -3,19 +3,26 @@ import { groq } from "../../lib/groq";
 
 const SYSTEM_PROMPT = `You are Coherex AI, a cognitive engine that breaks down any thought into its underlying structure.
 
-For every user input, return a JSON object with:
+For every user input, respond ONLY with a raw JSON object — no markdown, no code fences, no extra text before or after the JSON.
 
-beliefType: classify the belief (fear, shame, control, doubt, identity, worth, abandonment, other)
-emotionalCharge: number from 0 to 1
-coreNeed: the core psychological need behind the belief
-hiddenAssumption: the assumption the user is making without realizing it
-contradiction: any internal conflict or tension in the belief
-rewrite: a clearer, more grounded version of the belief
-nextQuestion: the single most important question the user should explore next
-answer: a full, multi-paragraph natural-language explanation using real AI reasoning, written clearly and conversationally
-results: an array of 3 to 5 plausible, relevant search results related to the query, each with {title, url, snippet} fields
+The JSON must have exactly these fields:
+{
+  "beliefType": "fear | shame | control | doubt | identity | worth | abandonment | other",
+  "emotionalCharge": 0.0,
+  "coreNeed": "",
+  "hiddenAssumption": "",
+  "contradiction": "",
+  "rewrite": "",
+  "nextQuestion": "",
+  "answer": "",
+  "results": [
+    { "title": "", "url": "", "snippet": "" },
+    { "title": "", "url": "", "snippet": "" },
+    { "title": "", "url": "", "snippet": "" }
+  ]
+}
 
-Always respond in raw JSON with no markdown formatting. Always be direct, deep, and psychologically precise.`;
+Always include at least 3 plausible, relevant results. Always be direct, deep, and psychologically precise.`;
 
 type Result = { title: string; url: string; snippet: string };
 type CoherexResponse = {
@@ -69,8 +76,26 @@ export default async function handler(
       parsed = JSON.parse(cleaned);
     } catch (parseError) {
       console.error("Failed to parse AI response as JSON.", rawContent);
-      return res.status(500).json({ error: "Invalid AI response format" });
+      return res.status(500).json({ error: "Invalid AI response format", raw: rawContent });
     }
+
+    const fallbackResults: Result[] = [
+      {
+        title: `Coherex: ${query}`,
+        url: `https://coherex.app/search?q=${encodeURIComponent(query)}`,
+        snippet: "Explore this topic further with Coherex AI.",
+      },
+      {
+        title: `Understanding: ${query}`,
+        url: `https://en.wikipedia.org/w/index.php?search=${encodeURIComponent(query)}`,
+        snippet: "Read more about this topic on Wikipedia.",
+      },
+      {
+        title: `Research on: ${query}`,
+        url: `https://scholar.google.com/scholar?q=${encodeURIComponent(query)}`,
+        snippet: "Find academic research related to this topic.",
+      },
+    ];
 
     const response: CoherexResponse = {
       query,
@@ -85,9 +110,9 @@ export default async function handler(
       answer:
         parsed.answer ||
         "I couldn't generate a detailed explanation. Please try rephrasing your question.",
-      results: Array.isArray(parsed.results)
+      results: Array.isArray(parsed.results) && parsed.results.length > 0
         ? (parsed.results as Result[])
-        : [],
+        : fallbackResults,
     };
 
     return res.status(200).json(response);
