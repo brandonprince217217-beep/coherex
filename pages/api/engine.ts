@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Groq from "groq-sdk";
+import { groq as sharedGroq } from "../../lib/groq";
 
 const SYSTEM_PROMPT = `You are Thought Protector. Analyze the user's thought and respond ONLY with a raw JSON object — no markdown, no code fences, no extra text before or after the JSON.
 
@@ -25,12 +26,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: "thought is required" });
     }
 
-    const resolvedKey = apiKey || process.env.GROQ_API_KEY;
+    const resolvedKey = apiKey || process.env.GROQ_API_KEY || process.env.NEXT_PUBLIC_GROQ_API_KEY;
     if (!resolvedKey) {
       return res.status(503).json({ error: "No Groq API key available" });
     }
 
-    const groq = new Groq({ apiKey: resolvedKey });
+    const envKey = process.env.GROQ_API_KEY || process.env.NEXT_PUBLIC_GROQ_API_KEY;
+    const groq = (envKey && sharedGroq) ? sharedGroq : new Groq({ apiKey: resolvedKey });
 
     const completion = await groq.chat.completions.create({
       model: "llama3-70b-8192",
@@ -58,6 +60,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json(parsed);
   } catch (err) {
     console.error("Engine error:", err);
-    return res.status(500).json({ error: "Engine error." });
+    return res.status(500).json({ error: err instanceof Error ? err.message : "Engine error." });
   }
 }
