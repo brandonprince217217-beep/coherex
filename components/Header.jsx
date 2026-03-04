@@ -46,6 +46,10 @@ export default function Header() {
         <Link href="/pricing" style={linkStyle('/pricing')}>
           Pricing
         </Link>
+
+        <Link href="/thought-protector" style={linkStyle('/thought-protector')}>
+          Thought Protector
+        </Link>
       </nav>
     </header>
   );
