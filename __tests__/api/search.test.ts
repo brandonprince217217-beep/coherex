@@ -144,7 +144,9 @@ describe("POST /api/search", () => {
     await handler(req as any, res as any);
 
     expect(res._getStatusCode()).toBe(500);
-    expect(res._getJSONData()).toEqual({ error: "Invalid AI response format" });
+    const data = res._getJSONData();
+    expect(data.error).toBe("Invalid AI response format");
+    expect(data.raw).toBe("not valid json");
   });
 
   it("parses AI response wrapped in markdown code fences", async () => {
@@ -206,6 +208,31 @@ describe("POST /api/search", () => {
     const data = res._getJSONData();
     expect(Array.isArray(data.results)).toBe(true);
     expect(data.results[0].title).toBe("Test Result");
+  });
+
+  it("returns 3 fallback results when AI omits the results field", async () => {
+    mockCreate.mockResolvedValueOnce({
+      choices: [{ message: { content: validAIResponse } }],
+    });
+
+    const { req, res } = createMocks({
+      method: "POST",
+      body: { query: "why do I self-sabotage?" },
+    });
+
+    await handler(req as any, res as any);
+
+    expect(res._getStatusCode()).toBe(200);
+    const data = res._getJSONData();
+    expect(Array.isArray(data.results)).toBe(true);
+    expect(data.results.length).toBeGreaterThanOrEqual(3);
+    data.results.forEach((r: { title: string; url: string; snippet: string }) => {
+      expect(typeof r.title).toBe("string");
+      expect(typeof r.url).toBe("string");
+      expect(typeof r.snippet).toBe("string");
+      expect(r.title.length).toBeGreaterThan(0);
+      expect(r.url.length).toBeGreaterThan(0);
+    });
   });
 
 

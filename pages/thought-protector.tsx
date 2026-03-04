@@ -18,39 +18,19 @@ export default function ThoughtProtector() {
       const res = await fetch("/api/engine", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: `
-You are Thought Protector.
-
-Analyze the user's thought and return JSON with these fields:
-
-{
-  "predictedNextThought": "",
-  "whyItAppears": "",
-  "patternDetected": "",
-  "protectedThought": "",
-  "reasoning": ""
-}
-
-User thought: "${input}"
-          `,
-        }),
+        body: JSON.stringify({ thought: input }),
       });
 
       const data = await res.json();
 
-      let parsed: any = null;
-
-      try {
-        parsed = JSON.parse(data.reply);
-      } catch {
-        parsed = {
-          error: "Invalid JSON returned from engine.",
-          raw: data.reply,
-        };
+      if (!res.ok) {
+        setResult({
+          error: typeof data.error === "string" ? data.error : "Engine error.",
+          raw: data.raw,
+        });
+      } else {
+        setResult(data);
       }
-
-      setResult(parsed);
     } catch (err) {
       setResult({ error: "Engine failed." });
     }
