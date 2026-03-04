@@ -26,13 +26,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: "thought is required" });
     }
 
-    const resolvedKey = apiKey || process.env.GROQ_API_KEY || process.env.NEXT_PUBLIC_GROQ_API_KEY;
+    const resolvedKey = apiKey || process.env.GROQ_API_KEY;
     if (!resolvedKey) {
-      return res.status(503).json({ error: "No Groq API key available" });
+      return res.status(503).json({ error: "No Groq API key available. Set GROQ_API_KEY in your environment or supply apiKey in the request body." });
     }
 
-    const envKey = process.env.GROQ_API_KEY || process.env.NEXT_PUBLIC_GROQ_API_KEY;
-    const groq = (envKey && sharedGroq) ? sharedGroq : new Groq({ apiKey: resolvedKey });
+    const groq = (!apiKey && sharedGroq) ? sharedGroq : new Groq({ apiKey: resolvedKey });
 
     const completion = await groq.chat.completions.create({
       model: "llama3-70b-8192",

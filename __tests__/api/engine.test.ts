@@ -82,7 +82,7 @@ describe("POST /api/engine", () => {
     });
     await handler(req as any, res as any);
     expect(res._getStatusCode()).toBe(503);
-    expect(res._getJSONData()).toEqual({ error: "No Groq API key available" });
+    expect(res._getJSONData()).toEqual({ error: "No Groq API key available. Set GROQ_API_KEY in your environment or supply apiKey in the request body." });
   });
 
   it("accepts thought field and uses body apiKey", async () => {
