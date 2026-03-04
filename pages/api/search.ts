@@ -79,6 +79,19 @@ export default async function handler(
       return res.status(500).json({ error: "Invalid AI response format", raw: rawContent });
     }
 
+    // Normalize potential snake_case keys from the model to camelCase
+    const normalized = {
+      beliefType: parsed.beliefType ?? (parsed as any).belief_type,
+      emotionalCharge: parsed.emotionalCharge ?? (parsed as any).emotional_charge,
+      coreNeed: parsed.coreNeed ?? (parsed as any).core_need,
+      hiddenAssumption: parsed.hiddenAssumption ?? (parsed as any).hidden_assumption,
+      contradiction: parsed.contradiction ?? (parsed as any).contradiction,
+      rewrite: parsed.rewrite ?? (parsed as any).rewrite,
+      nextQuestion: parsed.nextQuestion ?? (parsed as any).next_question,
+      answer: parsed.answer ?? (parsed as any).answer,
+      results: parsed.results ?? (parsed as any).results,
+    };
+
     const fallbackResults: Result[] = [
       {
         title: `Coherex: ${query}`,
@@ -99,19 +112,19 @@ export default async function handler(
 
     const response: CoherexResponse = {
       query,
-      beliefType: parsed.beliefType || "other",
+      beliefType: normalized.beliefType || "other",
       emotionalCharge:
-        typeof parsed.emotionalCharge === "number" ? parsed.emotionalCharge : 0.5,
-      coreNeed: parsed.coreNeed || "Unknown",
-      hiddenAssumption: parsed.hiddenAssumption || "None identified",
-      contradiction: parsed.contradiction || "None identified",
-      rewrite: parsed.rewrite || query,
-      nextQuestion: parsed.nextQuestion || "What matters most to you here?",
+        typeof normalized.emotionalCharge === "number" ? normalized.emotionalCharge : 0.5,
+      coreNeed: normalized.coreNeed || "Unknown",
+      hiddenAssumption: normalized.hiddenAssumption || "None identified",
+      contradiction: normalized.contradiction || "None identified",
+      rewrite: normalized.rewrite || query,
+      nextQuestion: normalized.nextQuestion || "What matters most to you here?",
       answer:
-        parsed.answer ||
+        normalized.answer ||
         "I couldn't generate a detailed explanation. Please try rephrasing your question.",
-      results: Array.isArray(parsed.results) && parsed.results.length > 0
-        ? (parsed.results as Result[])
+      results: Array.isArray(normalized.results) && normalized.results.length > 0
+        ? (normalized.results as Result[])
         : fallbackResults,
     };
 
