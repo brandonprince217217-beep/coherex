@@ -11,7 +11,7 @@ type EngineResult = {
 
 export default function EnginePage() {
   const [apiKey, setApiKey] = useState("");
-  const [query, setQuery] = useState("");
+  const [thought, setThought] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<EngineResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +26,7 @@ export default function EnginePage() {
       const res = await fetch("/api/engine", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query, apiKey }),
+        body: JSON.stringify({ thought, apiKey }),
       });
 
       const data = await res.json();
@@ -60,8 +60,8 @@ export default function EnginePage() {
         />
 
         <textarea
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          value={thought}
+          onChange={(e) => setThought(e.target.value)}
           placeholder='e.g. "I feel sad and stuck and like nothing will ever change."'
           rows={4}
           style={{ padding: "8px", borderRadius: "6px", background: "#020617", color: "white", border: "1px solid #1f2937" }}
@@ -69,14 +69,14 @@ export default function EnginePage() {
 
         <button
           type="submit"
-          disabled={loading || !apiKey || !query}
+          disabled={loading || !apiKey || !thought}
           style={{
             padding: "10px",
             borderRadius: "999px",
-            background: loading || !apiKey || !query ? "#4b5563" : "#2563eb",
+            background: loading || !apiKey || !thought ? "#4b5563" : "#2563eb",
             color: "white",
             fontWeight: 600,
-            cursor: loading || !apiKey || !query ? "not-allowed" : "pointer",
+            cursor: loading || !apiKey || !thought ? "not-allowed" : "pointer",
           }}
         >
           {loading ? "Analyzing..." : "Analyze"}

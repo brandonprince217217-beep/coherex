@@ -1,8 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Groq from "groq-sdk";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
 const SYSTEM_PROMPT = `You are Thought Protector. Analyze the user's thought and respond ONLY with a raw JSON object — no markdown, no code fences, no extra text before or after the JSON.
 
 The JSON must have exactly these fields:
@@ -20,17 +18,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { thought } = req.body;
+    const { thought, query, apiKey } = req.body;
+    const input = thought || query;
 
-    if (!thought || typeof thought !== "string") {
+    if (!input || typeof input !== "string") {
       return res.status(400).json({ error: "thought is required" });
     }
+
+    const resolvedKey = apiKey || process.env.GROQ_API_KEY;
+    if (!resolvedKey) {
+      return res.status(503).json({ error: "No Groq API key available" });
+    }
+
+    const groq = new Groq({ apiKey: resolvedKey });
 
     const completion = await groq.chat.completions.create({
       model: "llama3-70b-8192",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: thought },
+        { role: "user", content: input },
       ],
       temperature: 0.2,
     });
