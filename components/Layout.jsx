@@ -1,13 +1,16 @@
 import dynamic from 'next/dynamic';
 import Header from './Header';
 import Footer from './Footer';
+import BrainBackground from './BrainBackground';
 
-const SpaceBackground = dynamic(() => import('./SpaceBackground'), { ssr: false });
+// Optionally: keep SpaceBackground for fallback/cosmic vibes
+// const SpaceBackground = dynamic(() => import('./SpaceBackground'), { ssr: false });
 
 export default function Layout({ children }) {
   return (
     <>
-      <SpaceBackground />
+      <BrainBackground />
+      {/* <SpaceBackground /> */}
       <div style={{ 
         position: 'relative', 
         width: '100%', 
