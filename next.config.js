@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
+  basePath: '/coherex',
+  assetPrefix: '/coherex/',
   async headers() {
     return [
       {
