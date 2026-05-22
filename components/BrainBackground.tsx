@@ -1,53 +1,50 @@
-import React, { Suspense, useRef } from "react";
+import React, { useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, MeshDistortMaterial } from "@react-three/drei";
+import { OrbitControls, useGLTF } from "@react-three/drei";
 
-// Simple sphere brain-like placeholder. For full realism, replace with a brain GLTF/GLB model using drei's <Suspense> and <useGLTF> if desired.
-function BrainMesh() {
-  const mesh = useRef<any>();
-  // Animate slight breathing effect
+function BrainModel() {
+  const group = useRef<any>();
+  const { scene } = useGLTF("/models/brain.glb");
+
+  // Gentle breathing animation
   useFrame(({ clock }) => {
-    if (mesh.current) {
-      mesh.current.scale.x = 1 + Math.sin(clock.getElapsedTime()) * 0.04;
-      mesh.current.scale.y = 1 + Math.cos(clock.getElapsedTime() * 0.9) * 0.04;
+    const t = clock.getElapsedTime();
+    if (group.current) {
+      const scale = 1 + Math.sin(t * 1.5) * 0.03;
+      group.current.scale.set(scale, scale, scale);
+      group.current.rotation.y = t * 0.15;
     }
   });
-  return (
-    <mesh ref={mesh} position={[0, 0, 0]} castShadow receiveShadow>
-      <sphereGeometry args={[1.7, 64, 64]} />
-      <MeshDistortMaterial
-        distort={0.47}
-        speed={2}
-        color="#e6e7ec"
-        roughness={0.36}
-        metalness={0.15}
-        transparent={true}
-        opacity={0.97}
-      />
-    </mesh>
-  );
+
+  return <primitive ref={group} object={scene} position={[0, 0, 0]} />;
 }
 
 export default function BrainBackground() {
   return (
-    <div style={{
-      position: "fixed",
-      top: 0,
-      left: 0,
-      width: "100vw",
-      height: "100vh",
-      zIndex: 0,
-      pointerEvents: "none",
-      background: "radial-gradient(ellipse at center, #0a0a14 70%, #24244a 100%)",
-    }}>
-      <Canvas camera={{ position: [0, 0, 5], fov: 60 }} gl={{ alpha: true }}>
-        <ambientLight intensity={0.4} />
-        <pointLight position={[4, 9, 5]} intensity={0.7} />
-        <Suspense fallback={null}>
-          <BrainMesh />
-        </Suspense>
-        <OrbitControls enableZoom={false} enablePan={false} maxPolarAngle={Math.PI/1.6} minPolarAngle={Math.PI/2.6} />
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        zIndex: 0,
+        pointerEvents: "none",
+        background:
+          "radial-gradient(ellipse at center, #0a0a14 70%, #24244a 100%)",
+      }}
+    >
+      <Canvas camera={{ position: [0, 0, 4], fov: 55 }}>
+        <ambientLight intensity={0.6} />
+        <pointLight position={[4, 6, 5]} intensity={1.2} />
+        <React.Suspense fallback={null}>
+          <BrainModel />
+        </React.Suspense>
+        <OrbitControls enableZoom={false} enablePan={false} />
       </Canvas>
     </div>
   );
 }
+
+// Required for GLTF loading
+useGLTF.preload("/models/brain.glb");
