@@ -3,8 +3,7 @@ import Link from "next/link";
 
 export default function Layout({ children }) {
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      
+    <div className="app-shell">
       {/* Header */}
       <header
         style={{
@@ -28,23 +27,17 @@ export default function Layout({ children }) {
         </Link>
 
         <nav style={{ display: "flex", gap: "20px" }}>
-          <Link href="/" className="footer-link">
-            Home
-          </Link>
-          <Link href="/about" className="footer-link">
-            About
-          </Link>
-          <Link href="/chat" className="footer-link">
-            Chat
-          </Link>
-          <Link href="/search?q=coherex" className="footer-link">
-            Search
-          </Link>
+          <Link href="/" className="footer-link">Home</Link>
+          <Link href="/about" className="footer-link">About</Link>
+          <Link href="/chat" className="footer-link">Chat</Link>
+          <Link href="/search?q=coherex" className="footer-link">Search</Link>
         </nav>
       </header>
 
       {/* Page Content */}
-      <main style={{ flex: 1, paddingTop: "80px" }}>{children}</main>
+      <main style={{ paddingTop: "80px", minHeight: "100vh" }}>
+        {children}
+      </main>
 
       {/* Footer */}
       <footer className="footer">
@@ -55,15 +48,9 @@ export default function Layout({ children }) {
           </div>
 
           <div className="footer-right">
-            <Link href="/about" className="footer-link">
-              About
-            </Link>
-            <Link href="/chat" className="footer-link">
-              Chat
-            </Link>
-            <Link href="/search?q=coherex" className="footer-link">
-              Search
-            </Link>
+            <Link href="/about" className="footer-link">About</Link>
+            <Link href="/chat" className="footer-link">Chat</Link>
+            <Link href="/search?q=coherex" className="footer-link">Search</Link>
           </div>
         </div>
       </footer>
