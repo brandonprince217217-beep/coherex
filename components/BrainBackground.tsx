@@ -1,23 +1,6 @@
-import React, { useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, useGLTF } from "@react-three/drei";
-
-function BrainModel() {
-  const group = useRef<any>();
-  const { scene } = useGLTF("/models/brain.glb");
-
-  // Gentle breathing animation
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
-    if (group.current) {
-      const scale = 1 + Math.sin(t * 1.5) * 0.03;
-      group.current.scale.set(scale, scale, scale);
-      group.current.rotation.y = t * 0.15;
-    }
-  });
-
-  return <primitive ref={group} object={scene} position={[0, 0, 0]} />;
-}
+import React from "react";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
 
 export default function BrainBackground() {
   return (
@@ -37,14 +20,11 @@ export default function BrainBackground() {
       <Canvas camera={{ position: [0, 0, 4], fov: 55 }}>
         <ambientLight intensity={0.6} />
         <pointLight position={[4, 6, 5]} intensity={1.2} />
-        <React.Suspense fallback={null}>
-          <BrainModel />
-        </React.Suspense>
+
+        {/* Removed BrainModel completely */}
+
         <OrbitControls enableZoom={false} enablePan={false} />
       </Canvas>
     </div>
   );
 }
-
-// Required for GLTF loading
-useGLTF.preload("/models/brain.glb");
