@@ -1,5 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 import React, { useEffect, useState, useCallback } from "react";
+import BrainBackground from "../components/BrainBackground";
 import Constellation from "../components/Constellation";
 import InputBar from "../components/InputBar";
 import Layout from "../components/Layout";
@@ -97,7 +98,15 @@ export default function HomePage() {
 
   return (
     <Layout>
+
+      {/* ⭐ Brain Background Activated */}
+      <div className="absolute inset-0 -z-10">
+        <BrainBackground />
+      </div>
+
+      {/* Optional: keep Constellation layered above BrainBackground */}
       <Constellation />
+
       <div className="home-page">
         <section className="hero">
           <h1>Coherex Cognitive Field</h1>
