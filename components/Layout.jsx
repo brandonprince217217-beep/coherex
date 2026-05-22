@@ -1,9 +1,28 @@
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import BrainBackground from "./BrainBackground";
+import Constellation from "./Constellation";
 
 export default function Layout({ children }) {
+  const router = useRouter();
+
+  // Only show background on homepage
+  const showBackground = router.pathname === "/";
+
   return (
-    <div className="app-shell">
+    <div className="app-shell" style={{ position: "relative", minHeight: "100vh" }}>
+      
+      {/* ⭐ Background layers restored */}
+      {showBackground && (
+        <>
+          <div className="absolute inset-0 -z-10">
+            <BrainBackground />
+          </div>
+          <Constellation />
+        </>
+      )}
+
       {/* Header */}
       <header
         style={{
@@ -35,12 +54,12 @@ export default function Layout({ children }) {
       </header>
 
       {/* Page Content */}
-      <main style={{ paddingTop: "80px", minHeight: "100vh" }}>
+      <main style={{ paddingTop: "80px", minHeight: "100vh", position: "relative", zIndex: 2 }}>
         {children}
       </main>
 
       {/* Footer */}
-      <footer className="footer">
+      <footer className="footer" style={{ position: "relative", zIndex: 2 }}>
         <div className="footer-inner">
           <div className="footer-left">
             <div className="footer-logo">CX</div>
